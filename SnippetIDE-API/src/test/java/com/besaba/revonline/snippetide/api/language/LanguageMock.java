@@ -22,7 +22,7 @@ public class LanguageMock implements Language {
     return EnumSet.of(EventKind.COMPILE_START);
   }
 
-  public boolean receiveEvent(Event event) {
+  public boolean receiveEvent(Event<?> event) {
     return false;
   }
 }

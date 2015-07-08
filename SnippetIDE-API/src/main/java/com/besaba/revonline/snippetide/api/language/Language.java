@@ -46,9 +46,6 @@ public interface Language {
    * which contains all the event-classes
    * that you want to receive.
    *
-   * Remember to include in the Set only
-   * the classes which are inside the
-   * events pacakge!
    *
    * @return The set with the events the language should listen
    */
@@ -66,6 +63,15 @@ public interface Language {
    *    <li>
    *      Check if it's for you. You will receive the event even if the user
    *      is not writing code with this language.
+   *
+   *      You should check if it's for you by using the .getTarget() method.
+   *      Language classes are singletons so you should do:
+   *
+   *      <code>
+   *        if (event.getTarget() == this) {
+   *          // this is for me, execute!
+   *        }
+   *      </code>
    *    </li>
    *    <li>
    *      If it's for you, continue by casting the event parameter
@@ -83,8 +89,10 @@ public interface Language {
    *
    *  </ol>
    *
+   * @see Event
+   *
    * @param event The event sended
    * @return If you have handled correctly the event return true
    */
-  boolean receiveEvent(final Event event);
+  boolean receiveEvent(final Event<?> event);
 }
