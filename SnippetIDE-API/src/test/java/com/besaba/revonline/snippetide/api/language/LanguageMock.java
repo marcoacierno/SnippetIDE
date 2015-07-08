@@ -18,7 +18,7 @@ public class LanguageMock implements Language {
     return new String[] {"java"};
   }
 
-  public Set<EventKind> registerToEvents() {
+  public Set<EventKind> listenTo() {
     return EnumSet.of(EventKind.COMPILE_START);
   }
 

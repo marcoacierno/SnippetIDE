@@ -53,7 +53,7 @@ public interface Language {
    * @return The set with the events the language should listen
    */
   @NotNull
-  Set<EventKind> registerToEvents();
+  Set<EventKind> listenTo();
 
   /**
    * Called when the EventManager receives receives an event
