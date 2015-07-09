@@ -56,12 +56,19 @@ public class Boot {
   }
 
   private static void createDirectories(final Path applicationPath) {
-    final Path pluginPath = Paths.get(applicationPath.toAbsolutePath().toString(), "plugins");
+    final Path[] pathsToCreate = {
+        Paths.get(applicationPath.toAbsolutePath().toString(), "plugins"),
+        Paths.get(applicationPath.toAbsolutePath().toString(), "temp"),
+        Paths.get(applicationPath.toAbsolutePath().toString(), "temp", "sources"),
+        Paths.get(applicationPath.toAbsolutePath().toString(), "temp", "output"),
+    };
 
-    try {
-      Files.createDirectories(pluginPath);
-    } catch (IOException e) {
-      throw new BootFailedException(e);
+    for (final Path path : pathsToCreate) {
+      try {
+        Files.createDirectories(path);
+      } catch (IOException e) {
+        throw new BootFailedException(e);
+      }
     }
   }
 
