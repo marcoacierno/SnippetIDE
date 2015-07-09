@@ -1,15 +1,49 @@
 package com.besaba.revonline.snippetide.api.language;
 
-import com.besaba.revonline.snippetide.api.events.Event;
-import com.besaba.revonline.snippetide.api.events.EventKind;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Define a language.
  *
- * The IDE supports the compiling of a snippet and the executing of it.
+ * The IDE is event-based for every action, for example when
+ * the user wants to compile a snippet the application will
+ * send an event that you should receive, execute the action
+ * and send back the result using an event.
+ *
+ * It uses Guava's EventBus (wrapped inside an EventManager)
+ * inside your class you should create a method with the
+ * \@Subscribe annotation and with only one parameter
+ * which should be the event you want to receive.
+ *
+ * For example, if you want to know if a user wants
+ * to compile the snippet you can use this code
+ *
+ * <code>
+ *   @-Subscribe
+ *   public void compileSnippetEvent(final CompileStartEvent event) {
+ *     // You will receive every event, but you should check if it's
+ *     // for you.
+ *
+ *     if (event.getTarget() != this) {
+ *       return;
+ *     }
+ *
+ *     // ..
+ *     // compile the source (CompileStartEvent has everything you need)
+ *     // ..
+ *
+ *     // send CompileFinished event to inform the IDE
+ *     eventManager.post(new CompileFinishedEvent(this));
+ *   }
+ * </code>
+ *
+ * The method compileSnippetEvent will be invoked when the
+ * CompileStartEvent is propagated.
+ *
+ * @see com.google.common.eventbus.Subscribe
+ * @see com.besaba.revonline.snippetide.api.events.manager.EventManager
  */
 public interface Language {
   /**
@@ -29,70 +63,11 @@ public interface Language {
    *         For example in Java you can return:
    *
    *         <code>
-   *           return Collections.singletonList("java");
+   *           return new String[] {"java"};
    *         </code>
    *
    *         You cannot return null from this method.
    */
   @NotNull
   String[] getExtensions();
-
-  /**
-   * The entire IDE uses events to communicate
-   * between his parts. Every action of the user
-   * is derived using events.
-   *
-   * You should use this method to return a set
-   * which contains all the event-classes
-   * that you want to receive.
-   *
-   *
-   * @return The set with the events the language should listen
-   */
-  @NotNull
-  Set<EventKind> listenTo();
-
-  /**
-   * Called when the EventManager receives receives an event
-   * and this language is registered to receive it.
-   *
-   * Here you should do:
-   *
-   *  <ol>
-   *    <li>Check what is the type of the event (by using the getType method)</li>
-   *    <li>
-   *      Check if it's for you. You will receive the event even if the user
-   *      is not writing code with this language.
-   *
-   *      You should check if it's for you by using the .getTarget() method.
-   *      Language classes are singletons so you should do:
-   *
-   *      <code>
-   *        if (event.getTarget() == this) {
-   *          // this is for me, execute!
-   *        }
-   *      </code>
-   *    </li>
-   *    <li>
-   *      If it's for you, continue by casting the event parameter
-   *      to the correct type for the event.
-   *
-   *      For example, if it's a COMPILE_START event you should cast
-   *      event to CompileStartEvent. By casting it you will get
-   *      specific information about the event. In the
-   *      COMPILE_START event you could have the location of the
-   *      source file etc.
-   *
-   *      Otherwise, just stop here and return false.
-   *    </li>
-   *    <li>Now you have the information about the action you need to do, just do the job.</li>
-   *
-   *  </ol>
-   *
-   * @see Event
-   *
-   * @param event The event sended
-   * @return If you have handled correctly the event return true
-   */
-  boolean receiveEvent(final Event<?> event);
 }

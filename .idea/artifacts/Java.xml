@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Java">
+    <output-path>$PROJECT_DIR$/SnippetIDE/plugins</output-path>
+    <root id="archive" name="JavaLang.jar">
+      <element id="module-output" name="JavaLang" />
+      <element id="file-copy" path="$PROJECT_DIR$/JavaLang/manifest.json" />
+    </root>
+  </artifact>
+</component>

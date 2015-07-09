@@ -1,7 +1,6 @@
 package com.besaba.revonline.snippetide.api.events;
 
 public abstract class Event<T> {
-  private boolean handled;
   private T target;
 
   protected Event(T target) {
@@ -11,14 +10,4 @@ public abstract class Event<T> {
   public T getTarget() {
     return target;
   }
-
-  public boolean getHandled() {
-    return handled;
-  }
-
-  public void setHandled(boolean handled) {
-    this.handled = handled;
-  }
-
-  public abstract EventKind getType();
 }
