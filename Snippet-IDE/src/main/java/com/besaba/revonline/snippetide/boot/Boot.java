@@ -24,8 +24,20 @@ import java.nio.file.attribute.BasicFileAttributes;
  * Prepare the application
  */
 public class Boot {
-  private volatile static boolean booted;
+  private static final Path APPLICATION_PATH = Paths.get( System.getProperty("user.dir") , "SnippetIDE" );
+
+  private volatile boolean booted;
   private static final Logger logger = Logger.getLogger(Boot.class);
+  private static final Path[] pathsToCreate = {
+      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "plugins"),
+      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "temp"),
+      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "temp", "sources"),
+      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "temp", "output"),
+  };
+
+  public IDEApplication boot() {
+    return boot(APPLICATION_PATH);
+  }
 
   /**
    * Prepare and initialize everything inside the application.
@@ -35,7 +47,7 @@ public class Boot {
    * @throws IllegalStateException This method can be invoked only one time, if you try to invoke
    *                               it again it will throw this exception
    */
-  public static IDEApplication boot(final Path applicationPath) {
+  public IDEApplication boot(final Path applicationPath) {
     if (booted) {
       throw new IllegalStateException("Application already started");
     }
@@ -56,12 +68,7 @@ public class Boot {
   }
 
   private static void createDirectories(final Path applicationPath) {
-    final Path[] pathsToCreate = {
-        Paths.get(applicationPath.toAbsolutePath().toString(), "plugins"),
-        Paths.get(applicationPath.toAbsolutePath().toString(), "temp"),
-        Paths.get(applicationPath.toAbsolutePath().toString(), "temp", "sources"),
-        Paths.get(applicationPath.toAbsolutePath().toString(), "temp", "output"),
-    };
+
 
     for (final Path path : pathsToCreate) {
       try {
@@ -96,5 +103,13 @@ public class Boot {
     }
 
     logger.info("Loaded " + pluginManager.getPluginsCount() + " plugin(s)");
+  }
+
+  public void unboot() {
+    unboot(APPLICATION_PATH);
+  }
+
+  public void unboot(final Path applicationPath) {
+
   }
 }

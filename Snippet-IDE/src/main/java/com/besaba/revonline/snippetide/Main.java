@@ -10,19 +10,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Main extends Application {
-  private static final Path APPLICATION_PATH = Paths.get( System.getProperty("user.dir") , "SnippetIDE" );
+  private final Boot boot = new Boot();
 
   public static void main(String[] args) {
-    Boot.boot(APPLICATION_PATH);
-
     Application.launch(Main.class, args);
   }
 
   @Override
   public void start(final Stage primaryStage) throws Exception {
+    boot.boot();
+
     final Scene scene = new Scene(FXMLLoader.load(Main.class.getResource("ide.fxml")));
 
     primaryStage.setScene(scene);
     primaryStage.show();
+  }
+
+  @Override
+  public void stop() throws Exception {
+    boot.unboot();
   }
 }
