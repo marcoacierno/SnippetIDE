@@ -19,6 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Prepare the application
@@ -28,13 +31,7 @@ public class Boot {
 
   private volatile boolean booted;
   private static final Logger logger = Logger.getLogger(Boot.class);
-  private static final Path[] pathsToCreate = {
-      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "plugins"),
-      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "temp"),
-      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "temp", "sources"),
-      Paths.get(APPLICATION_PATH.toAbsolutePath().toString(), "temp", "output"),
-  };
-
+  private static List<Path> pathsToCreate;
   public IDEApplication boot() {
     return boot(APPLICATION_PATH);
   }
@@ -68,7 +65,14 @@ public class Boot {
   }
 
   private static void createDirectories(final Path applicationPath) {
+    final String absolutePathString = applicationPath.toAbsolutePath().toString();
 
+    pathsToCreate = new ArrayList<>(Arrays.asList(
+        Paths.get(absolutePathString, "plugins"),
+        Paths.get(absolutePathString, "temp"),
+        Paths.get(absolutePathString, "temp", "sources"),
+        Paths.get(absolutePathString, "temp", "output"))
+    );
 
     for (final Path path : pathsToCreate) {
       try {
