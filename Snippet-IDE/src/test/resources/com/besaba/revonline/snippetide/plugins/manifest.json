@@ -1,0 +1,12 @@
+{
+  "name": "My plugin name",
+  "description": "My description",
+  "version": "1.0",
+  "minSupportedVersion": "0.1",
+  "authors": [
+    "Marco Acierno"
+  ],
+  "languages": [
+    "test.TestLanguage"
+  ]
+}
