@@ -19,6 +19,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -140,5 +143,11 @@ public class JarPluginManager implements PluginManager {
   @Override
   public long getPluginsCount() {
     return plugins.size();
+  }
+
+  @NotNull
+  @Override
+  public List<Plugin> getPlugins() {
+    return Collections.unmodifiableList(new ArrayList<>(plugins.values()));
   }
 }

@@ -3,6 +3,8 @@ package com.besaba.revonline.snippetide.api.plugins;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -45,4 +47,16 @@ public interface PluginManager {
    * @return How many plugins it has loaded
    */
   long getPluginsCount();
+
+  /**
+   * It should return a list of all plugins loaded
+   * by the PluginManager.
+   *
+   * If there are no plugins, an empty list should be returned
+   * not null.
+   *
+   * @return An immutable list of all the plugins loaded by the PluginManager
+   */
+  @NotNull
+  List<Plugin> getPlugins();
 }
