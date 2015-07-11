@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="586.0" prefWidth="930.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:controller="com.besaba.revonline.snippetide.MainController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="586.0" prefWidth="930.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -28,6 +28,6 @@
       </MenuBar>
    </top>
    <center>
-      <TextArea prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <TextArea onKeyPressed="#onKeyPressed" fx:id="codeArea" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

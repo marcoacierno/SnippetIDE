@@ -51,11 +51,18 @@ public class Boot {
 
     logger.info("Boot phase started");
 
-    createDirectories(applicationPath);
-
     final EventManager eventManager = new EventBusEventManager();
     final PluginManager pluginManager = new JarPluginManager();
-    final IDEApplication application = new IDEApplicationImpl(eventManager, pluginManager);
+    final String applicationPathAsString = applicationPath.toString();
+    final IDEApplication application = new IDEApplicationImpl(
+        eventManager,
+        pluginManager,
+        applicationPath,
+        Paths.get(applicationPathAsString, "plugins")
+    );
+
+    createDirectories(application);
+
     IDEApplicationLauncher.createApplication(application);
 
     loadPlugins(pluginManager, applicationPath);
@@ -64,15 +71,11 @@ public class Boot {
     return application;
   }
 
-  private static void createDirectories(final Path applicationPath) {
-    final String absolutePathString = applicationPath.toAbsolutePath().toString();
-
+  private static void createDirectories(final IDEApplication applicationPath) {
     pathsToCreate = new ArrayList<>(Arrays.asList(
-        Paths.get(absolutePathString, "plugins"),
-        Paths.get(absolutePathString, "temp"),
-        Paths.get(absolutePathString, "temp", "sources"),
-        Paths.get(absolutePathString, "temp", "output"))
-    );
+        applicationPath.getApplicationDirectory(),
+        applicationPath.getPluginsDirectory()
+    ));
 
     for (final Path path : pathsToCreate) {
       try {
