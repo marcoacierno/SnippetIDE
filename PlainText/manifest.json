@@ -1,0 +1,12 @@
+{
+  "name": "Plain Text",
+  "description": "Plugin which adds Plain Text support",
+  "version": "1.0",
+  "minSupportedVersion": "0.1",
+  "authors": [
+    "Marco Acierno"
+  ],
+  "languages": [
+    "com.besaba.revonline.snippetide.lang.plaintext.PlainTextLanguage"
+  ]
+}
