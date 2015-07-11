@@ -43,6 +43,9 @@ public class Boot {
    * @return The booted application
    * @throws IllegalStateException This method can be invoked only one time, if you try to invoke
    *                               it again it will throw this exception
+   * @throws BootFailedException Throw when the boot of the application failed.
+   *                             It can be anything, maybe the boot has failed to create
+   *                             the directories or some configuration files are invalid
    */
   public IDEApplication boot(final Path applicationPath) {
     if (booted) {
@@ -83,7 +86,7 @@ public class Boot {
       try {
         Files.createDirectories(path);
       } catch (IOException e) {
-        throw new BootFailedException(e);
+        throw new BootFailedException("Unable to create application directory: " + path, e);
       }
     }
   }
