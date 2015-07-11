@@ -90,20 +90,19 @@ public class Boot {
       Files.walkFileTree(pluginPath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-
           try {
             pluginManager.loadPlugin(file);
           } catch (UnableToLoadPluginException e) {
             logger.fatal("Unable to load plugin " + e.getFileLocation() + "! The manager is " + e.getPluginManager(), e);
           }
 
-          logger.info("Correctly loaded plugin " + file + "!");
+          logger.info("Loaded plugin " + file + "!");
 
           return FileVisitResult.CONTINUE;
         }
       });
     } catch (IOException e) {
-      logger.fatal("Something went wrong during parsing the plugin directory", e);
+      logger.fatal("Something went wrong during reading the plugin directory", e);
     }
 
     logger.info("Loaded " + pluginManager.getPluginsCount() + " plugin(s)");
