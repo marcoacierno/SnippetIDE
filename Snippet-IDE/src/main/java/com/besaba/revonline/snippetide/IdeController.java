@@ -6,10 +6,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import org.apache.log4j.Logger;
 
-import java.nio.file.Path;
-
-public class MainController {
-  private final static Logger logger = Logger.getLogger(MainController.class);
+public class IdeController {
+  private final static Logger logger = Logger.getLogger(IdeController.class);
 
   @FXML
   private TextArea codeArea;
