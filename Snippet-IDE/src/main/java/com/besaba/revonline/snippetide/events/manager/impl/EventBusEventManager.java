@@ -1,4 +1,4 @@
-package com.besaba.revonline.snippetide.api.events.manager.impl;
+package com.besaba.revonline.snippetide.events.manager.impl;
 
 import com.besaba.revonline.snippetide.api.events.Event;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
