@@ -24,7 +24,7 @@ An example of manifest:
 }
 ```
 
-- **name**: Is the name of the plugin. Plugin names are unique so if two plugins have different names, only one will be
+- **name**: Is the name of the plugin. Plugin names are unique so if two plugins have the same name, only one will be
 loaded.
 - **description**: Description of the plugin
 - **version**: The version of the plugin
