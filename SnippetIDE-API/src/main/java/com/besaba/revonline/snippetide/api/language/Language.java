@@ -50,7 +50,7 @@ public interface Language {
    * @return The name of the language. Used by the IDE in the GUI
    *         when the user wants to create a snippet or in other similar
    *         places.
-   *         You cannot return null,
+   *         You cannot return null.
    */
   @NotNull
   String getName();
