@@ -102,7 +102,9 @@ public class Boot {
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
           try {
             final Plugin plugin = pluginManager.loadPlugin(file);
-            eventManager.registerListener(plugin);
+            // we need to register the languages created by the plugin not the plugin class!
+            plugin.getLanguages().forEach(eventManager::registerListener);
+
           } catch (UnableToLoadPluginException e) {
             logger.fatal("Unable to load plugin " + e.getFileLocation() + "! The manager is " + e.getPluginManager(), e);
           }
