@@ -4,6 +4,7 @@ import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
 import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -40,7 +41,7 @@ public class IdeControllerTest extends ApplicationTest {
 
     final Language randomLanguage = MockLanguage.INSTANCE;
     final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
-    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage) : null);
+    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage, MockPluginManager.plugin) : null);
 
     final Scene scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
     stage.setScene(scene);

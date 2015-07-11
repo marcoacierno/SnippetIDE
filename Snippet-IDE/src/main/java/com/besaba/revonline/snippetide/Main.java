@@ -29,16 +29,17 @@ public class Main extends Application {
 
     final List<Plugin> plugins = ideApplication.getPluginManager().getPlugins();
     Language tempLanguage = null;
+    Plugin firstPlugin = null;
 
     if (plugins.size() > 0) {
-      final Plugin firstPlugin = plugins.get(0);
+      firstPlugin = plugins.get(0);
 
       if (firstPlugin.getLanguages().size() > 0) {
         tempLanguage = firstPlugin.getLanguages().get(0);
       }
     }
 
-    if (tempLanguage == null) {
+    if (tempLanguage == null || firstPlugin == null) {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("Ops");
       alert.setContentText("Ops... Looks like the application doesn't have any language. ");
@@ -48,8 +49,10 @@ public class Main extends Application {
     }
 
     final Language randomLanguage = tempLanguage;
+    final Plugin plugin = firstPlugin;
+
     final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
-    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage) : null);
+    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage, plugin) : null);
 
     final Scene scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
 

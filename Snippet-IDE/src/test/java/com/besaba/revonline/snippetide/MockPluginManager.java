@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MockPluginManager implements PluginManager {
-  private Plugin plugin
+  public static final Plugin plugin
       = new Plugin("Mock", "Mock", Version.parse("0.1"), Version.parse("0.1"), new String[] {"Mock"}, Collections.singletonList(MockLanguage.INSTANCE));
 
   @NotNull

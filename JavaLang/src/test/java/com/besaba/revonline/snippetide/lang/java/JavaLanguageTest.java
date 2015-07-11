@@ -1,7 +1,12 @@
 package com.besaba.revonline.snippetide.lang.java;
 
+import com.besaba.revonline.snippetide.api.application.IDEApplication;
+import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
+import com.besaba.revonline.snippetide.api.events.manager.EventManager;
+import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,12 +17,50 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class JavaLanguageTest {
-  private JavaLanguage language = new JavaLanguage();
+  private JavaLanguage language;
   private Path javaSourceWithOneWarningAndZeroErrors;
   private Path outputDirectory;
 
+  // <editor-fold name="Application">
+  static {
+    IDEApplicationLauncher.createApplication(new IDEApplication() {
+      @NotNull
+      @Override
+      public EventManager getEventManager() {
+        return null;
+      }
+
+      @NotNull
+      @Override
+      public PluginManager getPluginManager() {
+        return null;
+      }
+
+      @NotNull
+      @Override
+      public Path getApplicationDirectory() {
+        return null;
+      }
+
+      @NotNull
+      @Override
+      public Path getPluginsDirectory() {
+        return null;
+      }
+
+      @NotNull
+      @Override
+      public Path getTemporaryDirectory() {
+        return null;
+      }
+    });
+  }
+  // </editor-fold>
+
   @Before
   public void setUp() throws Exception {
+    language = new JavaLanguage();
+
     javaSourceWithOneWarningAndZeroErrors = Paths.get(
         JavaLanguageTest.class.getResource("java_sourcewithonewarningandzeroerrors.java").toURI()
     );

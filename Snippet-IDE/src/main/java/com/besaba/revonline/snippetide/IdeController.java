@@ -10,6 +10,8 @@ import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.plugins.Plugin;
+import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.google.common.eventbus.Subscribe;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -17,11 +19,13 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
+import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
 import org.jetbrains.annotations.NotNull;
@@ -43,13 +47,18 @@ public class IdeController {
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
   @NotNull
-  private final Language language;
-  @FXML
-  private Text languageName;
+  private Language language;
   @NotNull
-  private final EventManager eventManager = IDEApplicationLauncher.getIDEApplication().getEventManager();
+  private Plugin plugin;
+
+  @FXML
+  private ComboBox<PluginLanguage> languagesChoice;
   @NotNull
   private final IDEApplication application = IDEApplicationLauncher.getIDEApplication();
+  @NotNull
+  private final EventManager eventManager = application.getEventManager();
+  @NotNull
+  private final PluginManager pluginManager = application.getPluginManager();
   @FXML
   private TextArea codeArea;
 
@@ -67,15 +76,57 @@ public class IdeController {
   /**
    * @param language What will be the language used by this view?
    */
-  public IdeController(@NotNull final Language language) {
+  public IdeController(@NotNull final Language language,
+                       @NotNull final Plugin plugin) {
     this.language = language;
+    this.plugin = plugin;
   }
 
   public void initialize() {
-    languageName.setText(language.getName());
     eventManager.registerListener(this);
 
+    prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void prepareLanguagesList() {
+    languagesChoice.setCellFactory(param -> new ListCell<PluginLanguage>() {
+      @Override
+      protected void updateItem(final PluginLanguage item, final boolean empty) {
+        super.updateItem(item, empty);
+
+        if (!empty) {
+          setText(item.getLanguage().getName() + " from " + item.getPlugin().getName());
+        } else {
+          setText(null);
+        }
+      }
+    });
+
+    languagesChoice.setConverter(new StringConverter<PluginLanguage>() {
+      @Override
+      public String toString(final PluginLanguage object) {
+        return object.getLanguage().getName() + " from " + object.getPlugin().getName();
+      }
+
+      @Override
+      public PluginLanguage fromString(final String string) {
+        return null;
+      }
+    });
+
+    languagesChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      language = newValue.getLanguage();
+      plugin = newValue.getPlugin();
+    });
+
+    pluginManager.getPlugins().forEach(plugin -> {
+      plugin.getLanguages().forEach(pluginLanguage -> {
+        languagesChoice.getItems().add(new PluginLanguage(pluginLanguage, plugin));
+      });
+    });
+
+    languagesChoice.setValue(new PluginLanguage(language, plugin));
   }
 
   private void prepareCompilationTable() {
@@ -164,6 +215,24 @@ public class IdeController {
       notification.showWarning();
     } else if (compilationResult.failedCompilation()) {
       notification.showError();
+    }
+  }
+
+  private static class PluginLanguage {
+    private Language language;
+    private Plugin plugin;
+
+    public PluginLanguage(final Language language, final Plugin plugin) {
+      this.language = language;
+      this.plugin = plugin;
+    }
+
+    public Language getLanguage() {
+      return language;
+    }
+
+    public Plugin getPlugin() {
+      return plugin;
     }
   }
 }
