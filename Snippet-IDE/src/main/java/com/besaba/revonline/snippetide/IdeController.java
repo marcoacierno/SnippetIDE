@@ -38,6 +38,8 @@ import java.nio.file.StandardOpenOption;
  * The controller of the view ide.fxml
  */
 public class IdeController {
+  public static final String DEFAULT_SNIPPET_FILE_NAME = "Solution";
+
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
   @NotNull
@@ -100,7 +102,7 @@ public class IdeController {
     final String sourceText = codeArea.getText();
     final Path sourceFile = Paths.get(
         application.getTemporaryDirectory().toString(),
-        "temp_source." + language.getExtensions()[0]
+        DEFAULT_SNIPPET_FILE_NAME + "." + language.getExtensions()[0]
     );
 
     if (!tryToWriteSourceToFile(sourceText, sourceFile)) {

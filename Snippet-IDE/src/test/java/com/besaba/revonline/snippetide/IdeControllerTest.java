@@ -53,7 +53,7 @@ public class IdeControllerTest extends ApplicationTest {
         .write("hello world")
         .press(KeyCode.F5);
 
-    final Path savedSourceFile = Paths.get(application.getTemporaryDirectory().toString(), "temp_source.pwn");
+    final Path savedSourceFile = Paths.get(application.getTemporaryDirectory().toString(), IdeController.DEFAULT_SNIPPET_FILE_NAME + ".pwn");
     assertTrue(Files.exists(savedSourceFile));
 
     final StringBuilder content = new StringBuilder();
@@ -82,7 +82,7 @@ public class IdeControllerTest extends ApplicationTest {
 
     assertEquals(MockLanguage.INSTANCE, MockLanguage.INSTANCE.compileStartEvent.getTarget());
     assertEquals(application.getTemporaryDirectory(), MockLanguage.INSTANCE.compileStartEvent.getOutputDirectory());
-    assertEquals(Paths.get(application.getTemporaryDirectory().toString(), "temp_source.pwn"), MockLanguage.INSTANCE.compileStartEvent.getSourceFile());
+    assertEquals(Paths.get(application.getTemporaryDirectory().toString(), IdeController.DEFAULT_SNIPPET_FILE_NAME + ".pwn"), MockLanguage.INSTANCE.compileStartEvent.getSourceFile());
 
     MockLanguage.INSTANCE.compileCalled = false;
     MockLanguage.INSTANCE.compileStartEvent = null;
