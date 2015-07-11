@@ -1,13 +1,27 @@
 package com.besaba.revonline.snippetide;
 
+import com.besaba.revonline.snippetide.api.language.Language;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * The controller of the view ide.fxml
+ */
 public class IdeController {
   private final static Logger logger = Logger.getLogger(IdeController.class);
+  @NotNull
+  private final Language language;
+
+  /**
+   * @param language What will be the language used by this view?
+   */
+  public IdeController(@NotNull final Language language) {
+    this.language = language;
+  }
 
   @FXML
   private TextArea codeArea;

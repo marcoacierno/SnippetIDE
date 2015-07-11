@@ -1,12 +1,18 @@
 package com.besaba.revonline.snippetide;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
+import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
+
+import java.util.List;
 
 public class Main extends Application {
   private final Boot boot = new Boot();
@@ -21,7 +27,31 @@ public class Main extends Application {
     final IDEApplication ideApplication = boot.boot();
     logApplicationStatus(ideApplication);
 
-    final Scene scene = new Scene(FXMLLoader.load(Main.class.getResource("ide.fxml")));
+    final List<Plugin> plugins = ideApplication.getPluginManager().getPlugins();
+    Language tempLanguage = null;
+
+    if (plugins.size() > 0) {
+      final Plugin firstPlugin = plugins.get(0);
+
+      if (firstPlugin.getLanguages().size() > 0) {
+        tempLanguage = firstPlugin.getLanguages().get(0);
+      }
+    }
+
+    if (tempLanguage == null) {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("Ops");
+      alert.setContentText("Ops... Looks like the application doesn't have any language. ");
+      alert.getButtonTypes().add(new ButtonType("Close application"));
+      alert.showAndWait();
+      System.exit(-1);
+    }
+
+    final Language randomLanguage = tempLanguage;
+    final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
+    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage) : null);
+
+    final Scene scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
 
     primaryStage.setScene(scene);
     primaryStage.show();
