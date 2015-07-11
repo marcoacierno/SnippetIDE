@@ -15,3 +15,6 @@ build_script:
   mvn clean package --batch-mode -Dmaven.test.skip=true
 test_script:
   mvn test
+cache:
+  - C:\maven\
+  - C:\Users\appveyor\.m2
