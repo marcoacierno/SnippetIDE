@@ -58,7 +58,8 @@ public class Boot {
         eventManager,
         pluginManager,
         applicationPath,
-        Paths.get(applicationPathAsString, "plugins")
+        Paths.get(applicationPathAsString, "plugins"),
+        Paths.get(applicationPathAsString, "temp")
     );
 
     createDirectories(application);
@@ -74,7 +75,8 @@ public class Boot {
   private static void createDirectories(final IDEApplication applicationPath) {
     final List<Path> pathsToCreate = new ArrayList<>(Arrays.asList(
         applicationPath.getApplicationDirectory(),
-        applicationPath.getPluginsDirectory()
+        applicationPath.getPluginsDirectory(),
+        applicationPath.getTemporaryDirectory()
     ));
 
     for (final Path path : pathsToCreate) {
