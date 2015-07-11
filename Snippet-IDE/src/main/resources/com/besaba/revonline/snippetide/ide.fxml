@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="748.0" prefWidth="1121.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.besaba.revonline.snippetide.IdeController">
    <center>
-      <SplitPane dividerPositions="0.7159663865546219" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+      <SplitPane dividerPositions="0.739193083573487" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
@@ -72,4 +73,11 @@
         </menus>
       </MenuBar>
    </top>
+   <bottom>
+      <ToolBar prefHeight="14.0" prefWidth="1121.0" BorderPane.alignment="CENTER">
+         <items>
+            <Text fx:id="languageName" strokeType="OUTSIDE" strokeWidth="0.0" text="PAWN" />
+         </items>
+      </ToolBar>
+   </bottom>
 </BorderPane>
