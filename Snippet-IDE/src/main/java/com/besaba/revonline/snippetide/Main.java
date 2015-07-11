@@ -53,6 +53,7 @@ public class Main extends Application {
 
     final Scene scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
 
+    primaryStage.setTitle("SnippetIDE");
     primaryStage.setScene(scene);
     primaryStage.show();
   }
