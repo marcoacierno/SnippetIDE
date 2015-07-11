@@ -116,6 +116,6 @@ public class Boot {
   }
 
   public void unboot(final Path applicationPath) {
-
+    logger.info("Unboot phase started");
   }
 }
