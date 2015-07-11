@@ -4,7 +4,8 @@ package com.besaba.revonline.snippetide.boot;
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
-import com.besaba.revonline.snippetide.api.events.manager.impl.EventBusEventManager;
+import com.besaba.revonline.snippetide.api.plugins.Plugin;
+import com.besaba.revonline.snippetide.events.manager.impl.EventBusEventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.UnableToLoadPluginException;
 import com.besaba.revonline.snippetide.application.IDEApplicationImpl;
@@ -69,7 +70,7 @@ public class Boot {
 
     IDEApplicationLauncher.createApplication(application);
 
-    loadPlugins(pluginManager, applicationPath);
+    loadPlugins(pluginManager, applicationPath, eventManager);
 
     booted = true;
     return application;
@@ -92,14 +93,16 @@ public class Boot {
   }
 
   private static void loadPlugins(@NotNull final PluginManager pluginManager,
-                                  @NotNull final Path applicationPath) {
+                                  @NotNull final Path applicationPath,
+                                  @NotNull final EventManager eventManager) {
     final Path pluginPath = Paths.get(applicationPath.toAbsolutePath().toString(), "plugins");
     try {
       Files.walkFileTree(pluginPath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
           try {
-            pluginManager.loadPlugin(file);
+            final Plugin plugin = pluginManager.loadPlugin(file);
+            eventManager.registerListener(plugin);
           } catch (UnableToLoadPluginException e) {
             logger.fatal("Unable to load plugin " + e.getFileLocation() + "! The manager is " + e.getPluginManager(), e);
           }
