@@ -12,6 +12,7 @@ import com.besaba.revonline.snippetide.application.IDEApplicationImpl;
 import com.besaba.revonline.snippetide.plugins.JarPluginManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -34,7 +35,7 @@ public class Boot {
   private static final Logger logger = Logger.getLogger(Boot.class);
 
   public IDEApplication boot() {
-    return boot(APPLICATION_PATH);
+    return boot(APPLICATION_PATH, null, null);
   }
 
   /**
@@ -48,15 +49,23 @@ public class Boot {
    *                             It can be anything, maybe the boot has failed to create
    *                             the directories or some configuration files are invalid
    */
-  public IDEApplication boot(final Path applicationPath) {
+  public IDEApplication boot(@NotNull final Path applicationPath,
+                             @Nullable EventManager eventManager,
+                             @Nullable PluginManager pluginManager) {
     if (booted) {
       throw new IllegalStateException("Application already started");
     }
 
+    if (eventManager == null) {
+      eventManager = new EventBusEventManager();
+    }
+
+    if (pluginManager == null) {
+      pluginManager = new JarPluginManager();
+    }
+
     logger.info("Boot phase started");
 
-    final EventManager eventManager = new EventBusEventManager();
-    final PluginManager pluginManager = new JarPluginManager();
     final String applicationPathAsString = applicationPath.toString();
     final IDEApplication application = new IDEApplicationImpl(
         eventManager,
@@ -127,5 +136,9 @@ public class Boot {
 
   public void unboot(final Path applicationPath) {
     logger.info("Unboot phase started");
+  }
+
+  public boolean isBooted() {
+    return booted;
   }
 }
