@@ -17,15 +17,19 @@ public class IDEApplicationImpl implements IDEApplication {
   private final Path applicationDirectory;
   @NotNull
   private final Path pluginsDirectory;
+  @NotNull
+  private final Path temporaryDirectory;
 
   public IDEApplicationImpl(@NotNull final EventManager eventManager,
                             @NotNull final PluginManager pluginManager,
                             @NotNull final Path applicationDirectory,
-                            @NotNull final Path pluginsDirectory) {
+                            @NotNull final Path pluginsDirectory,
+                            @NotNull final Path temporaryDirectory) {
     this.eventManager = eventManager;
     this.pluginManager = pluginManager;
     this.applicationDirectory = applicationDirectory;
     this.pluginsDirectory = pluginsDirectory;
+    this.temporaryDirectory = temporaryDirectory;
   }
 
   @NotNull
@@ -50,5 +54,11 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public Path getPluginsDirectory() {
     return pluginsDirectory;
+  }
+
+  @NotNull
+  @Override
+  public Path getTemporaryDirectory() {
+    return temporaryDirectory;
   }
 }

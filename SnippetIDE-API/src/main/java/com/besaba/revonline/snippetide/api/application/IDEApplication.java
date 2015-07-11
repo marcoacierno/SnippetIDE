@@ -18,4 +18,7 @@ public interface IDEApplication {
 
   @NotNull
   Path getPluginsDirectory();
+
+  @NotNull
+  Path getTemporaryDirectory();
 }
