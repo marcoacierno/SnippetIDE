@@ -31,7 +31,7 @@ public class Boot {
 
   private volatile boolean booted;
   private static final Logger logger = Logger.getLogger(Boot.class);
-  private static List<Path> pathsToCreate;
+
   public IDEApplication boot() {
     return boot(APPLICATION_PATH);
   }
@@ -72,7 +72,7 @@ public class Boot {
   }
 
   private static void createDirectories(final IDEApplication applicationPath) {
-    pathsToCreate = new ArrayList<>(Arrays.asList(
+    final List<Path> pathsToCreate = new ArrayList<>(Arrays.asList(
         applicationPath.getApplicationDirectory(),
         applicationPath.getPluginsDirectory()
     ));
