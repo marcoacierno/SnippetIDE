@@ -57,8 +57,8 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" text="New" />
-                  <MenuItem mnemonicParsing="false" text="Open" />
+                  <MenuItem onAction="#newFile" mnemonicParsing="false" text="New" />
+                  <MenuItem onAction="#openFile" mnemonicParsing="false" text="Open" />
               <MenuItem mnemonicParsing="false" text="Save copy" onAction="#saveFileCopy" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem onAction="#closeApplication" mnemonicParsing="false" text="Close" />

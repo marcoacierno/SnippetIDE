@@ -19,6 +19,8 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -28,12 +30,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -41,7 +47,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * The controller of the view ide.fxml
@@ -77,21 +83,46 @@ public class IdeController {
   @FXML
   private TableColumn<CompilationProblem, String> compilationTableMessage;
   // </editor-fold>
+  @NotNull
+  private final Optional<Path> originalFile;
 
   /**
    * @param language What will be the language used by this view?
    */
   public IdeController(@NotNull final Language language,
+                       @NotNull final Plugin plugin,
+                       @Nullable final Path originalFile) {
+    this.language = language;
+    this.plugin = plugin;
+    this.originalFile = Optional.ofNullable(originalFile);
+  }
+
+  public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin) {
     this.language = language;
     this.plugin = plugin;
+    this.originalFile = Optional.empty();
   }
 
   public void initialize() {
     eventManager.registerListener(this);
 
+    originalFile.ifPresent(this::loadCodeFromFile);
     prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void loadCodeFromFile(final Path file) {
+    try(final BufferedReader reader = Files.newBufferedReader(file)) {
+      codeArea.clear();
+
+      for(String line; (line = reader.readLine()) != null; ) {
+        codeArea.appendText(line);
+      }
+    } catch (IOException ex) {
+      final Alert alert = new Alert(Alert.AlertType.WARNING, "Unable to copy the file content. The content could be incomplete", ButtonType.OK);
+      alert.showAndWait();
+    }
   }
 
   private void prepareLanguagesList() {
@@ -230,11 +261,18 @@ public class IdeController {
   public void saveFileCopy(ActionEvent actionEvent) {
     final FileChooser fileChooser = new FileChooser();
 
+    final String[] fixedExtensions = Arrays.stream(language.getExtensions()).map(extension -> "*" + extension).toArray(String[]::new);
     fileChooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter(language.getName(), language.getExtensions())
+        new FileChooser.ExtensionFilter(language.getName(), fixedExtensions)
     );
 
-    final Path destination = fileChooser.showSaveDialog(null).toPath();
+    final File tempFile = fileChooser.showSaveDialog(null);
+
+    if (tempFile == null) {
+      return;
+    }
+
+    final Path destination = tempFile.toPath();
 
     if (!tryToWriteSourceToFile(destination)) {
       final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to save content to the file :(", ButtonType.OK);
@@ -244,6 +282,46 @@ public class IdeController {
 
   public void closeApplication(ActionEvent actionEvent) {
     Platform.exit();
+  }
+
+  public void newFile(ActionEvent actionEvent) {
+    openAnotherInstance(null);
+  }
+
+  public void openFile(ActionEvent actionEvent) {
+    final FileChooser fileChooser = new FileChooser();
+
+    final String[] fixedExtensions = Arrays.stream(language.getExtensions()).map(extension -> "*" + extension).toArray(String[]::new);
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(language.getName(), fixedExtensions));
+    final File tempFile = fileChooser.showOpenDialog(null);
+
+    if (tempFile == null) {
+      return;
+    }
+
+    final Path openFile = tempFile.toPath();
+    openAnotherInstance(openFile);
+  }
+
+  private void openAnotherInstance(@Nullable final Path fileToOpen) {
+    final Stage stage = new Stage();
+    final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
+
+    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(language, plugin, fileToOpen) : null);
+
+    final Scene scene;
+
+    try {
+      scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
+    } catch (IOException e) {
+      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to open or create a new instance of the IDE :( Check logs", ButtonType.OK);
+      alert.show();
+      return;
+    }
+
+    stage.setTitle("SnippetIDE " + (fileToOpen == null ? "" : fileToOpen.toString()));
+    stage.setScene(scene);
+    stage.show();
   }
 
   private static class PluginLanguage {
