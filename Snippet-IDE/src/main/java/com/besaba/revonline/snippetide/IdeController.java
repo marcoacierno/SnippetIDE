@@ -142,6 +142,7 @@ public class IdeController {
 
       for(String line; (line = reader.readLine()) != null; ) {
         codeArea.appendText(line);
+        codeArea.appendText(System.lineSeparator());
       }
     } catch (IOException ex) {
       final Alert alert = new Alert(Alert.AlertType.WARNING, "Unable to copy the file content. The content could be incomplete", ButtonType.OK);
