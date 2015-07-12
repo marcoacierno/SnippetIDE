@@ -29,6 +29,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -59,6 +60,9 @@ public class IdeController {
   public static final String DEFAULT_SNIPPET_FILE_NAME = "Solution";
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
+
+  @FXML
+  private TabPane compileAndRunPane;
 
   @FXML
   private TextArea runTextArea;
@@ -232,6 +236,7 @@ public class IdeController {
       return;
     }
 
+    compileAndRunPane.getSelectionModel().select(1);
     eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory()));
   }
 
@@ -265,6 +270,7 @@ public class IdeController {
         .build();
 
     logger.debug("event sent -> " + event);
+    compileAndRunPane.getSelectionModel().select(0);
     eventManager.post(event);
   }
 
