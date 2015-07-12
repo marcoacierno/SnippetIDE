@@ -8,9 +8,13 @@ import com.besaba.revonline.snippetide.api.compiler.CompilationProblemType;
 import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
 import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
+import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
+import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
+import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.io.Files;
 import org.jetbrains.annotations.NotNull;
 
 import javax.tools.Diagnostic;
@@ -21,12 +25,15 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 
 public class JavaLanguage implements Language {
   private final IDEApplication application = IDEApplicationLauncher.getIDEApplication();
+  private Optional<RunStartEvent> runningInformation = Optional.empty();
 
   @NotNull
   public String getName() {
@@ -71,5 +78,40 @@ public class JavaLanguage implements Language {
     final CompilationResult compilationResult = new CompilationResult(listBuilder.build());
 
     application.getEventManager().post(new CompileFinishedEvent(this, compilationResult));
+  }
+
+  @Subscribe
+  public void runSnippetEvent(final RunStartEvent runStartEvent) {
+    final CompileStartEvent compileStartEvent = new CompileStartEventBuilder()
+        .setTarget(this)
+        .setSourceFile(runStartEvent.getSourceFile())
+        .setOutputDirectory(runStartEvent.getTemporaryDirectory())
+        .build();
+
+    runningInformation = Optional.of(runStartEvent);
+    compileSnippetEvent(compileStartEvent);
+  }
+
+  @Subscribe
+  public void compileEndedEvent(final CompileFinishedEvent compileFinishedEvent) {
+    if (!runningInformation.isPresent()) {
+      return;
+    }
+
+    final RunStartEvent runStartEvent = runningInformation.get();
+
+    if (!compileFinishedEvent.getCompilationResult().successfulCompilation()) {
+      return;
+    }
+
+    final Path classFile = Paths.get(
+        Files.getNameWithoutExtension(runStartEvent.getSourceFile().getFileName().toString())
+    );
+
+//    final String command = "\"" + System.getenv("JAVA_HOME") + "\\bin\\java\" " + classFile + " -cp " + runStartEvent.getSourceFile().getParent();
+    final String command = "\"" + "D:\\Program Files\\Java\\jdk1.8.0_45" + "\\bin\\java\" " + classFile + " -cp \"" + runStartEvent.getSourceFile().getParent() + "\"";
+    application.getEventManager().post(new RunInformationEvent(command, runStartEvent));
+
+    runningInformation = Optional.empty();
   }
 }

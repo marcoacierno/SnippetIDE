@@ -10,9 +10,13 @@ import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
+import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
+import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
+import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import com.besaba.revonline.snippetide.run.RunSnippet;
 import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -20,8 +24,6 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -32,7 +34,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
@@ -58,6 +59,9 @@ public class IdeController {
   public static final String DEFAULT_SNIPPET_FILE_NAME = "Solution";
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
+
+  @FXML
+  private TextArea runTextArea;
 
   @NotNull
   private Language language;
@@ -89,6 +93,8 @@ public class IdeController {
   // </editor-fold>
   @NotNull
   private final Optional<Path> originalFile;
+  @NotNull
+  private Optional<RunSnippet> runSnippetThread = Optional.empty();
 
   /**
    * @param language What will be the language used by this view?
@@ -197,13 +203,17 @@ public class IdeController {
         compile();
         break;
       }
+      case F6: {
+        run();
+        break;
+      }
     }
   }
 
-  private void compile() {
-    logger.info("Pressed compile key");
+  private void run() {
+    stopIfAlreadyRunningRunThread();
+    cleanRunTextArea();
 
-    // if the code is too big what will happen?
     final String sourceText = codeArea.getText();
     final Path sourceFile = Paths.get(
         application.getTemporaryDirectory().toString(),
@@ -211,6 +221,29 @@ public class IdeController {
     );
 
     if (!tryToWriteSourceToFile(sourceText, sourceFile)) {
+      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to write file content :(", ButtonType.OK);
+      alert.show();
+      return;
+    }
+
+    eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory()));
+  }
+
+  private void cleanRunTextArea() {
+    runTextArea.clear();
+  }
+
+  // <editor-fold name="Compile events">
+  private void compile() {
+    logger.info("Pressed compile key");
+
+    // if the code is too big what will happen?
+    final Path sourceFile = Paths.get(
+        application.getTemporaryDirectory().toString(),
+        DEFAULT_SNIPPET_FILE_NAME + language.getExtensions()[0]
+    );
+
+    if (!tryToWriteSourceToFile(sourceFile)) {
       return;
     }
 
@@ -276,6 +309,8 @@ public class IdeController {
     }
   }
 
+  // </editor-fold>
+
   public void saveToOriginalPath(ActionEvent actionEvent) {
     if (!originalFile.isPresent()) {
       return;
@@ -335,6 +370,29 @@ public class IdeController {
   private void openAnotherInstance(@Nullable final Path fileToOpen) {
     final IDEInstanceContext ideInstanceContext = new IDEInstanceContext(language, plugin, fileToOpen);
     application.openIdeInstance(ideInstanceContext);
+  }
+
+  @Subscribe
+  public void runInformationResponse(final RunInformationEvent runInformationEvent) {
+    stopIfAlreadyRunningRunThread();
+
+    final RunSnippet runSnippet = new RunSnippet(runInformationEvent, eventManager);
+    runSnippet.start();
+  }
+
+  @Subscribe
+  public void onMessageFromSubprocess(final MessageFromProcess messageFromProcess) {
+    runTextArea.appendText(messageFromProcess.getMessage());
+    runTextArea.appendText(System.lineSeparator());
+  }
+
+  private void stopIfAlreadyRunningRunThread() {
+    if (!runSnippetThread.isPresent()) {
+      return;
+    }
+
+    runSnippetThread.get().stop();
+    runSnippetThread = Optional.empty();
   }
 
   private static class PluginLanguage {

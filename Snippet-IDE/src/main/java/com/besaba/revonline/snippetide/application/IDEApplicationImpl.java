@@ -13,12 +13,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 public class IDEApplicationImpl implements IDEApplication {
+  private final static Logger logger = Logger.getLogger(IDEApplicationImpl.class);
+
   @NotNull
   private final EventManager eventManager;
   @NotNull
@@ -80,8 +83,9 @@ public class IDEApplicationImpl implements IDEApplication {
 
     final Stage stage = new Stage();
     final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
+    final IdeController ideController = new IdeController(language, plugin, fileToOpen);
 
-    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(language, plugin, fileToOpen) : null);
+    loader.setControllerFactory(param -> param == IdeController.class ? ideController : null);
 
     final Scene scene;
 
@@ -92,6 +96,20 @@ public class IDEApplicationImpl implements IDEApplication {
       alert.show();
       return;
     }
+
+    stage.setOnCloseRequest(event -> {
+      logger.debug("IDEController " + ideController + " requested close, unregister controller to eventmanager");
+      eventManager.unregisterListener(ideController);
+    });
+
+    stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      logger.debug("IDEController " + ideController + " has focus? " + newValue);
+      if (newValue) {
+        eventManager.registerListener(ideController);
+      } else {
+        eventManager.unregisterListener(ideController);
+      }
+    });
 
     stage.setTitle("SnippetIDE " + (fileToOpen == null ? "" : fileToOpen.toString()));
     stage.setScene(scene);
