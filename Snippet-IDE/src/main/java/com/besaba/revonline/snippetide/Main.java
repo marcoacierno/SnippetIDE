@@ -6,6 +6,7 @@ import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -46,7 +47,7 @@ public class Main extends Application {
       alert.setContentText("Ops... Looks like the application doesn't have any language. ");
       alert.getButtonTypes().add(new ButtonType("Close application"));
       alert.showAndWait();
-      System.exit(-1);
+      Platform.exit();
     }
 
     final Language randomLanguage = tempLanguage;
