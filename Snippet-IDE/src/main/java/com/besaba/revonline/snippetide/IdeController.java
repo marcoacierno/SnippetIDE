@@ -25,6 +25,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -72,6 +73,8 @@ public class IdeController {
   private final PluginManager pluginManager = application.getPluginManager();
   @FXML
   private TextArea codeArea;
+  @FXML
+  private MenuItem saveToOriginalFile;
 
   // <editor-fold name="Compilation table fields">
   @FXML
@@ -107,9 +110,23 @@ public class IdeController {
   public void initialize() {
     eventManager.registerListener(this);
 
-    originalFile.ifPresent(this::loadCodeFromFile);
+    prepareIdeIfOriginalFileIsPresent();
     prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void prepareIdeIfOriginalFileIsPresent() {
+    final boolean present = originalFile.isPresent();
+
+    saveToOriginalFile.setDisable(!present);
+
+    if (!present) {
+      return;
+    }
+
+    final Path path = this.originalFile.get();
+
+    loadCodeFromFile(path);
   }
 
   private void loadCodeFromFile(final Path file) {
@@ -255,6 +272,17 @@ public class IdeController {
       notification.showWarning();
     } else if (compilationResult.failedCompilation()) {
       notification.showError();
+    }
+  }
+
+  public void saveToOriginalPath(ActionEvent actionEvent) {
+    if (!originalFile.isPresent()) {
+      return;
+    }
+
+    if (!tryToWriteSourceToFile(originalFile.get())) {
+      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to save content to the file :(", ButtonType.OK);
+      alert.show();
     }
   }
 

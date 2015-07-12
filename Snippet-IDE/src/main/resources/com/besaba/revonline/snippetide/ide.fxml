@@ -59,6 +59,8 @@
             <items>
                   <MenuItem onAction="#newFile" mnemonicParsing="false" text="New" />
                   <MenuItem onAction="#openFile" mnemonicParsing="false" text="Open" />
+              <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem mnemonicParsing="false" text="Save to original file" onAction="#saveToOriginalPath" fx:id="saveToOriginalFile" />
               <MenuItem mnemonicParsing="false" text="Save copy" onAction="#saveFileCopy" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem onAction="#closeApplication" mnemonicParsing="false" text="Close" />
