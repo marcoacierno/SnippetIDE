@@ -9,6 +9,7 @@ import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
 import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
+import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
@@ -111,6 +112,7 @@ public class JavaLanguage implements Language {
     final String javaHome = System.getenv("JAVA_HOME");
 
     if (javaHome == null) {
+      application.getEventManager().post(new MessageFromProcess("Unable to run, missing JAVA_HOME variable."));
       return;
     }
 
