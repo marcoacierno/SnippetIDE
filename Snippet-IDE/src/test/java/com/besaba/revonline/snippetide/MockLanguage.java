@@ -22,7 +22,7 @@ public class MockLanguage implements Language {
   @NotNull
   @Override
   public String[] getExtensions() {
-    return new String[] {"pwn"};
+    return new String[] {".pwn"};
   }
 
   @Subscribe

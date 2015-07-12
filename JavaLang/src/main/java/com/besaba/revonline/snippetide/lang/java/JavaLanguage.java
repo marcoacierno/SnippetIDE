@@ -35,7 +35,7 @@ public class JavaLanguage implements Language {
 
   @NotNull
   public String[] getExtensions() {
-    return new String[] {"java"};
+    return new String[] {".java"};
   }
 
   @Subscribe

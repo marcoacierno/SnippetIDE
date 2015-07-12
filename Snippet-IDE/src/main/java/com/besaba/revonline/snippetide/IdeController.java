@@ -15,6 +15,7 @@ import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.google.common.eventbus.Subscribe;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -25,6 +26,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
@@ -37,6 +39,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * The controller of the view ide.fxml
@@ -153,7 +157,7 @@ public class IdeController {
     final String sourceText = codeArea.getText();
     final Path sourceFile = Paths.get(
         application.getTemporaryDirectory().toString(),
-        DEFAULT_SNIPPET_FILE_NAME + "." + language.getExtensions()[0]
+        DEFAULT_SNIPPET_FILE_NAME + language.getExtensions()[0]
     );
 
     if (!tryToWriteSourceToFile(sourceText, sourceFile)) {
@@ -170,14 +174,18 @@ public class IdeController {
     eventManager.post(event);
   }
 
-  private boolean tryToWriteSourceToFile(final String sourceText, final Path sourceFile) {
+  private boolean tryToWriteSourceToFile(final Path destination) {
+    return tryToWriteSourceToFile(codeArea.getText(), destination);
+  }
+
+  private boolean tryToWriteSourceToFile(final String source, final Path destination) {
     try(final BufferedWriter writer = Files.newBufferedWriter(
-        sourceFile,
+        destination,
         StandardCharsets.UTF_8,
         StandardOpenOption.CREATE,
         StandardOpenOption.TRUNCATE_EXISTING)
        ) {
-      writer.write(sourceText);
+      writer.write(source);
     } catch (IOException e) {
       final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to compile the snippet :(", ButtonType.OK);
       alert.showAndWait();
@@ -215,6 +223,21 @@ public class IdeController {
       notification.showWarning();
     } else if (compilationResult.failedCompilation()) {
       notification.showError();
+    }
+  }
+
+  public void saveFileCopy(ActionEvent actionEvent) {
+    final FileChooser fileChooser = new FileChooser();
+
+    fileChooser.getExtensionFilters().add(
+        new FileChooser.ExtensionFilter(language.getName(), language.getExtensions())
+    );
+
+    final Path destination = fileChooser.showSaveDialog(null).toPath();
+
+    if (!tryToWriteSourceToFile(destination)) {
+      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to save content to the file :(", ButtonType.OK);
+      alert.show();
     }
   }
 

@@ -58,12 +58,12 @@ public interface Language {
   /**
    * @return The extensions supported by the language.
    *         Remember to pass just the name of the extension
-   *         without the dot (".").
+   *         with the dot (".").
    *
    *         For example in Java you can return:
    *
    *         <code>
-   *           return new String[] {"java"};
+   *           return new String[] {".java"};
    *         </code>
    *
    *         You cannot return null from this method.
