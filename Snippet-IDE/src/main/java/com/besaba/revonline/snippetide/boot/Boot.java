@@ -33,6 +33,7 @@ public class Boot {
 
   private volatile boolean booted;
   private static final Logger logger = Logger.getLogger(Boot.class);
+  private IDEApplication ideApplication;
 
   public IDEApplication boot() {
     return boot(APPLICATION_PATH, null, null);
@@ -81,6 +82,7 @@ public class Boot {
 
     loadPlugins(pluginManager, applicationPath, eventManager);
 
+    ideApplication = application;
     booted = true;
     return application;
   }
@@ -136,6 +138,30 @@ public class Boot {
 
   public void unboot(final Path applicationPath) {
     logger.info("Unboot phase started");
+
+    try {
+      cleanDirectory(ideApplication.getTemporaryDirectory());
+    } catch (IOException e) {
+      logger.fatal("Unboot failed", e);
+    }
+
+    logger.info("Unboot ended");
+  }
+
+  private void cleanDirectory(final Path temporaryDirectory) throws IOException {
+    Files.walkFileTree(temporaryDirectory, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+        Files.delete(file);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+        Files.delete(dir);
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 
   public boolean isBooted() {
