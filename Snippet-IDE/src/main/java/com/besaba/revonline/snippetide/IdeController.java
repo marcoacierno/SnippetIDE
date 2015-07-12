@@ -2,6 +2,7 @@ package com.besaba.revonline.snippetide;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
+import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblem;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblemType;
 import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
@@ -332,24 +333,8 @@ public class IdeController {
   }
 
   private void openAnotherInstance(@Nullable final Path fileToOpen) {
-    final Stage stage = new Stage();
-    final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
-
-    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(language, plugin, fileToOpen) : null);
-
-    final Scene scene;
-
-    try {
-      scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
-    } catch (IOException e) {
-      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to open or create a new instance of the IDE :( Check logs", ButtonType.OK);
-      alert.show();
-      return;
-    }
-
-    stage.setTitle("SnippetIDE " + (fileToOpen == null ? "" : fileToOpen.toString()));
-    stage.setScene(scene);
-    stage.show();
+    final IDEInstanceContext ideInstanceContext = new IDEInstanceContext(language, plugin, fileToOpen);
+    application.openIdeInstance(ideInstanceContext);
   }
 
   private static class PluginLanguage {

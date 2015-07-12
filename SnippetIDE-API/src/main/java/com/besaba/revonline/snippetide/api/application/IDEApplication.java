@@ -21,4 +21,6 @@ public interface IDEApplication {
 
   @NotNull
   Path getTemporaryDirectory();
+
+  void openIdeInstance(final IDEInstanceContext IdeInstanceContext);
 }

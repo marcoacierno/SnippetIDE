@@ -27,7 +27,6 @@ public class IdeControllerTest extends ApplicationTest {
   private static IDEApplication application;
   private static final Boot boot = new Boot();
 
-
   @Override
   public void start(final Stage stage) throws Exception {
     if (!boot.isBooted()) {
@@ -47,6 +46,8 @@ public class IdeControllerTest extends ApplicationTest {
     stage.setScene(scene);
     stage.show();
   }
+
+  // <editor-fold name="Test if file is written correctly when compile is pressed">
 
   @Test
   public void testTypeTextInsideCodeAreaPressCompileAndCheckIfFileIsWrittenCorrectly() throws Exception {
@@ -88,4 +89,6 @@ public class IdeControllerTest extends ApplicationTest {
     MockLanguage.INSTANCE.compileCalled = false;
     MockLanguage.INSTANCE.compileStartEvent = null;
   }
+  
+  // </editor-fold>
 }

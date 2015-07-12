@@ -1,12 +1,22 @@
 package com.besaba.revonline.snippetide.application;
 
+import com.besaba.revonline.snippetide.IdeController;
+import com.besaba.revonline.snippetide.Main;
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
+import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
+import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class IDEApplicationImpl implements IDEApplication {
   @NotNull
@@ -60,5 +70,31 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public Path getTemporaryDirectory() {
     return temporaryDirectory;
+  }
+
+  @Override
+  public void openIdeInstance(final IDEInstanceContext context) {
+    final Language language = context.getLanguage();
+    final Plugin plugin = context.getPlugin();
+    final Path fileToOpen = context.getOriginalFile();
+
+    final Stage stage = new Stage();
+    final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
+
+    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(language, plugin, fileToOpen) : null);
+
+    final Scene scene;
+
+    try {
+      scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
+    } catch (IOException e) {
+      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to open or create a new instance of the IDE :( Check logs", ButtonType.OK);
+      alert.show();
+      return;
+    }
+
+    stage.setTitle("SnippetIDE " + (fileToOpen == null ? "" : fileToOpen.toString()));
+    stage.setScene(scene);
+    stage.show();
   }
 }

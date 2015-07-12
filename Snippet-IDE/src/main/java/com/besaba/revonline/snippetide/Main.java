@@ -1,6 +1,7 @@
 package com.besaba.revonline.snippetide;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
+import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
@@ -51,14 +52,8 @@ public class Main extends Application {
     final Language randomLanguage = tempLanguage;
     final Plugin plugin = firstPlugin;
 
-    final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
-    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage, plugin) : null);
-
-    final Scene scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
-
-    primaryStage.setTitle("SnippetIDE");
-    primaryStage.setScene(scene);
-    primaryStage.show();
+    final IDEInstanceContext ideInstanceContext = new IDEInstanceContext(randomLanguage, plugin, null);
+    ideApplication.openIdeInstance(ideInstanceContext);
   }
 
   private void logApplicationStatus(final IDEApplication ideApplication) {
