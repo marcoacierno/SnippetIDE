@@ -108,8 +108,14 @@ public class JavaLanguage implements Language {
         Files.getNameWithoutExtension(runStartEvent.getSourceFile().getFileName().toString())
     );
 
-//    final String command = "\"" + System.getenv("JAVA_HOME") + "\\bin\\java\" " + classFile + " -cp " + runStartEvent.getSourceFile().getParent();
-    final String command = "\"" + "D:\\Program Files\\Java\\jdk1.8.0_45" + "\\bin\\java\" " + classFile + " -cp \"" + runStartEvent.getSourceFile().getParent() + "\"";
+    final String javaHome = System.getenv("JAVA_HOME");
+
+    if (javaHome == null) {
+      return;
+    }
+
+    final String command = "\"" + javaHome + "\\bin\\java\" " + classFile + " -cp " + runStartEvent.getSourceFile().getParent();
+//    final String command = "\"" + "D:\\Program Files\\Java\\jdk1.8.0_45" + "\\bin\\java\" " + classFile + " -cp \"" + runStartEvent.getSourceFile().getParent() + "\"";
     application.getEventManager().post(new RunInformationEvent(command, runStartEvent));
 
     runningInformation = Optional.empty();
