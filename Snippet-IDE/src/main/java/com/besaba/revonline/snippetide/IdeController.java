@@ -13,6 +13,7 @@ import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.google.common.eventbus.Subscribe;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -239,6 +240,10 @@ public class IdeController {
       final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to save content to the file :(", ButtonType.OK);
       alert.show();
     }
+  }
+
+  public void closeApplication(ActionEvent actionEvent) {
+    Platform.exit();
   }
 
   private static class PluginLanguage {
