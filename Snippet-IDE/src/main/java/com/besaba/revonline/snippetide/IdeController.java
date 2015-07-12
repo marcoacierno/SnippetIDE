@@ -211,6 +211,11 @@ public class IdeController {
     }
   }
 
+  @FXML
+  private void run(ActionEvent event) {
+    run();
+  }
+
   private void run() {
     stopIfAlreadyRunningRunThread();
     cleanRunTextArea();
@@ -235,6 +240,11 @@ public class IdeController {
   }
 
   // <editor-fold name="Compile events">
+  @FXML
+  private void compile(ActionEvent actionEvent) {
+    compile();
+  }
+
   private void compile() {
     logger.info("Pressed compile key");
 
