@@ -18,6 +18,7 @@ import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.run.RunSnippet;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.io.Files;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -46,7 +47,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -66,6 +66,9 @@ public class IdeController {
 
   @FXML
   private TextArea runTextArea;
+
+  @NotNull
+  private String fileName = DEFAULT_SNIPPET_FILE_NAME;
 
   @NotNull
   private Language language;
@@ -137,11 +140,12 @@ public class IdeController {
 
     final Path path = this.originalFile.get();
 
+    fileName = Files.getNameWithoutExtension(path.getFileName().toString());
     loadCodeFromFile(path);
   }
 
   private void loadCodeFromFile(final Path file) {
-    try(final BufferedReader reader = Files.newBufferedReader(file)) {
+    try(final BufferedReader reader = java.nio.file.Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
       codeArea.clear();
 
       for(String line; (line = reader.readLine()) != null; ) {
@@ -227,7 +231,7 @@ public class IdeController {
     final String sourceText = codeArea.getText();
     final Path sourceFile = Paths.get(
         application.getTemporaryDirectory().toString(),
-        DEFAULT_SNIPPET_FILE_NAME + language.getExtensions()[0]
+        fileName + language.getExtensions()[0]
     );
 
     if (!tryToWriteSourceToFile(sourceText, sourceFile)) {
@@ -256,7 +260,7 @@ public class IdeController {
     // if the code is too big what will happen?
     final Path sourceFile = Paths.get(
         application.getTemporaryDirectory().toString(),
-        DEFAULT_SNIPPET_FILE_NAME + language.getExtensions()[0]
+        fileName + language.getExtensions()[0]
     );
 
     if (!tryToWriteSourceToFile(sourceFile)) {
@@ -279,7 +283,7 @@ public class IdeController {
   }
 
   private boolean tryToWriteSourceToFile(final String source, final Path destination) {
-    try(final BufferedWriter writer = Files.newBufferedWriter(
+    try(final BufferedWriter writer = java.nio.file.Files.newBufferedWriter(
         destination,
         StandardCharsets.UTF_8,
         StandardOpenOption.CREATE,
