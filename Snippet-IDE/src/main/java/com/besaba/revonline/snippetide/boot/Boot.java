@@ -35,6 +35,15 @@ public class Boot {
   private static final Logger logger = Logger.getLogger(Boot.class);
   private IDEApplication ideApplication;
 
+  public Boot() {
+    try {
+      IDEApplicationLauncher.getIDEApplication();
+      booted = true;
+    } catch (IllegalStateException ex) {
+      booted = false;
+    }
+  }
+
   public IDEApplication boot() {
     return boot(APPLICATION_PATH, null, null);
   }
