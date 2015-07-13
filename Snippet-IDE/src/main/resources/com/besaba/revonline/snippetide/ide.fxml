@@ -54,6 +54,9 @@
    </center>
    <top>
       <MenuBar BorderPane.alignment="CENTER">
+        <useSystemMenuBar>
+          true
+        </useSystemMenuBar>
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
