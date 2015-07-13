@@ -78,9 +78,9 @@ public class JarPluginManagerTest {
   @Test
   public void testLoadPluginPassingADirectoryAsFile() throws Exception {
     exception.expect(UnableToLoadPluginException.class);
-    exception.expectMessage("C:\\ is a directory");
+//    exception.expectMessage(JarPluginManagerTest.class.getResource(".").toURI().toString() + " is a directory");
 
-    jarPluginManager.loadPlugin(Paths.get("C:\\"));
+    jarPluginManager.loadPlugin(Paths.get(JarPluginManagerTest.class.getResource(".").toURI()));
   }
 
   @Test
