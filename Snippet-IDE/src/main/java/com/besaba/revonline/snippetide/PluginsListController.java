@@ -5,8 +5,8 @@ import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import com.google.common.escape.Escaper;
+import com.google.common.html.HtmlEscapers;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -74,6 +74,7 @@ public class PluginsListController {
         return;
       }
 
+      final Escaper escaper = HtmlEscapers.htmlEscaper();
       final String script = String.format("var plugin = {\n" +
               "  name: \"%s\",\n" +
               "  description: \"%s\",\n" +
@@ -84,12 +85,12 @@ public class PluginsListController {
               "};" +
               "" +
               "injectData();",
-          plugin.getName(),
-          plugin.getDescription(),
+          escaper.escape(plugin.getName()),
+          escaper.escape(plugin.getDescription()),
           plugin.getVersion().toString(),
           plugin.getMinIdeVersion().toString(),
-          Arrays.stream(plugin.getAuthors()).map(author -> "\"" + author + "\"").reduce("", (acc, nxt) -> nxt + "," + acc),
-          plugin.getLanguages().stream().map(Language::getName).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc)
+          Arrays.stream(plugin.getAuthors()).map(escaper::escape).map(author -> "\"" + author + "\"").reduce("", (acc, nxt) -> nxt + "," + acc),
+          plugin.getLanguages().stream().map(Language::getName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc)
       );
 
       logger.debug("script to inject");
