@@ -75,6 +75,7 @@
           <Menu mnemonicParsing="false" text="?">
             <items>
               <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" text="Show logs" onAction="#showLogs" />
             </items>
           </Menu>
         </menus>

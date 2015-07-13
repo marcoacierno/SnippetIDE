@@ -42,6 +42,7 @@ import org.controlsfx.control.Notifications;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -414,6 +415,16 @@ public class IdeController {
 
     runSnippetThread.get().stop();
     runSnippetThread = Optional.empty();
+  }
+
+  public void showLogs(ActionEvent actionEvent) {
+    try {
+      Desktop.getDesktop().open(new File(System.getProperty("user.dir"), "SnippetIDE" + "\\logs.txt"));
+    } catch (IOException|IllegalArgumentException e) {
+      final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to open log file", ButtonType.OK);
+      alert.show();
+      logger.fatal("Unable to open log file", e);
+    }
   }
 
   private static class PluginLanguage {
