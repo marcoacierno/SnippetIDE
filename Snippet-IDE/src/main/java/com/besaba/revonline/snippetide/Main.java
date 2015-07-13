@@ -29,12 +29,13 @@ public class Main extends Application {
 
   @Override
   public void init() throws Exception {
-    final Path applicationDir = Paths.get(getParameters().getNamed().get("applicationdir"));
+    final String strApplicationDir = getParameters().getNamed().get("applicationdir");
 
-    if (applicationDir == null) {
-      ideApplication = boot.boot();
-    } else {
+    if (strApplicationDir != null) {
+      final Path applicationDir = Paths.get(strApplicationDir);
       ideApplication = boot.boot(applicationDir, null, null);
+    } else {
+      ideApplication = boot.boot();
     }
 
     logApplicationStatus(ideApplication);
