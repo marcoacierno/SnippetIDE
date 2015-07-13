@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SnippetIDE-API">
+    <output-path>$PROJECT_DIR$/out/artifacts/SnippetIDE_API</output-path>
+    <root id="archive" name="SnippetIDE-API.jar">
+      <element id="module-output" name="SnippetIDE-API" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/intellij/annotations/12.0/annotations-12.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/guava/guava/18.0/guava-18.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

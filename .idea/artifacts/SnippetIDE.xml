@@ -1,0 +1,32 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="SnippetIDE">
+    <output-path>$PROJECT_DIR$/out/artifacts/SnippetIDE</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="com.besaba.revonline.snippetide.Main" />
+        <option name="description" value="Application which allows you to compile and run snippets" />
+        <option name="htmlParamFile" value="" />
+        <option name="paramFile" value="" />
+        <option name="title" value="SnippetIDE" />
+        <option name="vendor" value="Marco Acierno" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="Snippet_IDE.jar">
+        <element id="module-output" name="Snippet-IDE" />
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/Snippet-IDE/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="library" level="project" name="Maven: com.google.guava:guava:18.0" />
+        <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.3.1" />
+        <element id="library" level="project" name="Maven: org.controlsfx:controlsfx:8.40.9" />
+        <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
+        <element id="library" level="project" name="Maven: org.controlsfx:openjfx-dialogs:1.0.3" />
+        <element id="library" level="project" name="Maven: com.intellij:annotations:12.0" />
+      </element>
+      <element id="artifact" artifact-name="Java" />
+      <element id="artifact" artifact-name="PlainText" />
+      <element id="artifact" artifact-name="SnippetIDE-API" />
+    </root>
+  </artifact>
+</component>
