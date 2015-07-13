@@ -14,21 +14,34 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Main extends Application {
   private final Boot boot = new Boot();
   private Logger logger = Logger.getLogger(Main.class);
+  private IDEApplication ideApplication;
 
   public static void main(String[] args) {
     Application.launch(Main.class, args);
   }
 
   @Override
-  public void start(final Stage primaryStage) throws Exception {
-    final IDEApplication ideApplication = boot.boot();
-    logApplicationStatus(ideApplication);
+  public void init() throws Exception {
+    final Path applicationDir = Paths.get(getParameters().getNamed().get("applicationdir"));
 
+    if (applicationDir == null) {
+      ideApplication = boot.boot();
+    } else {
+      ideApplication = boot.boot(applicationDir, null, null);
+    }
+
+    logApplicationStatus(ideApplication);
+  }
+
+  @Override
+  public void start(final Stage primaryStage) throws Exception {
     final List<Plugin> plugins = ideApplication.getPluginManager().getPlugins();
     Language tempLanguage = null;
     Plugin firstPlugin = null;
