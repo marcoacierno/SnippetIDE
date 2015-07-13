@@ -48,6 +48,7 @@ public class Main extends Application {
       alert.getButtonTypes().add(new ButtonType("Close application"));
       alert.showAndWait();
       Platform.exit();
+      return;
     }
 
     final Language randomLanguage = tempLanguage;
