@@ -94,6 +94,7 @@ public class IDEApplicationImpl implements IDEApplication {
     } catch (IOException e) {
       final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to open or create a new instance of the IDE :( Check logs", ButtonType.OK);
       alert.show();
+      logger.fatal("Unable to create IDE instance!", e);
       return;
     }
 
