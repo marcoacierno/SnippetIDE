@@ -25,6 +25,8 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -36,6 +38,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
@@ -424,6 +428,20 @@ public class IdeController {
       final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to open log file", ButtonType.OK);
       alert.show();
       logger.fatal("Unable to open log file", e);
+    }
+  }
+
+  public void showPluginsList(ActionEvent actionEvent) {
+    try {
+      final Stage stage = new Stage();
+      final Scene scene = new Scene(FXMLLoader.load(IdeController.class.getResource("pluginslist.fxml")));
+      stage.initModality(Modality.WINDOW_MODAL);
+      stage.initOwner(runTextArea.getScene().getWindow());
+      stage.setScene(scene);
+      stage.show();
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open plugins list", ButtonType.OK).show();
+      logger.error("Failed to open plugins list stage", e);
     }
   }
 
