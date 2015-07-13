@@ -3,3 +3,5 @@
 .idea/datasources.xml
 .idea/libraries
 .idea/dictionary.xml
+out/
+*/target/
