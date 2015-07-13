@@ -127,6 +127,8 @@ public class Boot {
 
           } catch (UnableToLoadPluginException e) {
             logger.fatal("Unable to load plugin " + e.getFileLocation() + "! The manager is " + e.getPluginManager(), e);
+          } catch (Exception e) {
+            logger.fatal("Unable to load plugin " + file + ".", e);
           }
 
           logger.info("Loaded plugin " + file + "!");
