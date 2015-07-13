@@ -39,6 +39,10 @@ public class JarPluginManager implements PluginManager {
       throw new UnableToLoadPluginException(file + " is a directory", file, this);
     }
 
+    if (!com.google.common.io.Files.getFileExtension(file.getFileName().toString()).equals("jar")) {
+      throw new UnableToLoadPluginException(file + " not a jar file", file, this);
+    }
+
     final JarFile jarFile;
 
     try {
