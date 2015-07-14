@@ -96,7 +96,7 @@ public class Boot {
     return application;
   }
 
-  private static void createDirectories(final IDEApplication applicationPath) {
+  private void createDirectories(final IDEApplication applicationPath) {
     final List<Path> pathsToCreate = new ArrayList<>(Arrays.asList(
         applicationPath.getApplicationDirectory(),
         applicationPath.getPluginsDirectory(),
@@ -112,7 +112,7 @@ public class Boot {
     }
   }
 
-  private static void loadPlugins(@NotNull final PluginManager pluginManager,
+  private void loadPlugins(@NotNull final PluginManager pluginManager,
                                   @NotNull final Path applicationPath,
                                   @NotNull final EventManager eventManager) {
     final Path pluginPath = Paths.get(applicationPath.toAbsolutePath().toString(), "plugins");
