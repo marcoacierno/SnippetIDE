@@ -124,14 +124,13 @@ public class Boot {
             final Plugin plugin = pluginManager.loadPlugin(file);
             // we need to register the languages created by the plugin not the plugin class!
             plugin.getLanguages().forEach(eventManager::registerListener);
+            logger.info("Loaded plugin " + file + "!");
 
           } catch (UnableToLoadPluginException e) {
             logger.fatal("Unable to load plugin " + e.getFileLocation() + "! The manager is " + e.getPluginManager(), e);
           } catch (Exception e) {
             logger.fatal("Unable to load plugin " + file + ".", e);
           }
-
-          logger.info("Loaded plugin " + file + "!");
 
           return FileVisitResult.CONTINUE;
         }
