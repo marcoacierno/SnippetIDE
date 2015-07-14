@@ -84,14 +84,13 @@ public class Boot {
         Paths.get(applicationPathAsString, "plugins"),
         Paths.get(applicationPathAsString, "temp")
     );
+    ideApplication = application;
 
     createDirectories();
-
-    IDEApplicationLauncher.createApplication(application);
     loadPlugins(pluginManager, eventManager);
 
-    ideApplication = application;
     booted = true;
+    IDEApplicationLauncher.createApplication(application);
     return application;
   }
 
