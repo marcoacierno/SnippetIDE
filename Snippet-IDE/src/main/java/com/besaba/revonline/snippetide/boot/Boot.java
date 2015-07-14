@@ -84,20 +84,23 @@ public class Boot {
         Paths.get(applicationPathAsString, "plugins"),
         Paths.get(applicationPathAsString, "temp")
     );
-    ideApplication = application;
 
-    createDirectories();
-    booted = true;
+    createDirectories(application);
+
     IDEApplicationLauncher.createApplication(application);
-    loadPlugins(pluginManager, eventManager);
+
+    loadPlugins(pluginManager, applicationPath, eventManager);
+
+    ideApplication = application;
+    booted = true;
     return application;
   }
 
-  private void createDirectories() {
+  private static void createDirectories(final IDEApplication applicationPath) {
     final List<Path> pathsToCreate = new ArrayList<>(Arrays.asList(
-        ideApplication.getApplicationDirectory(),
-        ideApplication.getPluginsDirectory(),
-        ideApplication.getTemporaryDirectory()
+        applicationPath.getApplicationDirectory(),
+        applicationPath.getPluginsDirectory(),
+        applicationPath.getTemporaryDirectory()
     ));
 
     for (final Path path : pathsToCreate) {
@@ -109,15 +112,16 @@ public class Boot {
     }
   }
 
-  private void loadPlugins(@NotNull final PluginManager pluginManager,
-                           @NotNull final EventManager eventManager) {
-    final Path pluginPath = ideApplication.getPluginsDirectory();
+  private static void loadPlugins(@NotNull final PluginManager pluginManager,
+                                  @NotNull final Path applicationPath,
+                                  @NotNull final EventManager eventManager) {
+    final Path pluginPath = Paths.get(applicationPath.toAbsolutePath().toString(), "plugins");
     try {
       Files.walkFileTree(pluginPath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
           try {
-            final Plugin plugin = pluginManager.loadPlugin(file, ideApplication.getVersion());
+            final Plugin plugin = pluginManager.loadPlugin(file);
             // we need to register the languages created by the plugin not the plugin class!
             plugin.getLanguages().forEach(eventManager::registerListener);
 

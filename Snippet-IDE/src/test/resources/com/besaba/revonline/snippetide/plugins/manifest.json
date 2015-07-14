@@ -2,9 +2,11 @@
   "name": "My plugin name",
   "description": "My description",
   "version": "1.0",
-  "minSupportedVersion": "3.0",
+  "minSupportedVersion": "0.1",
   "authors": [
-    "Another guy"
+    "Marco Acierno"
   ],
-  "languages": []
+  "languages": [
+    "test.TestLanguage"
+  ]
 }

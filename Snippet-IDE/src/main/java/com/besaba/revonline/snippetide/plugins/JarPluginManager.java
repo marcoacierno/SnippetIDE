@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -20,6 +19,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +31,10 @@ import java.util.zip.ZipEntry;
 
 public class JarPluginManager implements PluginManager {
   private final ConcurrentMap<String, Plugin> plugins = new ConcurrentHashMap<>();
-  private final static Logger logger = Logger.getLogger(JarPluginManager.class);
 
   @NotNull
   @Override
-  public Plugin loadPlugin(@NotNull final Path file, @NotNull final Version ideVersion) {
+  public Plugin loadPlugin(@NotNull final Path file) {
     if (Files.isDirectory(file)) {
       throw new UnableToLoadPluginException(file + " is a directory", file, this);
     }
@@ -59,12 +59,6 @@ public class JarPluginManager implements PluginManager {
 
     try {
       final Plugin plugin = parseManifest(file, jarFile, manifestEntry);
-
-      if (ideVersion.compareTo(plugin.getMinIdeVersion()) == -1) {
-        logger.warn("Plugin " + plugin.getName() + " is not compatible with the IDE version");
-        throw new UnableToLoadPluginException("Plugin " + plugin.getName() + " doesn't support ide version " + ideVersion, file, this);
-      }
-
       plugins.put(plugin.getName().toLowerCase(), plugin);
       return plugin;
     } catch (IOException e) {

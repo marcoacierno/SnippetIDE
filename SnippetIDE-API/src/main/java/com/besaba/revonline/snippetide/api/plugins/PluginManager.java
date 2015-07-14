@@ -32,7 +32,7 @@ public interface PluginManager {
    *                                     is not a plugin or is invalid
    */
   @NotNull
-  Plugin loadPlugin(@NotNull final Path file, @NotNull final Version ideVersion);
+  Plugin loadPlugin(@NotNull final Path file);
 
   /**
    * Search a plugin by name (There cannot be two plugins with the same name)

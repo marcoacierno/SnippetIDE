@@ -28,7 +28,7 @@ public class MockPluginManager implements PluginManager {
 
   @NotNull
   @Override
-  public Plugin loadPlugin(@NotNull final Path file, @NotNull final Version ideVersion) {
+  public Plugin loadPlugin(@NotNull final Path file) {
     throw new UnsupportedOperationException();
   }
 
