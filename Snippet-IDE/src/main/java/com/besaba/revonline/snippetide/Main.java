@@ -55,7 +55,7 @@ public class Main extends Application {
       }
     }
 
-    if (tempLanguage == null || firstPlugin == null) {
+    if (tempLanguage == null) {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("Ops");
       alert.setContentText("Ops... Looks like the application doesn't have any language. ");
