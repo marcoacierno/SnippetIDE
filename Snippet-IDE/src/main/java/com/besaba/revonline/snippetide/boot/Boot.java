@@ -87,10 +87,9 @@ public class Boot {
     ideApplication = application;
 
     createDirectories();
-    loadPlugins(pluginManager, eventManager);
-
     booted = true;
     IDEApplicationLauncher.createApplication(application);
+    loadPlugins(pluginManager, eventManager);
     return application;
   }
 
