@@ -7,8 +7,6 @@ import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
@@ -20,7 +18,7 @@ import java.util.List;
 
 public class Main extends Application {
   private final Boot boot = new Boot();
-  private Logger logger = Logger.getLogger(Main.class);
+  private static Logger logger = Logger.getLogger(Main.class);
   private IDEApplication ideApplication;
 
   public static void main(String[] args) {
