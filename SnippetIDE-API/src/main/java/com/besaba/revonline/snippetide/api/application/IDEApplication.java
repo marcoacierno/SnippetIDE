@@ -2,6 +2,7 @@ package com.besaba.revonline.snippetide.api.application;
 
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import com.besaba.revonline.snippetide.api.plugins.Version;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -23,4 +24,7 @@ public interface IDEApplication {
   Path getTemporaryDirectory();
 
   void openIdeInstance(final IDEInstanceContext IdeInstanceContext);
+
+  @NotNull
+  Version getVersion();
 }

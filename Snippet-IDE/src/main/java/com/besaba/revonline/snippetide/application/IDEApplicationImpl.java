@@ -8,6 +8,7 @@ import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import com.besaba.revonline.snippetide.api.plugins.Version;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -115,5 +116,11 @@ public class IDEApplicationImpl implements IDEApplication {
     stage.setTitle("SnippetIDE " + (fileToOpen == null ? "" : fileToOpen.toString()));
     stage.setScene(scene);
     stage.show();
+  }
+
+  @NotNull
+  @Override
+  public Version getVersion() {
+    return Version.parse("0.1");
   }
 }
