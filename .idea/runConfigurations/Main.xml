@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Main" type="Application" factoryName="Application" singleton="true" nameIsGenerated="true">
+    <log_file path="$PROJECT_DIR$/SnippetIDE" checked="true" skipped="true" show_all="true" alias="Logs" />
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
       <pattern>
         <option name="PATTERN" value="com.besaba.revonline.snippetide.*" />

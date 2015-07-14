@@ -85,22 +85,21 @@ public class Boot {
         Paths.get(applicationPathAsString, "temp")
     );
 
-    createDirectories(application);
+    createDirectories();
 
     IDEApplicationLauncher.createApplication(application);
-
-    loadPlugins(pluginManager, applicationPath, eventManager);
+    loadPlugins(pluginManager, eventManager);
 
     ideApplication = application;
     booted = true;
     return application;
   }
 
-  private static void createDirectories(final IDEApplication applicationPath) {
+  private void createDirectories() {
     final List<Path> pathsToCreate = new ArrayList<>(Arrays.asList(
-        applicationPath.getApplicationDirectory(),
-        applicationPath.getPluginsDirectory(),
-        applicationPath.getTemporaryDirectory()
+        ideApplication.getApplicationDirectory(),
+        ideApplication.getPluginsDirectory(),
+        ideApplication.getTemporaryDirectory()
     ));
 
     for (final Path path : pathsToCreate) {
@@ -112,16 +111,15 @@ public class Boot {
     }
   }
 
-  private static void loadPlugins(@NotNull final PluginManager pluginManager,
-                                  @NotNull final Path applicationPath,
-                                  @NotNull final EventManager eventManager) {
-    final Path pluginPath = Paths.get(applicationPath.toAbsolutePath().toString(), "plugins");
+  private void loadPlugins(@NotNull final PluginManager pluginManager,
+                           @NotNull final EventManager eventManager) {
+    final Path pluginPath = ideApplication.getPluginsDirectory();
     try {
       Files.walkFileTree(pluginPath, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
           try {
-            final Plugin plugin = pluginManager.loadPlugin(file);
+            final Plugin plugin = pluginManager.loadPlugin(file, ideApplication.getVersion());
             // we need to register the languages created by the plugin not the plugin class!
             plugin.getLanguages().forEach(eventManager::registerListener);
 
