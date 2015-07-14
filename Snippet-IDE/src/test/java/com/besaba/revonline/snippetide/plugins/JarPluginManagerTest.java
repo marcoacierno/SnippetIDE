@@ -11,9 +11,8 @@ import org.junit.rules.ExpectedException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.zip.ZipException;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
@@ -86,8 +85,7 @@ public class JarPluginManagerTest {
   @Test
   public void testLoadPluginPassingATxtFileAsFile() throws Exception {
     exception.expect(UnableToLoadPluginException.class);
-    exception.expectMessage("java.util.zip.ZipException: error in opening zip file");
-    exception.expectCause(is(instanceOf(ZipException.class)));
+    exception.expectMessage(containsString("not a jar file"));
 
     jarPluginManager.loadPlugin(
         Paths.get(JarPluginManagerTest.class.getResource("myfile.txt").toURI())
