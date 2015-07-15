@@ -13,9 +13,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -116,6 +121,47 @@ public class IDEApplicationImpl implements IDEApplication {
     stage.setTitle("SnippetIDE " + (fileToOpen == null ? "" : fileToOpen.toString()));
     stage.setScene(scene);
     stage.show();
+  }
+
+  @Override
+  public void openAboutWindow(@Nullable final Window window) {
+    try {
+      final Stage stage = new Stage();
+
+      final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("."));
+      final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("about.fxml")));
+      scene.getStylesheets().add(IdeController.class.getResource("about.css").toExternalForm());
+
+      ((Text) scene.getRoot().lookup("#versionText")).setText("Version: " + getVersion().toString());
+
+      stage.initStyle(StageStyle.UNDECORATED);
+      stage.initModality(Modality.WINDOW_MODAL);
+      stage.initOwner(window);
+      stage.setResizable(false);
+      stage.setScene(scene);
+
+      stage.show();
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open about window", ButtonType.OK).show();
+      logger.error("Failed to open about window", e);
+    }
+  }
+
+  @Override
+  public void openPluginsList(@Nullable final Window window) {
+    try {
+      final Stage stage = new Stage();
+      final Scene scene = new Scene(FXMLLoader.load(IdeController.class.getResource("pluginslist.fxml")));
+
+      stage.initModality(Modality.WINDOW_MODAL);
+      stage.initOwner(window);
+      stage.setScene(scene);
+
+      stage.show();
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open plugins list", ButtonType.OK).show();
+      logger.error("Failed to open plugins list stage", e);
+    }
   }
 
   @NotNull

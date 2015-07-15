@@ -77,7 +77,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="?">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" text="About" onAction="#showAbout" />
               <MenuItem mnemonicParsing="false" text="Plugins" onAction="#showPluginsList" />
               <MenuItem mnemonicParsing="false" text="Show logs" onAction="#showLogs" />
             </items>

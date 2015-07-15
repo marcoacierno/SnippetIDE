@@ -37,9 +37,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
@@ -432,17 +434,11 @@ public class IdeController {
   }
 
   public void showPluginsList(ActionEvent actionEvent) {
-    try {
-      final Stage stage = new Stage();
-      final Scene scene = new Scene(FXMLLoader.load(IdeController.class.getResource("pluginslist.fxml")));
-      stage.initModality(Modality.WINDOW_MODAL);
-      stage.initOwner(runTextArea.getScene().getWindow());
-      stage.setScene(scene);
-      stage.show();
-    } catch (IOException e) {
-      new Alert(Alert.AlertType.ERROR, "Unable to open plugins list", ButtonType.OK).show();
-      logger.error("Failed to open plugins list stage", e);
-    }
+    application.openPluginsList(runTextArea.getScene().getWindow());
+  }
+
+  public void showAbout(final ActionEvent actionEvent) {
+    application.openAboutWindow(runTextArea.getScene().getWindow());
   }
 
   private static class PluginLanguage {
