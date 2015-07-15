@@ -87,6 +87,8 @@ public class RunSnippet implements Runnable {
   }
 
   private void execute(final String command, final Path workingDirectory) throws IOException, InterruptedException {
+    logger.debug("received command: " + command);
+    logger.debug("working directory: " + workingDirectory);
     final Process process = new ProcessBuilder(command)
         .directory(workingDirectory.getParent().toFile())
         .start();
