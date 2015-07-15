@@ -443,21 +443,4 @@ public class IdeController {
     application.openAboutWindow(runTextArea.getScene().getWindow());
   }
 
-  private static class PluginLanguage {
-    private Language language;
-    private Plugin plugin;
-
-    public PluginLanguage(final Language language, final Plugin plugin) {
-      this.language = language;
-      this.plugin = plugin;
-    }
-
-    public Language getLanguage() {
-      return language;
-    }
-
-    public Plugin getPlugin() {
-      return plugin;
-    }
-  }
 }
