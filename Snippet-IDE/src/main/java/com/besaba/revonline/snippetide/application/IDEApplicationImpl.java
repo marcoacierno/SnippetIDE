@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -131,11 +132,20 @@ public class IDEApplicationImpl implements IDEApplication {
       final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("."));
       final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("about.fxml")));
       scene.getStylesheets().add(IdeController.class.getResource("about.css").toExternalForm());
+      scene.setOnKeyPressed(event -> {
+        if (event.getCode() == KeyCode.ESCAPE) {
+          stage.close();
+        }
+      });
+      stage.focusedProperty().addListener(((observable, oldValue, newValue) -> {
+        if (!newValue) {
+          stage.close();
+        }
+      }));
 
       ((Text) scene.getRoot().lookup("#versionText")).setText("Version: " + getVersion().toString());
 
       stage.initStyle(StageStyle.UNDECORATED);
-      stage.initModality(Modality.WINDOW_MODAL);
       stage.initOwner(window);
       stage.setResizable(false);
       stage.setScene(scene);
