@@ -58,6 +58,10 @@ public class JavaLanguage implements Language {
 
   @Subscribe
   public void compileSnippetEvent(final CompileStartEvent event) {
+    if (event.getTarget() != this) {
+      return;
+    }
+
     final Path sourceFile = event.getSourceFile();
     final Path outputDirectory = event.getOutputDirectory();
 
@@ -106,6 +110,10 @@ public class JavaLanguage implements Language {
 
   @Subscribe
   public void runSnippetEvent(final RunStartEvent runStartEvent) {
+    if (runStartEvent.getTarget() != this) {
+      return;
+    }
+
     final CompileStartEvent compileStartEvent = new CompileStartEventBuilder()
         .setTarget(this)
         .setSourceFile(runStartEvent.getSourceFile())
