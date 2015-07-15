@@ -13,4 +13,10 @@ public class PlainTextLanguage implements Language {
   public String[] getExtensions() {
     return new String[] {"txt"};
   }
+
+  @NotNull
+  @Override
+  public String getTemplate() {
+    return "Text";
+  }
 }

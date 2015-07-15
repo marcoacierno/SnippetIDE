@@ -46,6 +46,16 @@ public class JavaLanguage implements Language {
     return new String[] {".java"};
   }
 
+  @NotNull
+  @Override
+  public String getTemplate() {
+    return "public class Solution {\n" +
+        "\tpublic static void main(final String[] args) {\n" +
+        "\t\tSystem.out.println(\"Hello world\");\n" +
+        "\t}\n" +
+        "}";
+  }
+
   @Subscribe
   public void compileSnippetEvent(final CompileStartEvent event) {
     final Path sourceFile = event.getSourceFile();

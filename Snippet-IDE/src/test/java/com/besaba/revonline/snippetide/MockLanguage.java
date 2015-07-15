@@ -25,6 +25,12 @@ public class MockLanguage implements Language {
     return new String[] {".pwn"};
   }
 
+  @NotNull
+  @Override
+  public String getTemplate() {
+    return "";
+  }
+
   @Subscribe
   public void compile(final CompileStartEvent compileStartEvent) {
     compileCalled = true;

@@ -70,4 +70,16 @@ public interface Language {
    */
   @NotNull
   String[] getExtensions();
+
+  /**
+   * @return The template base of the language.
+   *         A code that the user can use as base
+   *         for his snippets.
+   *
+   *         For example, in Java it could be
+   *         a code that prints "Hello world"
+   *         to the console
+   */
+  @NotNull
+  String getTemplate();
 }

@@ -25,8 +25,6 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -37,11 +35,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
@@ -131,20 +125,28 @@ public class IdeController {
   public void initialize() {
     eventManager.registerListener(this);
 
-    prepareIdeIfOriginalFileIsPresent();
+    prepareIde();
     prepareLanguagesList();
     prepareCompilationTable();
   }
 
-  private void prepareIdeIfOriginalFileIsPresent() {
+  private void prepareIde() {
     final boolean present = originalFile.isPresent();
-
     saveToOriginalFile.setDisable(!present);
 
     if (!present) {
+      prepareCodeAreaWithTemplate();
       return;
     }
 
+    prepareCodeAreaWithOriginalFile();
+  }
+
+  private void prepareCodeAreaWithTemplate() {
+    codeArea.appendText(language.getTemplate());
+  }
+
+  private void prepareCodeAreaWithOriginalFile() {
     final Path path = this.originalFile.get();
 
     fileName = Files.getNameWithoutExtension(path.getFileName().toString());
