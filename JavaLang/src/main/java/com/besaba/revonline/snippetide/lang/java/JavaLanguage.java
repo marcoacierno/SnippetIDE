@@ -62,6 +62,19 @@ public class JavaLanguage implements Language {
     final Path outputDirectory = event.getOutputDirectory();
 
     final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
+    if (compiler == null) {
+      final CompilationResult compilationResult = new CompilationResult(Collections.singletonList(
+          new CompilationProblemBuilder()
+              .setLine(0)
+              .setMessage("Unable to create java compiler. Your JAVA_HOME should point to your JDK.")
+              .setType(CompilationProblemType.Error)
+              .createCompilationProblem()
+      ));
+      application.getEventManager().post(new CompileFinishedEvent(this, compilationResult));
+      return;
+    }
+
     final DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
     final StandardJavaFileManager fileManager = compiler.getStandardFileManager(
         diagnosticCollector,
