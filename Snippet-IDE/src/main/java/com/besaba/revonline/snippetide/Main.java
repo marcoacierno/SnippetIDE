@@ -7,6 +7,7 @@ import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.application.Preloader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
@@ -27,16 +28,21 @@ public class Main extends Application {
 
   @Override
   public void init() throws Exception {
-    final String strApplicationDir = getParameters().getNamed().get("applicationdir");
+    try {
+      final String strApplicationDir = getParameters().getNamed().get("applicationdir");
 
-    if (strApplicationDir != null) {
-      final Path applicationDir = Paths.get(strApplicationDir);
-      ideApplication = boot.boot(applicationDir, null, null);
-    } else {
-      ideApplication = boot.boot();
+      if (strApplicationDir != null) {
+        final Path applicationDir = Paths.get(strApplicationDir);
+        ideApplication = boot.boot(applicationDir, null, null);
+      } else {
+        ideApplication = boot.boot();
+      }
+
+      logApplicationStatus(ideApplication);
+    } catch(Exception e) {
+      notifyPreloader(new Preloader.ErrorNotification(null, "Boot exception: " + e.getMessage(), e));
+      throw e;
     }
-
-    logApplicationStatus(ideApplication);
   }
 
   @Override

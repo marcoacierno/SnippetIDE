@@ -27,6 +27,7 @@
       <element id="artifact" artifact-name="Java" />
       <element id="artifact" artifact-name="PlainText" />
       <element id="artifact" artifact-name="SnippetIDE-API" />
+      <element id="artifact" artifact-name="Preloader" />
     </root>
   </artifact>
 </component>
