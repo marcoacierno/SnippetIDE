@@ -405,6 +405,89 @@ public class JsonConfigurationTest {
   }
 
   @Test
+  public void testSetWithAnArray() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"hello\": \"World\",\n" +
+        "    \"age\": 1,\n" +
+        "    \"world\": 1,\n" +
+        "    \"long\": 9223372036854775207\n" +
+        "  }\n" +
+        "}";
+
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    configuration.set("user.age", new String[] {"a", "b"});
+
+    assertArrayEquals(new String[] {"a", "b"}, configuration.getAsArray("user.age").get());
+  }
+
+  @Test
+  public void testSetWithAnArrayOfIntegers() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"hello\": \"World\",\n" +
+        "    \"age\": 1,\n" +
+        "    \"world\": 1,\n" +
+        "    \"long\": 9223372036854775207\n" +
+        "  }\n" +
+        "}";
+
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    configuration.set("user.age", new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+
+    assertArrayEquals(new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}, configuration.getAsArray("user.age").get());
+
+  }
+
+  @Test
+  public void testSetArrayOfIntsAndTrySave() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"hello\": \"World\",\n" +
+        "    \"age\": 1,\n" +
+        "    \"world\": 1,\n" +
+        "    \"long\": 9223372036854775207\n" +
+        "  }\n" +
+        "}";
+
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    configuration.set("user.age", new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+    configuration.save(outputStream);
+
+    final String output = outputStream.toString("UTF-8");
+
+    assertEquals("{\"user\":{\"world\":\"1\",\"hello\":\"World\",\"age\":[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"10\"],\"long\":\"9223372036854775207\"}}", output);
+  }
+
+  @Test
+  public void testSetAnArrayOfBooleans() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"hello\": \"World\",\n" +
+        "    \"age\": 1,\n" +
+        "    \"world\": 1,\n" +
+        "    \"long\": 9223372036854775207\n" +
+        "  }\n" +
+        "}";
+
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    configuration.set("user.age", new boolean[] {true, false, true, true});
+
+    assertArrayEquals(new String[] {"true", "false", "true", "true"}, configuration.getAsArray("user.age").get());
+  }
+
+  @Test
   public void testSaveAndRecreateFromSaveOutput() throws Exception {
     final String json = "{\n" +
         "  \"user\": {\n" +
@@ -465,6 +548,8 @@ public class JsonConfigurationTest {
 
     assertThat(configuration.getAsArray("user.me").isPresent(), is(false));
   }
+
+
 
   public static void assertConcurrent(final String message, final List<? extends Runnable> runnables, final int maxTimeoutSeconds) throws InterruptedException {
     final int numThreads = runnables.size();
