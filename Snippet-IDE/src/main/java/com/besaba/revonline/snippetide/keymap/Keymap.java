@@ -3,19 +3,16 @@ package com.besaba.revonline.snippetide.keymap;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
-import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -78,6 +75,17 @@ public class Keymap {
         ConfigurationSettingsContract.Keymap.SECTION_NAME + "." + action.getSettingsEntry(),
         newCombination
     );
+  }
+
+  public static boolean isUsed(@NotNull final KeyCodeCombination combination) {
+    return Arrays.stream(Action.values()).anyMatch(action -> {
+      try {
+        final KeyCodeCombination actionCombination = keymap.get(action.getSettingsEntry());
+        return actionCombination.equals(combination);
+      } catch (ExecutionException e) {
+        return false;
+      }
+    });
   }
 
   public static void invalidate(@NotNull final String key) {

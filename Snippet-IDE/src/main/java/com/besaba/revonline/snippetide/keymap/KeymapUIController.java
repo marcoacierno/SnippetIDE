@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -55,7 +56,18 @@ public class KeymapUIController {
     }
 
     final TextField actionTextField = (TextField) root.lookup("#actionTextArea");
+    final Label errorMessage = (Label) root.lookup("#errorMessage");
+
     final KeyCodeCombination[] combination = new KeyCodeCombination[1];
+
+    final Dialog<KeyCodeCombination> alert = new Dialog<>();
+
+    alert.getDialogPane().getButtonTypes().add(ButtonType.APPLY);
+    alert.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+
+    alert.getDialogPane().setContent(root);
+
+    final Node applyButton = alert.getDialogPane().lookupButton(ButtonType.APPLY);
 
     actionTextField.setOnKeyTyped(Event::consume);
     actionTextField.setOnKeyPressed(event -> {
@@ -69,14 +81,18 @@ public class KeymapUIController {
       final ModifierValue meta      = event.isMetaDown()      ? ModifierValue.DOWN : ModifierValue.UP;
       final ModifierValue shortcut  = event.isShortcutDown()  ? ModifierValue.DOWN : ModifierValue.UP;
 
-      combination[0] = new KeyCodeCombination(keyCode, shift, control, alt, meta, shortcut);
-      actionTextField.setText(combination[0].getDisplayText());
-    });
+      final KeyCodeCombination tempCombination = combination[0] = new KeyCodeCombination(keyCode, shift, control, alt, meta, shortcut);
+      actionTextField.setText(tempCombination.getDisplayText());
 
-    final Dialog<KeyCodeCombination> alert = new Dialog<>();
-    alert.getDialogPane().getButtonTypes().add(new ButtonType("Apply", ButtonBar.ButtonData.APPLY));
-    alert.getDialogPane().getButtonTypes().add(new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE));
-    alert.getDialogPane().setContent(root);
+      if (Keymap.isUsed(tempCombination)) {
+        errorMessage.setVisible(true);
+        errorMessage.setText("This combination is already used");
+        applyButton.setDisable(true);
+      } else {
+        errorMessage.setVisible(false);
+        applyButton.setDisable(false);
+      }
+    });
 
     alert.setResultConverter(param -> {
       if (param.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
