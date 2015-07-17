@@ -86,7 +86,8 @@ public class KeymapUIController {
 
       final CombinationUsageInformation combinationUsageInformation = Keymap.getCombinationInformation(tempCombination);
 
-      if (combinationUsageInformation != null) {
+      if (combinationUsageInformation != null &&
+          combinationUsageInformation.getAction() != keymapTable.getSelectionModel().getSelectedItem()) {
         errorMessage.setVisible(true);
         errorMessage.setText("This combination is already used by " + combinationUsageInformation.getAction().toString());
         applyButton.setDisable(true);
