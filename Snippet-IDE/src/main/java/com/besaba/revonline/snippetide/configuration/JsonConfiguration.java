@@ -120,6 +120,13 @@ public class JsonConfiguration implements Configuration {
     return !optional.isPresent() ? Optional.empty() : Optional.of(Boolean.parseBoolean(optional.get()));
   }
 
+  @NotNull
+  @Override
+  public Optional<Float> getAsFloat(@NotNull final String name) {
+    final Optional<String> optional = get(name);
+    return !optional.isPresent() ? Optional.empty() : Optional.of(Float.parseFloat(optional.get()));
+  }
+
   /**
    * Sets the value of a section. The name
    * is composed of: sectionName.entryName

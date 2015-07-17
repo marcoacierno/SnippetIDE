@@ -325,6 +325,23 @@ public class JsonConfigurationTest {
   }
 
   @Test
+  public void testGetDoubleWithGetAsFloatMethod() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"hello\": \"world\",\n" +
+        "    \"age\": 84,\n" +
+        "    \"world\": 10,\n" +
+        "    \"long\": 8686.54\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertEquals(8686.54f, configuration.getAsFloat("user.long").get(), DELTA);
+
+  }
+
+  @Test
   public void testSave() throws Exception {
     final String json = "{\n" +
         "  \"user\": {\n" +

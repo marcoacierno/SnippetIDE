@@ -82,6 +82,14 @@ public interface Configuration {
   Optional<Boolean> getAsBoolean(@NotNull final String name);
 
   /**
+   * @param name The setting name
+   * @return The setting as boolean (if it's a boolean)
+   *         or NumberFormatException if not
+   */
+  @NotNull
+  Optional<Float> getAsFloat(@NotNull final String name);
+
+  /**
    * Set the value
    *
    * @param name The name of the setting
