@@ -50,7 +50,7 @@ public class PluginsListControllerTest extends ApplicationTest {
 
       final PluginManager pluginManager = new MockPluginManager();
 
-      boot.boot(Paths.get(System.getenv("user.dir"), "test-dir"), eventManager, pluginManager);
+      boot.boot(Paths.get(System.getenv("user.dir"), "test-dir"), eventManager, pluginManager, null);
     }
   }
 

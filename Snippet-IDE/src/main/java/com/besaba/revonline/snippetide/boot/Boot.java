@@ -3,17 +3,24 @@ package com.besaba.revonline.snippetide.boot;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
+import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
+import com.besaba.revonline.snippetide.configuration.JsonConfiguration;
 import com.besaba.revonline.snippetide.events.manager.impl.EventBusEventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.UnableToLoadPluginException;
 import com.besaba.revonline.snippetide.application.IDEApplicationImpl;
 import com.besaba.revonline.snippetide.plugins.JarPluginManager;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -24,6 +31,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Prepare the application
@@ -45,7 +53,7 @@ public class Boot {
   }
 
   public IDEApplication boot() {
-    return boot(APPLICATION_PATH, null, null);
+    return boot(APPLICATION_PATH, null, null, null);
   }
 
   /**
@@ -61,7 +69,8 @@ public class Boot {
    */
   public IDEApplication boot(@NotNull final Path applicationPath,
                              @Nullable EventManager eventManager,
-                             @Nullable PluginManager pluginManager) {
+                             @Nullable PluginManager pluginManager,
+                             @Nullable Configuration configuration) {
     if (booted) {
       throw new IllegalStateException("Application already started");
     }
@@ -74,6 +83,10 @@ public class Boot {
       pluginManager = new JarPluginManager();
     }
 
+    if (configuration == null) {
+      configuration = new JsonConfiguration();
+    }
+
     logger.info("Boot phase started");
 
     final String applicationPathAsString = applicationPath.toString();
@@ -82,18 +95,43 @@ public class Boot {
         pluginManager,
         applicationPath,
         Paths.get(applicationPathAsString, "plugins"),
-        Paths.get(applicationPathAsString, "temp")
+        Paths.get(applicationPathAsString, "temp"),
+        configuration,
+        Paths.get(applicationPathAsString, "settings.json"),
+        Paths.get(applicationPathAsString, "default_settings.json")
     );
+    ideApplication = application;
 
+    loadConfiguration(configuration);
     createDirectories(application);
 
     IDEApplicationLauncher.createApplication(application);
 
     loadPlugins(pluginManager, applicationPath, eventManager);
 
-    ideApplication = application;
     booted = true;
     return application;
+  }
+
+  private void loadConfiguration(final Configuration configuration) {
+    if (Files.notExists(ideApplication.getConfigurationFile())) {
+      loadDefaultConfigurationFile(configuration);
+      return;
+    }
+
+    try(final FileInputStream stream = new FileInputStream(ideApplication.getConfigurationFile().toFile())) {
+      configuration.load(stream);
+    } catch (IOException e) {
+      throw new BootFailedException("Unable to load user configuration file", e);
+    }
+  }
+
+  private void loadDefaultConfigurationFile(final Configuration configuration) {
+    try(final FileInputStream stream = new FileInputStream(ideApplication.getDefaultConfigurationFile().toFile())) {
+      configuration.load(stream);
+    } catch (IOException e) {
+      throw new BootFailedException("Unable to load default configuration file", e);
+    }
   }
 
   private void createDirectories(final IDEApplication applicationPath) {
@@ -148,7 +186,13 @@ public class Boot {
     try {
       cleanDirectory(ideApplication.getTemporaryDirectory());
     } catch (IOException e) {
-      logger.fatal("Unboot failed", e);
+      logger.fatal("Unable to clean temporary directory!", e);
+    }
+
+    try(final FileOutputStream fileStream = new FileOutputStream(ideApplication.getConfigurationFile().toFile())) {
+      ideApplication.getConfiguration().save(fileStream);
+    } catch (IOException e) {
+      logger.fatal("Unable to save user settings!", e);
     }
 
     logger.info("Unboot ended");

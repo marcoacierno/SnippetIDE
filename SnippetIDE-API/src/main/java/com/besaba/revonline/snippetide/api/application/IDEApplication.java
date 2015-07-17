@@ -1,5 +1,6 @@
 package com.besaba.revonline.snippetide.api.application;
 
+import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.Version;
@@ -17,6 +18,9 @@ public interface IDEApplication {
   PluginManager getPluginManager();
 
   @NotNull
+  Configuration getConfiguration();
+
+  @NotNull
   Path getApplicationDirectory();
 
   @NotNull
@@ -24,6 +28,12 @@ public interface IDEApplication {
 
   @NotNull
   Path getTemporaryDirectory();
+
+  @NotNull
+  Path getConfigurationFile();
+
+  @NotNull
+  Path getDefaultConfigurationFile();
 
   void openIdeInstance(final IDEInstanceContext IdeInstanceContext);
 

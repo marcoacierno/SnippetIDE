@@ -4,6 +4,7 @@ import com.besaba.revonline.snippetide.IdeController;
 import com.besaba.revonline.snippetide.Main;
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
+import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
@@ -39,17 +40,29 @@ public class IDEApplicationImpl implements IDEApplication {
   private final Path pluginsDirectory;
   @NotNull
   private final Path temporaryDirectory;
+  @NotNull
+  private final Configuration configuration;
+  @NotNull
+  private final Path configurationFile;
+  @NotNull
+  private final Path defaultConfigurationFile;
 
   public IDEApplicationImpl(@NotNull final EventManager eventManager,
                             @NotNull final PluginManager pluginManager,
                             @NotNull final Path applicationDirectory,
                             @NotNull final Path pluginsDirectory,
-                            @NotNull final Path temporaryDirectory) {
+                            @NotNull final Path temporaryDirectory,
+                            @NotNull final Configuration configuration,
+                            @NotNull final Path configurationFile,
+                            @NotNull final Path defaultConfigurationFile) {
     this.eventManager = eventManager;
     this.pluginManager = pluginManager;
     this.applicationDirectory = applicationDirectory;
     this.pluginsDirectory = pluginsDirectory;
     this.temporaryDirectory = temporaryDirectory;
+    this.configuration = configuration;
+    this.configurationFile = configurationFile;
+    this.defaultConfigurationFile = defaultConfigurationFile;
   }
 
   @NotNull
@@ -62,6 +75,12 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public PluginManager getPluginManager() {
     return pluginManager;
+  }
+
+  @NotNull
+  @Override
+  public Configuration getConfiguration() {
+    return configuration;
   }
 
   @NotNull
@@ -80,6 +99,18 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public Path getTemporaryDirectory() {
     return temporaryDirectory;
+  }
+
+  @NotNull
+  @Override
+  public Path getConfigurationFile() {
+    return configurationFile;
+  }
+
+  @NotNull
+  @Override
+  public Path getDefaultConfigurationFile() {
+    return defaultConfigurationFile;
   }
 
   @Override

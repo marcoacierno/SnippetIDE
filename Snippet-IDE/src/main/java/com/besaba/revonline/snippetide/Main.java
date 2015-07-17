@@ -33,7 +33,7 @@ public class Main extends Application {
 
       if (strApplicationDir != null) {
         final Path applicationDir = Paths.get(strApplicationDir);
-        ideApplication = boot.boot(applicationDir, null, null);
+        ideApplication = boot.boot(applicationDir, null, null, null);
       } else {
         ideApplication = boot.boot();
       }

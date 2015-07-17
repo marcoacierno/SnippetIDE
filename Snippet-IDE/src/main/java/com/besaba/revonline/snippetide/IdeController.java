@@ -16,6 +16,8 @@ import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import com.besaba.revonline.snippetide.keymap.Action;
+import com.besaba.revonline.snippetide.keymap.Keymap;
 import com.besaba.revonline.snippetide.run.RunSnippet;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
@@ -215,13 +217,18 @@ public class IdeController {
 
   public void onKeyPressed(Event event) {
     final KeyEvent keyEvent = (KeyEvent) event;
+    final Action action = Keymap.match(keyEvent);
 
-    switch (keyEvent.getCode()) {
-      case F5: {
+    if (action == null) {
+      return;
+    }
+
+    switch (action) {
+      case Compile: {
         compile();
         break;
       }
-      case F6: {
+      case Run: {
         run();
         break;
       }
