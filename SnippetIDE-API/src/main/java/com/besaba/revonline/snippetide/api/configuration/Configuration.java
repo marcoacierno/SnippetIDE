@@ -14,7 +14,17 @@ public interface Configuration {
   /**
    * Called when the configuration should load the settings
    *
-   * @param inputStream It's where you should read the settings.
+   * @param inputStream In this stream you can found the settings of
+   *                    the user.
+   *                    An implementation can decide what is inside this
+   *                    stream.
+   *                    Example: If the implementation
+   *                    uses JSON to save and read settings, it should
+   *                    assume that this stream contains a valid json.
+   *                    If it doesn't, it is allowed to throw
+   *                    any exception you want since it's not
+   *                    your job to convert the stream to your
+   *                    format.
    *                    Do not close the stream. You don't own it.
    */
   void load(@NotNull final InputStream inputStream);
@@ -22,7 +32,8 @@ public interface Configuration {
   /**
    * Called when the configuration should save ALL the settings
    *
-   * @param outputStream Write in this stream to save the content.
+   * @param outputStream Write in this stream the settings of the
+   *                     user in the format of the implementation.
    *                     Do not close the stream. You don't own it.
    *
    * @throws IOException Throw if something went wrong during the
