@@ -240,7 +240,7 @@ public class JsonConfigurationTest {
     final JsonConfiguration configuration = new JsonConfiguration();
     configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
 
-    assertFalse(configuration.get("user.my").isPresent());
+    assertFalse(configuration.getAsInt("user.my").isPresent());
 
     configuration.set("user.my", 10);
 
@@ -260,7 +260,7 @@ public class JsonConfigurationTest {
 
     configuration.set("keymap.compile", "F5");
 
-    assertEquals("F5", configuration.get("keymap.compile").get());
+    assertEquals("F5", configuration.getAsString("keymap.compile").get());
   }
 
   @Test
@@ -317,11 +317,11 @@ public class JsonConfigurationTest {
     final JsonConfiguration configuration = new JsonConfiguration();
     configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
 
-    assertEquals("world", configuration.get("user.hello").get());
+    assertEquals("world", configuration.getAsString("user.hello").get());
 
     configuration.set("user.hello", "die");
 
-    assertEquals("die", configuration.get("user.hello").get());
+    assertEquals("die", configuration.getAsString("user.hello").get());
   }
 
   @Test

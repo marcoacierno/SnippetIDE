@@ -63,7 +63,7 @@ public class JsonConfiguration implements Configuration {
   }
 
   @NotNull
-  public <T> Optional<T> get(@NotNull final String name) {
+  private <T> Optional<T> get(@NotNull final String name) {
     final int dotSeparatorPosition = name.indexOf('.');
 
     if (dotSeparatorPosition == -1) {
@@ -114,6 +114,21 @@ public class JsonConfiguration implements Configuration {
     return !optional.isPresent() ? Optional.empty() : Optional.of(Boolean.parseBoolean(optional.get()));
   }
 
+  /**
+   * Sets the value of a section. The name
+   * is composed of: sectionName.entryName
+   *
+   * If the section doesn't exists it will
+   * be created.
+   *
+   * If the entryName doesn't exists it will
+   * be created.
+   *
+   * @param name The name of the setting
+   * @param value The value to save
+   * @param <T> The type of the value
+   * @throws IllegalArgumentException If the name passed is not of the format: sectionName.entryName
+   */
   @Override
   public <T> void set(@NotNull final String name,
                       @NotNull final T value) {
