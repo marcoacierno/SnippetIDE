@@ -18,6 +18,7 @@
     <module>SnippetIDE-API</module>
     <module>JavaLang</module>
     <module>PlainText</module>
+    <module>Preloader</module>
   </modules>
 
   <build>
