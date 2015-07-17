@@ -88,6 +88,19 @@ public class Keymap {
     });
   }
 
+  public static CombinationUsageInformation getCombinationInformation(final KeyCodeCombination combination) {
+    for (final Action action : Action.values()) {
+      try {
+        final KeyCodeCombination actionCombination = keymap.get(action.getSettingsEntry());
+        if (actionCombination.equals(combination)) {
+          return new CombinationUsageInformation(action, actionCombination);
+        }
+      } catch (ExecutionException ignored) { }
+    }
+
+    return null;
+  }
+
   public static void invalidate(@NotNull final String key) {
     keymap.invalidate(key);
   }

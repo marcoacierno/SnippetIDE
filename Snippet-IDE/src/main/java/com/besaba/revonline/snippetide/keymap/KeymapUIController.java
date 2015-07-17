@@ -84,9 +84,11 @@ public class KeymapUIController {
       final KeyCodeCombination tempCombination = combination[0] = new KeyCodeCombination(keyCode, shift, control, alt, meta, shortcut);
       actionTextField.setText(tempCombination.getDisplayText());
 
-      if (Keymap.isUsed(tempCombination)) {
+      final CombinationUsageInformation combinationUsageInformation = Keymap.getCombinationInformation(tempCombination);
+
+      if (combinationUsageInformation != null) {
         errorMessage.setVisible(true);
-        errorMessage.setText("This combination is already used");
+        errorMessage.setText("This combination is already used by " + combinationUsageInformation.getAction().toString());
         applyButton.setDisable(true);
       } else {
         errorMessage.setVisible(false);
