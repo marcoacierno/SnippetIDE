@@ -21,8 +21,7 @@ public class Keymap {
   private final static Logger logger = Logger.getLogger(Keymap.class);
 
   private static LoadingCache<String, KeyCodeCombination> keymap = CacheBuilder.newBuilder()
-      .maximumSize(20)
-      .expireAfterAccess(10, TimeUnit.MINUTES)
+      .maximumSize(100)
       .build(new CacheLoader<String, KeyCodeCombination>() {
         @Override
         public KeyCodeCombination load(final String actionName) throws Exception {
