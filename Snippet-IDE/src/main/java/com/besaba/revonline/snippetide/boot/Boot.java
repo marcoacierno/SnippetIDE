@@ -119,16 +119,16 @@ public class Boot {
       return;
     }
 
-    try {
-      configuration.load(new FileInputStream(ideApplication.getConfigurationFile().toFile()));
+    try(final FileInputStream stream = new FileInputStream(ideApplication.getConfigurationFile().toFile())) {
+      configuration.load(stream);
     } catch (IOException e) {
       throw new BootFailedException("Unable to load user configuration file", e);
     }
   }
 
   private void loadDefaultConfigurationFile(final Configuration configuration) {
-    try {
-      configuration.load(new FileInputStream(ideApplication.getDefaultConfigurationFile().toFile()));
+    try(final FileInputStream stream = new FileInputStream(ideApplication.getDefaultConfigurationFile().toFile())) {
+      configuration.load(stream);
     } catch (IOException e) {
       throw new BootFailedException("Unable to load default configuration file", e);
     }
@@ -189,8 +189,8 @@ public class Boot {
       logger.fatal("Unable to clean temporary directory!", e);
     }
 
-    try {
-      ideApplication.getConfiguration().save(new FileOutputStream(ideApplication.getConfigurationFile().toFile()));
+    try(final FileOutputStream fileStream = new FileOutputStream(ideApplication.getConfigurationFile().toFile())) {
+      ideApplication.getConfiguration().save(fileStream);
     } catch (IOException e) {
       logger.fatal("Unable to save user settings!", e);
     }
