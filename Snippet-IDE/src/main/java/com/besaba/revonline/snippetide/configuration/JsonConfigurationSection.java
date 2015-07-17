@@ -83,6 +83,11 @@ public class JsonConfigurationSection implements ConfigurationSection {
     values.put(name, value);
   }
 
+  @Override
+  public boolean remove(@NotNull final String name) {
+    return values.remove(name) != null;
+  }
+
   @NotNull
   Map<String, Object> getValues() {
     return Collections.unmodifiableMap(values);

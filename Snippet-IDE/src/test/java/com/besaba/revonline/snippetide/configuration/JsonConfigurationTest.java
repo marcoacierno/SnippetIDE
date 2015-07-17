@@ -549,7 +549,158 @@ public class JsonConfigurationTest {
     assertThat(configuration.getAsArray("user.me").isPresent(), is(false));
   }
 
+  @Test
+  public void testRemoveAnInt() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
 
+    assertTrue(configuration.remove("user.age"));
+  }
+
+  @Test
+  public void testRemoveAString() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertTrue(configuration.remove("user.name"));
+  }
+
+  @Test
+  public void testRemoveAnEntryWhichDoesntExists() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertFalse(configuration.remove("user.work"));
+  }
+
+  @Test
+  public void testRemoveASection() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertTrue(configuration.remove("user"));
+  }
+
+  @Test
+  public void testRemoveASectionWhichDoesntExists() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertFalse(configuration.remove("keymap"));
+  }
+
+  @Test
+  public void testRemoveASectionAndSaveConfiguration() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertTrue(configuration.remove("user"));
+
+    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    configuration.save(byteArrayOutputStream);
+
+    final String output = byteArrayOutputStream.toString("UTF-8");
+    assertEquals("{}", output);
+  }
+
+  @Test
+  public void testRemoveAnEntryAndSaveConfiguration() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertTrue(configuration.remove("user.age"));
+
+    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    configuration.save(byteArrayOutputStream);
+
+    final String output = byteArrayOutputStream.toString("UTF-8");
+
+    assertEquals("{\"user\":{\"name\":\"ReVo_\"}}", output);
+  }
+
+  @Test
+  public void testRemoveAnEntryFromASectionWhichDoesntExists() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Section keymap doesn't exists.");
+
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    configuration.remove("keymap.compile");
+  }
+
+  @Test
+  public void testRemoveEntrySaveAndLoadAgain() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"age\": \"98\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertTrue(configuration.remove("user.name"));
+
+    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    configuration.save(byteArrayOutputStream);
+
+    final String output = byteArrayOutputStream.toString("UTF-8");
+
+    final JsonConfiguration newCopy = new JsonConfiguration();
+    newCopy.load(new ByteArrayInputStream(output.getBytes(UTF_8)));
+
+    assertEquals(98, newCopy.getAsInt("user.age").getAsInt());
+    assertFalse(newCopy.getAsString("user.name").isPresent());
+  }
 
   public static void assertConcurrent(final String message, final List<? extends Runnable> runnables, final int maxTimeoutSeconds) throws InterruptedException {
     final int numThreads = runnables.size();

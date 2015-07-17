@@ -91,6 +91,8 @@ public interface Configuration {
 
   Optional<String[]> getAsArray(@NotNull final String name);
 
+  boolean remove(@NotNull final String name);
+
   /**
    * Set the value
    *

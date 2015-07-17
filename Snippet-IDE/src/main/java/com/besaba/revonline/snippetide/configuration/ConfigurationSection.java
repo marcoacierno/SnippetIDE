@@ -12,4 +12,5 @@ public interface ConfigurationSection {
   void save(@NotNull final OutputStream outputStream) throws IOException;
   <T> Optional<T> get(@NotNull final String name);
   <T> void set(@NotNull final String name, @NotNull final T value);
+  boolean remove(@NotNull final String name);
 }

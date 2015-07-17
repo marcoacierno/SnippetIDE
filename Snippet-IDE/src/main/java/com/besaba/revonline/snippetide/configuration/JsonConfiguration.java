@@ -133,6 +133,28 @@ public class JsonConfiguration implements Configuration {
     return get(name);
   }
 
+  @Override
+  public boolean remove(@NotNull final String name) {
+    final int dotSeparatorPosition = name.indexOf('.');
+
+    if (dotSeparatorPosition == -1) {
+      return removeSection(name);
+    }
+
+    final String section = name.substring(0, dotSeparatorPosition);
+    final String element = name.substring(dotSeparatorPosition + 1);
+
+    if (!configurations.containsKey(section)) {
+      throw new IllegalArgumentException("Section " + section + " doesn't exists.");
+    }
+
+    return configurations.get(section).remove(element);
+  }
+
+  private boolean removeSection(final String name) {
+    return configurations.remove(name) != null;
+  }
+
   /**
    * Sets the value of a section. The name
    * is composed of: sectionName.entryName
