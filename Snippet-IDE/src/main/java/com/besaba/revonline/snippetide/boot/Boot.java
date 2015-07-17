@@ -12,10 +12,14 @@ import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.UnableToLoadPluginException;
 import com.besaba.revonline.snippetide.application.IDEApplicationImpl;
 import com.besaba.revonline.snippetide.plugins.JarPluginManager;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -26,6 +30,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Prepare the application
@@ -94,6 +99,7 @@ public class Boot {
         Paths.get(applicationPathAsString, "settings.json"),
         Paths.get(applicationPathAsString, "default_settings.json")
     );
+    ideApplication = application;
 
     loadConfiguration(configuration);
     createDirectories(application);
@@ -102,13 +108,29 @@ public class Boot {
 
     loadPlugins(pluginManager, applicationPath, eventManager);
 
-    ideApplication = application;
     booted = true;
     return application;
   }
 
   private void loadConfiguration(final Configuration configuration) {
+    if (Files.notExists(ideApplication.getConfigurationFile())) {
+      loadDefaultConfigurationFile(configuration);
+      return;
+    }
 
+    try {
+      configuration.load(new FileInputStream(ideApplication.getConfigurationFile().toFile()));
+    } catch (IOException e) {
+      throw new BootFailedException("Unable to load user configuration file", e);
+    }
+  }
+
+  private void loadDefaultConfigurationFile(final Configuration configuration) {
+    try {
+      configuration.load(new FileInputStream(ideApplication.getDefaultConfigurationFile().toFile()));
+    } catch (IOException e) {
+      throw new BootFailedException("Unable to load default configuration file", e);
+    }
   }
 
   private void createDirectories(final IDEApplication applicationPath) {
