@@ -256,7 +256,6 @@ public class IdeController {
       return;
     }
 
-    compileAndRunPane.getSelectionModel().select(1);
     eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory()));
   }
 
@@ -290,7 +289,6 @@ public class IdeController {
         .build();
 
     logger.debug("event sent -> " + event);
-    compileAndRunPane.getSelectionModel().select(0);
     eventManager.post(event);
   }
 
@@ -320,6 +318,8 @@ public class IdeController {
   @Subscribe
   public void onCompileFinished(final CompileFinishedEvent compileFinishedEvent) {
     logger.debug("compile finished!");
+
+    compileAndRunPane.getSelectionModel().select(0);
     final CompilationResult compilationResult = compileFinishedEvent.getCompilationResult();
 
     showCompilationNotification(compilationResult);
@@ -411,6 +411,8 @@ public class IdeController {
 
   @Subscribe
   public void runInformationResponse(final RunInformationEvent runInformationEvent) {
+    compileAndRunPane.getSelectionModel().select(1);
+
     stopIfAlreadyRunningRunThread();
 
     final RunSnippet runSnippet = new RunSnippet(runInformationEvent, eventManager);
