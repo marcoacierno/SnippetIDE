@@ -205,6 +205,20 @@ public class IDEApplicationImpl implements IDEApplication {
     }
   }
 
+  @Override
+  public void openKeymapSetting(@Nullable final Window window) throws IOException {
+    final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("keymap/"));
+    final Stage stage = new Stage();
+    final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("keymap/keymap.fxml")));
+
+    stage.initModality(Modality.WINDOW_MODAL);
+    stage.initOwner(window);
+    stage.setResizable(false);
+    stage.setScene(scene);
+
+    stage.show();
+  }
+
   @NotNull
   @Override
   public Version getVersion() {

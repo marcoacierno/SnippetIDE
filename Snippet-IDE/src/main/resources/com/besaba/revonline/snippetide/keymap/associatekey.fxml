@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="75.0" prefWidth="451.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="134.0" layoutY="14.0" prefHeight="17.0" prefWidth="183.0" text="Press any key inside the text area" textAlignment="CENTER" />
+      <TextField id="actionTextArea" layoutY="38.0" prefHeight="25.0" prefWidth="451.0" />
+   </children>
+</Pane>

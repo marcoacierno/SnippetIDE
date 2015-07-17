@@ -79,6 +79,7 @@
             <items>
               <MenuItem mnemonicParsing="false" text="About" onAction="#showAbout" />
               <MenuItem mnemonicParsing="false" text="Plugins" onAction="#showPluginsList" />
+              <MenuItem mnemonicParsing="false" text="Keymap" onAction="#showKeymapUi" />
               <MenuItem mnemonicParsing="false" text="Show logs" onAction="#showLogs" />
             </items>
           </Menu>

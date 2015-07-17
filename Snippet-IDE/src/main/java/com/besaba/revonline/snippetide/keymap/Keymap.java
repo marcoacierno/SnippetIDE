@@ -39,24 +39,7 @@ public class Keymap {
           }
 
           final String combination = combinationString.get();
-
-          final int separatorPosition = combination.indexOf('|');
-          final boolean hasSeparator = separatorPosition != -1;
-
-          if (hasSeparator) {
-            final Iterator<String> parts = Splitter.on('|').split(combination).iterator();
-
-            final KeyCode code = KeyCode.getKeyCode(parts.next());
-            final KeyCombination.ModifierValue shift = KeyCombination.ModifierValue.valueOf(parts.next());
-            final KeyCombination.ModifierValue control = KeyCombination.ModifierValue.valueOf(parts.next());
-            final KeyCombination.ModifierValue alt = KeyCombination.ModifierValue.valueOf(parts.next());
-            final KeyCombination.ModifierValue meta = KeyCombination.ModifierValue.valueOf(parts.next());
-            final KeyCombination.ModifierValue shortcut = KeyCombination.ModifierValue.valueOf(parts.next());
-
-            return new KeyCodeCombination(code, shift, control, alt, meta, shortcut);
-          } else {
-            return new KeyCodeCombination(KeyCode.getKeyCode(combination));
-          }
+          return (KeyCodeCombination) KeyCodeCombination.valueOf(combination);
         }
       });
 
@@ -64,24 +47,37 @@ public class Keymap {
   @Nullable
   public static Action match(@NotNull final KeyEvent event) {
     for (final Action action : Action.values()) {
-      try {
-        final KeyCodeCombination combination = keymap.get(action.getSettingsEntry());
+      final KeyCodeCombination combination = getCombination(action);
 
-        if (combination == null) {
-          logger.info("action " + action + " seems to don't have an associated keymap");
-          continue;
-        }
+      if (combination == null) {
+        logger.info("action " + action + " seems to don't have an associated keymap");
+        continue;
+      }
 
-        if (combination.match(event)) {
-          return action;
-        }
-      } catch (ExecutionException e) {
-        logger.error("skipping " + action + " because lookup thrown an exception", e);
+      if (combination.match(event)) {
+        return action;
       }
     }
 
     logger.debug("no association found for event: " + event);
     return null;
+  }
+
+  public static KeyCodeCombination getCombination(@NotNull final Action action) {
+    try {
+      return keymap.get(action.getSettingsEntry());
+    } catch (ExecutionException e) {
+      return null;
+    }
+  }
+
+  public static void updateCombination(@NotNull final Action action, @NotNull final KeyCodeCombination newCombination) {
+    keymap.put(action.getSettingsEntry(), newCombination);
+    final Configuration configuration = IDEApplicationLauncher.getIDEApplication().getConfiguration();
+    configuration.set(
+        ConfigurationSettingsContract.Keymap.SECTION_NAME + "." + action.getSettingsEntry(),
+        newCombination
+    );
   }
 
   public static void invalidate(@NotNull final String key) {

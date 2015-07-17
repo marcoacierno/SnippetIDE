@@ -450,4 +450,12 @@ public class IdeController {
     application.openAboutWindow(runTextArea.getScene().getWindow());
   }
 
+  public void showKeymapUi(ActionEvent actionEvent) {
+    try {
+      application.openKeymapSetting(runTextArea.getScene().getWindow());
+    } catch (IOException e) {
+      logger.fatal("unable to keymap settings", e);
+      new Alert(Alert.AlertType.ERROR, "Unable to keymap settings page", ButtonType.OK).show();
+    }
+  }
 }

@@ -8,6 +8,7 @@ import javafx.stage.Window;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 public interface IDEApplication {
@@ -40,6 +41,8 @@ public interface IDEApplication {
   void openAboutWindow(@Nullable Window window);
 
   void openPluginsList(@Nullable Window window);
+
+  void openKeymapSetting(@Nullable Window window) throws IOException;
 
   @NotNull
   Version getVersion();
