@@ -26,8 +26,9 @@ public interface Configuration {
    *                    your job to convert the stream to your
    *                    format.
    *                    Do not close the stream. You don't own it.
+   * @throws IOException If something went wrong during the load process
    */
-  void load(@NotNull final InputStream inputStream);
+  void load(@NotNull final InputStream inputStream) throws IOException;
 
   /**
    * Called when the configuration should save ALL the settings
