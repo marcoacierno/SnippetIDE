@@ -1,6 +1,8 @@
 package com.besaba.revonline.snippetide.configuration;
 
 import com.besaba.revonline.snippetide.api.configuration.Configuration;
+import com.besaba.revonline.snippetide.api.configuration.ConfigurationLoadFailedException;
+import com.besaba.revonline.snippetide.api.configuration.ConfigurationSaveFailedException;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,7 +30,7 @@ public class JsonConfiguration implements Configuration {
   private Map<String, ConfigurationSection> configurations = new HashMap<>();
 
   @Override
-  public void load(@NotNull final InputStream inputStream) {
+  public void load(@NotNull final InputStream inputStream) throws ConfigurationLoadFailedException {
     final JsonParser parser = new JsonParser();
     final JsonObject root = parser.parse(new InputStreamReader(inputStream)).getAsJsonObject();
 
@@ -48,7 +50,7 @@ public class JsonConfiguration implements Configuration {
   }
 
   @Override
-  public void save(@NotNull final OutputStream outputStream) throws IOException {
+  public void save(@NotNull final OutputStream outputStream) throws ConfigurationSaveFailedException {
     final Type type = new TypeToken<Map<String, Configuration>>() {}.getType();
     final OutputStreamWriter out = new OutputStreamWriter(outputStream);
     final JsonWriter writer = new JsonWriter(out);
@@ -58,8 +60,12 @@ public class JsonConfiguration implements Configuration {
         .create()
         .toJson(configurations, type, writer);
 
-    writer.flush();
-    out.flush();
+    try {
+      writer.flush();
+      out.flush();
+    } catch (IOException e) {
+      throw new ConfigurationSaveFailedException(e);
+    }
   }
 
   @NotNull

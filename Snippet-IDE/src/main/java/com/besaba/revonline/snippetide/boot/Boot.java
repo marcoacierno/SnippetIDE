@@ -4,6 +4,8 @@ package com.besaba.revonline.snippetide.boot;
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.configuration.Configuration;
+import com.besaba.revonline.snippetide.api.configuration.ConfigurationLoadFailedException;
+import com.besaba.revonline.snippetide.api.configuration.ConfigurationSaveFailedException;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.configuration.JsonConfiguration;
@@ -121,7 +123,7 @@ public class Boot {
 
     try(final FileInputStream stream = new FileInputStream(ideApplication.getConfigurationFile().toFile())) {
       configuration.load(stream);
-    } catch (IOException e) {
+    } catch (ConfigurationLoadFailedException|IOException e) {
       throw new BootFailedException("Unable to load user configuration file", e);
     }
   }
@@ -129,7 +131,7 @@ public class Boot {
   private void loadDefaultConfigurationFile(final Configuration configuration) {
     try(final FileInputStream stream = new FileInputStream(ideApplication.getDefaultConfigurationFile().toFile())) {
       configuration.load(stream);
-    } catch (IOException e) {
+    } catch (ConfigurationLoadFailedException|IOException e) {
       throw new BootFailedException("Unable to load default configuration file", e);
     }
   }
@@ -191,7 +193,7 @@ public class Boot {
 
     try(final FileOutputStream fileStream = new FileOutputStream(ideApplication.getConfigurationFile().toFile())) {
       ideApplication.getConfiguration().save(fileStream);
-    } catch (IOException e) {
+    } catch (IOException|ConfigurationSaveFailedException e) {
       logger.fatal("Unable to save user settings!", e);
     }
 

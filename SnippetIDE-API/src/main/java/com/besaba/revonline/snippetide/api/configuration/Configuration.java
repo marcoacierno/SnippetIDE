@@ -26,9 +26,9 @@ public interface Configuration {
    *                    your job to convert the stream to your
    *                    format.
    *                    Do not close the stream. You don't own it.
-   * @throws IOException If something went wrong during the load process
+   * @throws ConfigurationLoadFailedException If something went wrong during the load process
    */
-  void load(@NotNull final InputStream inputStream) throws IOException;
+  void load(@NotNull final InputStream inputStream) throws ConfigurationLoadFailedException;
 
   /**
    * Called when the configuration should save ALL the settings
@@ -37,10 +37,10 @@ public interface Configuration {
    *                     user in the format of the implementation.
    *                     Do not close the stream. You don't own it.
    *
-   * @throws IOException Throw if something went wrong during the
+   * @throws ConfigurationSaveFailedException Throw if something went wrong during the
    *                     save process
    */
-  void save(@NotNull final OutputStream outputStream) throws IOException;
+  void save(@NotNull final OutputStream outputStream) throws ConfigurationSaveFailedException;
 
   /**
    * @param name The setting name
