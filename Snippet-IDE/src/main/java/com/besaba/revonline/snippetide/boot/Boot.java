@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -185,7 +186,13 @@ public class Boot {
     try {
       cleanDirectory(ideApplication.getTemporaryDirectory());
     } catch (IOException e) {
-      logger.fatal("Unboot failed", e);
+      logger.fatal("Unable to clean temporary directory!", e);
+    }
+
+    try {
+      ideApplication.getConfiguration().save(new FileOutputStream(ideApplication.getConfigurationFile().toFile()));
+    } catch (IOException e) {
+      logger.fatal("Unable to save user settings!", e);
     }
 
     logger.info("Unboot ended");
