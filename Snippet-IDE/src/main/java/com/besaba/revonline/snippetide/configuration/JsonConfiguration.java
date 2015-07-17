@@ -63,7 +63,6 @@ public class JsonConfiguration implements Configuration {
   }
 
   @NotNull
-  @Override
   public <T> Optional<T> get(@NotNull final String name) {
     final int dotSeparatorPosition = name.indexOf('.');
 

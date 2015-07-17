@@ -31,29 +31,9 @@ public interface Configuration {
   void save(@NotNull final OutputStream outputStream) throws IOException;
 
   /**
-   * Get a setting by name. Everything
-   * is stored as a String so this method
-   * is more for internal usage
-   * than public usage.
-   *
-   * It could be removed
-   * in a new revision
-   * of the api.
-   *
-   * @param name The name of the setting.
-   *             Example:
-   *             <code>
-   *              .get("User.FavouriteLanguage");
-   *             </code>
-   * @param <T> The type. Example string.
-   * @return The parameter
-   */
-  @NotNull
-  <T> Optional<T> get(@NotNull final String name);
-
-  /**
    * @param name The setting name
    * @return The setting as integer (if it's an integer)
+   *         or NumberFormatException if not
    */
   @NotNull
   OptionalInt getAsInt(@NotNull final String name);
@@ -61,6 +41,7 @@ public interface Configuration {
   /**
    * @param name The setting name
    * @return The setting as double (if it's a double)
+   *         or NumberFormatException if not
    */
   @NotNull
   OptionalDouble getAsDouble(@NotNull final String name);
@@ -68,13 +49,14 @@ public interface Configuration {
   /**
    * @param name The setting name
    * @return The setting as long (if it's a long)
+   *         or NumberFormatException if not
    */
   @NotNull
   OptionalLong getAsLong(@NotNull final String name);
 
   /**
    * @param name The setting name
-   * @return The setting as string (if it's a string)
+   * @return The setting as string. (if it's a string)
    */
   @NotNull
   Optional<String> getAsString(@NotNull final String name);
@@ -82,6 +64,7 @@ public interface Configuration {
   /**
    * @param name The setting name
    * @return The setting as boolean (if it's a boolean)
+   *         or NumberFormatException if not
    */
   @NotNull
   Optional<Boolean> getAsBoolean(@NotNull final String name);
