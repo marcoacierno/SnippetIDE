@@ -91,6 +91,13 @@ public interface Configuration {
 
   Optional<String[]> getAsArray(@NotNull final String name);
 
+  /**
+   * Removes an entry from the settings.
+   *
+   * @param name The name of the setting
+   * @return True if the element has been removed or
+   *         false if not.
+   */
   boolean remove(@NotNull final String name);
 
   /**
