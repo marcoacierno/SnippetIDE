@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
 public class JarPluginManagerTest {
 
   private Path pluginWithoutManifest;
+  private Path pluginWhichRequireIdeVersion31;
 
   /**
    * If you need to test findPluginByName
@@ -37,6 +38,7 @@ public class JarPluginManagerTest {
   public void setUp() throws Exception {
     pluginWithoutManifest = Paths.get(JarPluginManagerTest.class.getResource("WrongPluginWithoutManifest.jar").toURI());
     correctPluginWithALanguage = Paths.get(JarPluginManagerTest.class.getResource("PluginWithAManifest.jar").toURI());
+    pluginWhichRequireIdeVersion31 = Paths.get(JarPluginManagerTest.class.getResource("PluginWhichRequiresIdeVersion31.jar").toURI());
   }
 
   @Test
@@ -44,12 +46,12 @@ public class JarPluginManagerTest {
     exception.expect(UnableToLoadPluginException.class);
     exception.expectMessage("Missing manifest.json file!");
 
-    jarPluginManager.loadPlugin(pluginWithoutManifest);
+    jarPluginManager.loadPlugin(pluginWithoutManifest, Version.parse("0.1"));
   }
 
   @Test
   public void testPluginLoadCorrect() throws Exception {
-    final Plugin plugin = jarPluginManager.loadPlugin(correctPluginWithALanguage);
+    final Plugin plugin = jarPluginManager.loadPlugin(correctPluginWithALanguage, Version.parse("0.1"));
 
     assertEquals("My plugin name", plugin.getName());
     assertEquals("My description", plugin.getDescription());
@@ -66,12 +68,12 @@ public class JarPluginManagerTest {
 
   @Test
   public void testLoadSamePluginSameTimes() throws Exception {
-    final Plugin plugin1 = jarPluginManager.loadPlugin(correctPluginWithALanguage);
+    final Plugin plugin1 = jarPluginManager.loadPlugin(correctPluginWithALanguage, Version.parse("0.1"));
 
     exception.expect(UnableToLoadPluginException.class);
     exception.expectMessage("Another plugin with the same name (My plugin name) already loaded");
 
-    final Plugin plugin2 = jarPluginManager.loadPlugin(correctPluginWithALanguage);
+    final Plugin plugin2 = jarPluginManager.loadPlugin(correctPluginWithALanguage, Version.parse("0.1"));
   }
 
   @Test
@@ -79,7 +81,7 @@ public class JarPluginManagerTest {
     exception.expect(UnableToLoadPluginException.class);
 //    exception.expectMessage(JarPluginManagerTest.class.getResource(".").toURI().toString() + " is a directory");
 
-    jarPluginManager.loadPlugin(Paths.get(JarPluginManagerTest.class.getResource(".").toURI()));
+    jarPluginManager.loadPlugin(Paths.get(JarPluginManagerTest.class.getResource(".").toURI()), Version.parse("0.1"));
   }
 
   @Test
@@ -88,16 +90,34 @@ public class JarPluginManagerTest {
     exception.expectMessage(containsString("not a jar file"));
 
     jarPluginManager.loadPlugin(
-        Paths.get(JarPluginManagerTest.class.getResource("myfile.txt").toURI())
+        Paths.get(JarPluginManagerTest.class.getResource("myfile.txt").toURI()), Version.parse("0.1")
     );
   }
 
   @Test
   public void testFindTestLanguage() throws Exception {
-    final Plugin testPlugin = jarPluginManager.loadPlugin(correctPluginWithALanguage);
+    final Plugin testPlugin = jarPluginManager.loadPlugin(correctPluginWithALanguage, Version.parse("0.1"));
     final Plugin foundPlugin = jarPluginManager.searchPluginByName("My plugin name").get();
 
     assertEquals(testPlugin, foundPlugin);
+  }
+
+  @Test
+  public void testLoadPluginWhichRequiresIde31PassingVersion10() throws Exception {
+    exception.expect(UnableToLoadPluginException.class);
+    exception.expectMessage("Plugin My plugin name is not compatible with running IDE");
+
+    jarPluginManager.loadPlugin(pluginWhichRequireIdeVersion31, Version.parse("1.0"));
+  }
+
+  @Test
+  public void testLoadPluginWhichRequiredIde31PassingVersion31() throws Exception {
+    final Plugin plugin = jarPluginManager.loadPlugin(pluginWhichRequireIdeVersion31, Version.parse("3.1"));
+  }
+
+  @Test
+  public void testLoadPluginWhichRequiresIde31PassingVersion35() throws Exception {
+    jarPluginManager.loadPlugin(pluginWhichRequireIdeVersion31, Version.parse("3.5"));
   }
 
   @Test

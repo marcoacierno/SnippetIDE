@@ -161,7 +161,7 @@ public class Boot {
         @Override
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
           try {
-            final Plugin plugin = pluginManager.loadPlugin(file);
+            final Plugin plugin = pluginManager.loadPlugin(file, ideApplication.getVersion());
             // we need to register the languages created by the plugin not the plugin class!
             plugin.getLanguages().forEach(eventManager::registerListener);
             logger.info("Loaded plugin " + file + "!");

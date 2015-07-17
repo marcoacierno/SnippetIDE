@@ -34,7 +34,7 @@ public class JarPluginManager implements PluginManager {
 
   @NotNull
   @Override
-  public Plugin loadPlugin(@NotNull final Path file) {
+  public Plugin loadPlugin(@NotNull final Path file, @NotNull final Version ideVersion) {
     if (Files.isDirectory(file)) {
       throw new UnableToLoadPluginException(file + " is a directory", file, this);
     }
@@ -59,6 +59,11 @@ public class JarPluginManager implements PluginManager {
 
     try {
       final Plugin plugin = parseManifest(file, jarFile, manifestEntry);
+
+      if (ideVersion.compareTo(plugin.getMinIdeVersion()) == -1) {
+        throw new UnableToLoadPluginException("Plugin " + plugin.getName() + " is not compatible with running IDE", file, this);
+      }
+
       plugins.put(plugin.getName().toLowerCase(), plugin);
       return plugin;
     } catch (IOException e) {
