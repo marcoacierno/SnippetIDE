@@ -25,13 +25,16 @@ public class KeymapUIController {
   @FXML
   private TableView<Action> keymapTable;
   @FXML
-  private TableColumn<Action, KeyCodeCombination> combination;
+  private TableColumn<Action, String> combination;
   @FXML
   private TableColumn<Action, String> keyAction;
 
   public void initialize() {
     keyAction.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().toString()));
-    combination.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(Keymap.getCombination(param.getValue())));
+    combination.setCellValueFactory(param -> {
+      final KeyCodeCombination combination = Keymap.getCombination(param.getValue());
+      return new ReadOnlyObjectWrapper<>(combination == null ? "" : combination.getDisplayText());
+    });
 
     keymapTable.setOnMouseClicked(this::onItemClick);
     keymapTable.getItems().addAll(Action.values());
