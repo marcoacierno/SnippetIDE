@@ -90,9 +90,12 @@ public class Boot {
         applicationPath,
         Paths.get(applicationPathAsString, "plugins"),
         Paths.get(applicationPathAsString, "temp"),
-        configuration
+        configuration,
+        Paths.get(applicationPathAsString, "settings.json"),
+        Paths.get(applicationPathAsString, "default_settings.json")
     );
 
+    loadConfiguration(configuration);
     createDirectories(application);
 
     IDEApplicationLauncher.createApplication(application);
@@ -102,6 +105,10 @@ public class Boot {
     ideApplication = application;
     booted = true;
     return application;
+  }
+
+  private void loadConfiguration(final Configuration configuration) {
+
   }
 
   private void createDirectories(final IDEApplication applicationPath) {

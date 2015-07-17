@@ -42,19 +42,27 @@ public class IDEApplicationImpl implements IDEApplication {
   private final Path temporaryDirectory;
   @NotNull
   private final Configuration configuration;
+  @NotNull
+  private final Path configurationFile;
+  @NotNull
+  private final Path defaultConfigurationFile;
 
   public IDEApplicationImpl(@NotNull final EventManager eventManager,
                             @NotNull final PluginManager pluginManager,
                             @NotNull final Path applicationDirectory,
                             @NotNull final Path pluginsDirectory,
                             @NotNull final Path temporaryDirectory,
-                            @NotNull final Configuration configuration) {
+                            @NotNull final Configuration configuration,
+                            @NotNull final Path configurationFile,
+                            @NotNull final Path defaultConfigurationFile) {
     this.eventManager = eventManager;
     this.pluginManager = pluginManager;
     this.applicationDirectory = applicationDirectory;
     this.pluginsDirectory = pluginsDirectory;
     this.temporaryDirectory = temporaryDirectory;
     this.configuration = configuration;
+    this.configurationFile = configurationFile;
+    this.defaultConfigurationFile = defaultConfigurationFile;
   }
 
   @NotNull
@@ -91,6 +99,18 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public Path getTemporaryDirectory() {
     return temporaryDirectory;
+  }
+
+  @NotNull
+  @Override
+  public Path getConfigurationFile() {
+    return configurationFile;
+  }
+
+  @NotNull
+  @Override
+  public Path getDefaultConfigurationFile() {
+    return defaultConfigurationFile;
   }
 
   @Override

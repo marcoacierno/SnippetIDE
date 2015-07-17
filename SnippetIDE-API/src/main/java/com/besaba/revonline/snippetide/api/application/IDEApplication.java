@@ -29,6 +29,12 @@ public interface IDEApplication {
   @NotNull
   Path getTemporaryDirectory();
 
+  @NotNull
+  Path getConfigurationFile();
+
+  @NotNull
+  Path getDefaultConfigurationFile();
+
   void openIdeInstance(final IDEInstanceContext IdeInstanceContext);
 
   void openAboutWindow(@Nullable Window window);
