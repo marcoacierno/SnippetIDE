@@ -4,6 +4,7 @@ import com.besaba.revonline.snippetide.IdeController;
 import com.besaba.revonline.snippetide.Main;
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
+import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
@@ -39,17 +40,21 @@ public class IDEApplicationImpl implements IDEApplication {
   private final Path pluginsDirectory;
   @NotNull
   private final Path temporaryDirectory;
+  @NotNull
+  private final Configuration configuration;
 
   public IDEApplicationImpl(@NotNull final EventManager eventManager,
                             @NotNull final PluginManager pluginManager,
                             @NotNull final Path applicationDirectory,
                             @NotNull final Path pluginsDirectory,
-                            @NotNull final Path temporaryDirectory) {
+                            @NotNull final Path temporaryDirectory,
+                            @NotNull final Configuration configuration) {
     this.eventManager = eventManager;
     this.pluginManager = pluginManager;
     this.applicationDirectory = applicationDirectory;
     this.pluginsDirectory = pluginsDirectory;
     this.temporaryDirectory = temporaryDirectory;
+    this.configuration = configuration;
   }
 
   @NotNull
@@ -62,6 +67,12 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public PluginManager getPluginManager() {
     return pluginManager;
+  }
+
+  @NotNull
+  @Override
+  public Configuration getConfiguration() {
+    return configuration;
   }
 
   @NotNull

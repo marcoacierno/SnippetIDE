@@ -3,8 +3,10 @@ package com.besaba.revonline.snippetide.boot;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
+import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
+import com.besaba.revonline.snippetide.configuration.JsonConfiguration;
 import com.besaba.revonline.snippetide.events.manager.impl.EventBusEventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.UnableToLoadPluginException;
@@ -45,7 +47,7 @@ public class Boot {
   }
 
   public IDEApplication boot() {
-    return boot(APPLICATION_PATH, null, null);
+    return boot(APPLICATION_PATH, null, null, null);
   }
 
   /**
@@ -61,7 +63,8 @@ public class Boot {
    */
   public IDEApplication boot(@NotNull final Path applicationPath,
                              @Nullable EventManager eventManager,
-                             @Nullable PluginManager pluginManager) {
+                             @Nullable PluginManager pluginManager,
+                             @Nullable Configuration configuration) {
     if (booted) {
       throw new IllegalStateException("Application already started");
     }
@@ -74,6 +77,10 @@ public class Boot {
       pluginManager = new JarPluginManager();
     }
 
+    if (configuration == null) {
+      configuration = new JsonConfiguration();
+    }
+
     logger.info("Boot phase started");
 
     final String applicationPathAsString = applicationPath.toString();
@@ -82,7 +89,8 @@ public class Boot {
         pluginManager,
         applicationPath,
         Paths.get(applicationPathAsString, "plugins"),
-        Paths.get(applicationPathAsString, "temp")
+        Paths.get(applicationPathAsString, "temp"),
+        configuration
     );
 
     createDirectories(application);

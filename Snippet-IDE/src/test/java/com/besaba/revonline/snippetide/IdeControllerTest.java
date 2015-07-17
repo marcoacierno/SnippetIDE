@@ -33,7 +33,8 @@ public class IdeControllerTest extends ApplicationTest {
       application = boot.boot(
           Paths.get(System.getenv("user.dir"), "test-dir"),
           null,
-          new MockPluginManager()
+          new MockPluginManager(),
+          null
       );
       application.getEventManager().registerListener(MockLanguage.INSTANCE);
     }
