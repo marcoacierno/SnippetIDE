@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class JsonConfigurationTest {
@@ -140,10 +141,7 @@ public class JsonConfigurationTest {
   }
 
   @Test
-  public void testArrayNotSupportedAsValueYet() throws Exception {
-    expectedException.expect(UnsupportedOperationException.class);
-    expectedException.expectMessage("Arrays not supported yet");
-
+  public void testLoadArray() throws Exception {
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"name\": [\n" +
@@ -158,6 +156,8 @@ public class JsonConfigurationTest {
         "}";
     final JsonConfiguration jsonConfiguration = new JsonConfiguration();
     jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertArrayEquals(new String[] {"M", "D", "E", "F", "G", "D"}, jsonConfiguration.getAsArray("user.name").get());
   }
 
   @Test
@@ -386,6 +386,25 @@ public class JsonConfigurationTest {
   }
 
   @Test
+  public void testSaveAnArray() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"arr\": [\n" +
+        "      \"a\", \"b\", \"c\", \"d\", \"e\"\n" +
+        "    ]\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    configuration.save(byteArrayOutputStream);
+
+    final String output = byteArrayOutputStream.toString("UTF-8");
+    assertEquals("{\"user\":{\"arr\":[\"a\",\"b\",\"c\",\"d\",\"e\"]}}", output);
+  }
+
+  @Test
   public void testSaveAndRecreateFromSaveOutput() throws Exception {
     final String json = "{\n" +
         "  \"user\": {\n" +
@@ -418,6 +437,33 @@ public class JsonConfigurationTest {
     configuration.set("user.name", 10);
 
     assertEquals(10, configuration.getAsInt("user.name").getAsInt());
+  }
+
+  @Test
+  public void testReadAnArrayOfStringsAsValue() throws Exception {
+    final String json = "{\"user\": {\"likes\": [\"Java\", \"C#\"]}}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertArrayEquals(new String[] {"Java", "C#"}, configuration.getAsArray("user.likes").get());
+  }
+
+  @Test
+  public void testReadAnEmptyArrayAsValue() throws Exception {
+    final String json = "{\"user\": {\"likes\": []}}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertThat(configuration.getAsArray("user.likes").get(), arrayWithSize(0));
+  }
+
+  @Test
+  public void testReadAnInvalidFieldWithGetAsArray() throws Exception {
+    final String json = "{\"user\": {\"likes\": \"me\"}}";
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+
+    assertThat(configuration.getAsArray("user.me").isPresent(), is(false));
   }
 
   public static void assertConcurrent(final String message, final List<? extends Runnable> runnables, final int maxTimeoutSeconds) throws InterruptedException {

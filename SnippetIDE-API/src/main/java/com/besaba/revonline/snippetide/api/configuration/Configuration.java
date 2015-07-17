@@ -89,6 +89,8 @@ public interface Configuration {
   @NotNull
   Optional<Float> getAsFloat(@NotNull final String name);
 
+  Optional<String[]> getAsArray(@NotNull final String name);
+
   /**
    * Set the value
    *

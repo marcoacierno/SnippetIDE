@@ -1,6 +1,7 @@
 package com.besaba.revonline.snippetide.configuration;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -44,7 +45,14 @@ public class JsonConfigurationSection implements ConfigurationSection {
       } else if (value.isJsonNull()) {
         throw new IllegalArgumentException("null is not a valid parameter");
       } else if (value.isJsonArray()) {
-        throw new UnsupportedOperationException("Arrays not supported yet");
+        final JsonArray array = value.getAsJsonArray();
+        final String[] result = new String[array.size()];
+
+        for (int i = 0; i < array.size(); i++) {
+          result[i] = array.get(i).getAsString();
+        }
+
+        values.put(key, result);
       } else if (value.isJsonObject()) {
         throw new UnsupportedOperationException("Objects not supported yet");
       }
