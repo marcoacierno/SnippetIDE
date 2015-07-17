@@ -131,6 +131,7 @@ public class JavaLanguage implements Language {
     }
 
     final RunStartEvent runStartEvent = runningInformation.get();
+    runningInformation = Optional.empty();
 
     if (!compileFinishedEvent.getCompilationResult().successfulCompilation()) {
       return;
@@ -149,7 +150,5 @@ public class JavaLanguage implements Language {
 
     final String command = "\"" + javaHome + "\\bin\\java\" " + classFile + " -cp \"" + runStartEvent.getSourceFile().getParent() + "\"";
     application.getEventManager().post(new RunInformationEvent(command, runStartEvent));
-
-    runningInformation = Optional.empty();
   }
 }
