@@ -1,5 +1,6 @@
 package com.besaba.revonline.snippetide.api.language;
 
+import com.besaba.revonline.snippetide.api.run.RunConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -82,4 +83,19 @@ public interface Language {
    */
   @NotNull
   String getTemplate();
+
+  /**
+   * @return The run configurations of the language.
+   *         A language can provide zero or more
+   *         run configurations.
+   *
+   *         The IDE will show a form where
+   *         the user will insert the values
+   *         required by the run configuration.
+   *
+   *         In the run event you will receive only
+   *         one run configuration with the values.
+   */
+  @NotNull
+  RunConfiguration[] getRunConfigurations();
 }

@@ -2,6 +2,7 @@ package com.besaba.revonline.snippetide;
 
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.run.RunConfiguration;
 import com.google.common.eventbus.Subscribe;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +30,12 @@ public class MockLanguage implements Language {
   @Override
   public String getTemplate() {
     return "";
+  }
+
+  @NotNull
+  @Override
+  public RunConfiguration[] getRunConfigurations() {
+    return new RunConfiguration[0];
   }
 
   @Subscribe

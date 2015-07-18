@@ -16,22 +16,32 @@ import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import com.besaba.revonline.snippetide.api.run.RunConfiguration;
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
+import com.besaba.revonline.snippetide.run.ConfigurationTab;
+import com.besaba.revonline.snippetide.run.CustomPropertyEditorFactory;
+import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
 import com.besaba.revonline.snippetide.run.RunSnippet;
+import com.besaba.revonline.snippetide.run.SimplePropertySheetItem;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -41,6 +51,7 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
+import org.controlsfx.control.PropertySheet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +65,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -256,7 +269,59 @@ public class IdeController {
       return;
     }
 
-    eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory()));
+    final Dialog<RunConfigurationValues> fillRunConfiguration = new Dialog<>();
+    final Parent root;
+
+    try {
+      root = FXMLLoader.load(IdeController.class.getResource("fillrunconfiguration.fxml"));
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open run configuration dialog :(", ButtonType.OK).show();
+      return;
+    }
+
+    final TabPane configurationsTabPane = ((TabPane) root.lookup("#configurations"));
+    final RunConfiguration[] configurations = language.getRunConfigurations();
+
+    for (final RunConfiguration configuration : configurations) {
+      final Tab tab = new ConfigurationTab(configuration.getName(), configuration);
+      final ObservableList<PropertySheet.Item> items = FXCollections.observableArrayList();
+
+      configuration.getFields().forEach((name, fieldInfo) -> items.add(new SimplePropertySheetItem(name, fieldInfo)));
+
+      final PropertySheet propertySheet = new PropertySheet(items);
+      propertySheet.searchBoxVisibleProperty().set(false);
+      propertySheet.setModeSwitcherVisible(false);
+
+      propertySheet.setPropertyEditorFactory(new CustomPropertyEditorFactory());
+
+      tab.setContent(propertySheet);
+
+      configurationsTabPane.getTabs().add(tab);
+    }
+
+    fillRunConfiguration.getDialogPane().setContent(root);
+    fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.OK);
+    fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+    fillRunConfiguration.setResultConverter(param -> {
+      if (param == ButtonType.CLOSE) {
+        return null;
+      }
+
+      final ConfigurationTab activeTab = (ConfigurationTab) configurationsTabPane.getSelectionModel().getSelectedItem();
+      final PropertySheet propertySheet = (PropertySheet) activeTab.getContent().lookup("PropertySheet");
+
+      final Map<String, Object> values = new HashMap<>();
+
+      propertySheet.getItems().forEach(item -> values.put(item.getName(), item.getValue()));
+
+      return new RunConfigurationValues(activeTab.getRunConfiguration(), values);
+    });
+
+    final Optional<RunConfigurationValues> runConfigurationValues = fillRunConfiguration.showAndWait();
+
+    runConfigurationValues.ifPresent(value ->
+        eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value)));
   }
 
   private void cleanRunTextArea() {

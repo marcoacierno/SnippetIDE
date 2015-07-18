@@ -1,6 +1,7 @@
 package com.besaba.revonline.snippetide.lang.plaintext;
 
 import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.run.RunConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 public class PlainTextLanguage implements Language {
@@ -18,5 +19,11 @@ public class PlainTextLanguage implements Language {
   @Override
   public String getTemplate() {
     return "Text";
+  }
+
+  @NotNull
+  @Override
+  public RunConfiguration[] getRunConfigurations() {
+    return new RunConfiguration[0];
   }
 }

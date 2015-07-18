@@ -13,6 +13,9 @@ import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.run.FieldInfo;
+import com.besaba.revonline.snippetide.api.run.RunConfiguration;
+import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
@@ -33,7 +36,20 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class JavaLanguage implements Language {
+  private static final int SIMPLE_RUN_CONFIGURATION_ID = 1;
+
   private final IDEApplication application = IDEApplicationLauncher.getIDEApplication();
+  private final RunConfiguration runConfiguration = new RunConfiguration.Builder(SIMPLE_RUN_CONFIGURATION_ID)
+      .setName("Run")
+      .addField(
+          "JRE Location",
+          new FieldInfo(
+              String.class,
+              System.getenv("JAVA_HOME"),
+              "Location to your JRE/JDK"
+          )
+      )
+      .create();
   private Optional<RunStartEvent> runningInformation = Optional.empty();
 
   @NotNull
@@ -54,6 +70,14 @@ public class JavaLanguage implements Language {
         "\t\tSystem.out.println(\"Hello world\");\n" +
         "\t}\n" +
         "}";
+  }
+
+  @NotNull
+  @Override
+  public RunConfiguration[] getRunConfigurations() {
+    return new RunConfiguration[] {
+        runConfiguration
+    };
   }
 
   @Subscribe
@@ -130,6 +154,10 @@ public class JavaLanguage implements Language {
       return;
     }
 
+    realRun(compileFinishedEvent);
+  }
+
+  private void realRun(final CompileFinishedEvent compileFinishedEvent) {
     final RunStartEvent runStartEvent = runningInformation.get();
     runningInformation = Optional.empty();
 
@@ -137,11 +165,23 @@ public class JavaLanguage implements Language {
       return;
     }
 
+    final RunConfigurationValues runConfigurationValues = runStartEvent.getRunConfigurationValues();
+
+    switch (runConfigurationValues.getParent().getId()) {
+      case SIMPLE_RUN_CONFIGURATION_ID: {
+        simpleRun(runStartEvent, runConfigurationValues);
+        break;
+      }
+    }
+  }
+
+  private void simpleRun(final RunStartEvent runStartEvent,
+                         final RunConfigurationValues runConfigurationValues) {
+    final String javaHome = (String) runConfigurationValues.getValues().get("JRE Location");
+
     final Path classFile = Paths.get(
         Files.getNameWithoutExtension(runStartEvent.getSourceFile().getFileName().toString())
     );
-
-    final String javaHome = System.getenv("JAVA_HOME");
 
     if (javaHome == null) {
       application.getEventManager().post(new MessageFromProcess("Unable to run, missing JAVA_HOME variable."));
