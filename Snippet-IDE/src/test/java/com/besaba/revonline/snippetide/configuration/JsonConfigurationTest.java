@@ -1,6 +1,7 @@
 package com.besaba.revonline.snippetide.configuration;
 
 import com.besaba.revonline.snippetide.api.configuration.ConfigurationLoadFailedException;
+import com.besaba.revonline.snippetide.api.configuration.ConfigurationSaveFailedException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,6 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 
 import static java.nio.charset.StandardCharsets.*;
 import static org.hamcrest.Matchers.*;
@@ -330,10 +332,7 @@ public class JsonConfigurationTest {
         "}";
     final JsonConfiguration configuration = loadJson(json);
 
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    configuration.save(outputStream);
-
-    final String output = new String(outputStream.toByteArray(), UTF_8);
+    final String output = saveJson(configuration);
     assertEquals("{\"user\":{\"world\":\"10\",\"hello\":\"world\",\"age\":\"84\",\"long\":\"9223372036854775207\"}}", output);
   }
 
@@ -353,10 +352,7 @@ public class JsonConfigurationTest {
     configuration.set("user.world", 50);
     configuration.set("user.hello", "Ciao");
 
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    configuration.save(outputStream);
-
-    final String output = new String(outputStream.toByteArray(), UTF_8);
+    final String output = saveJson(configuration);
     assertEquals("{\"user\":{\"world\":\"50\",\"hello\":\"Ciao\",\"age\":\"84\",\"long\":\"9223372036854775207\"}}", output);
   }
 
@@ -371,10 +367,7 @@ public class JsonConfigurationTest {
         "}";
     final JsonConfiguration configuration = loadJson(json);
 
-    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    configuration.save(byteArrayOutputStream);
-
-    final String output = byteArrayOutputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
     assertEquals("{\"user\":{\"arr\":[\"a\",\"b\",\"c\",\"d\",\"e\"]}}", output);
   }
 
@@ -430,11 +423,7 @@ public class JsonConfigurationTest {
 
     configuration.set("user.age", new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-    configuration.save(outputStream);
-
-    final String output = outputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
 
     assertEquals("{\"user\":{\"world\":\"1\",\"hello\":\"World\",\"age\":[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"10\"],\"long\":\"9223372036854775207\"}}", output);
   }
@@ -601,10 +590,7 @@ public class JsonConfigurationTest {
 
     assertTrue(configuration.remove("user"));
 
-    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    configuration.save(byteArrayOutputStream);
-
-    final String output = byteArrayOutputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
     assertEquals("{}", output);
   }
 
@@ -620,10 +606,7 @@ public class JsonConfigurationTest {
 
     assertTrue(configuration.remove("user.age"));
 
-    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    configuration.save(byteArrayOutputStream);
-
-    final String output = byteArrayOutputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
 
     assertEquals("{\"user\":{\"name\":\"ReVo_\"}}", output);
   }
@@ -656,10 +639,7 @@ public class JsonConfigurationTest {
 
     assertTrue(configuration.remove("user.name"));
 
-    final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    configuration.save(byteArrayOutputStream);
-
-    final String output = byteArrayOutputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
 
     final JsonConfiguration newCopy = loadJson(output);
 
@@ -736,9 +716,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
     final JsonConfiguration configuration = loadJson(json);
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    configuration.save(outputStream);
-    final String output = outputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
     assertEquals("{\"user\":{\"work\":{\"hours\":[\"1\",\"2\",\"3\",\"4\",\"5\"],\"name\":\"Hello_World\"}}}", output);
   }
 
@@ -807,10 +785,7 @@ public class JsonConfigurationTest {
     final String json = "{\"my\":{\"sub\":{\"section\":\"yes\"}}}";
     final JsonConfiguration configuration = loadJson(json);
 
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    configuration.save(outputStream);
-
-    final String output = outputStream.toString("UTF-8");
+    final String output = saveJson((JsonConfiguration) configuration);
     assertEquals(json, output);
   }
 
@@ -849,5 +824,12 @@ public class JsonConfigurationTest {
     final JsonConfiguration configuration = new JsonConfiguration();
     configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
     return configuration;
+  }
+
+  @NotNull
+  private String saveJson(final JsonConfiguration configuration) throws ConfigurationSaveFailedException, UnsupportedEncodingException {
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    configuration.save(outputStream);
+    return outputStream.toString("UTF-8");
   }
 }
