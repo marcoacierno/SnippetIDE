@@ -4,21 +4,14 @@ import com.besaba.revonline.snippetide.api.events.Event;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.boot.Boot;
-import com.besaba.revonline.snippetide.run.RunSnippet;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
-import org.testfx.matcher.base.NodeMatchers;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;

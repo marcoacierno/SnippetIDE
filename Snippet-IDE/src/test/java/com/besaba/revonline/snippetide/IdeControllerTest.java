@@ -1,17 +1,13 @@
 package com.besaba.revonline.snippetide;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
-import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
-import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
 import com.besaba.revonline.snippetide.api.language.Language;
-import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.boot.Boot;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.BufferedReader;

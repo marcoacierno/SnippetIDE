@@ -1,18 +1,13 @@
 package com.besaba.revonline.snippetide.configuration;
 
+import com.besaba.revonline.snippetide.api.configuration.ConfigurationLoadFailedException;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.*;
 import static org.hamcrest.Matchers.*;
@@ -31,8 +26,7 @@ public class JsonConfigurationTest {
         "    \"age\": 17\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     assertEquals(17, jsonConfiguration.getAsInt("user.age").getAsInt());
   }
@@ -44,8 +38,7 @@ public class JsonConfigurationTest {
         "    \"hello\": \"world\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     assertFalse(jsonConfiguration.getAsLong("user.my").isPresent());
   }
@@ -57,8 +50,7 @@ public class JsonConfigurationTest {
         "  \"world\": {},\n" +
         "  \"user\": {}\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("hello.my", 5);
 
@@ -72,8 +64,7 @@ public class JsonConfigurationTest {
         "    \"hello\": \"world\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals("world", configuration.getAsString("user.hello").get());
   }
@@ -87,8 +78,7 @@ public class JsonConfigurationTest {
         "    \"world\": 10\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals(10, configuration.getAsInt("user.world").getAsInt());
   }
@@ -103,8 +93,7 @@ public class JsonConfigurationTest {
         "    \"long\": 9223372036854775207\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals(9223372036854775207L, configuration.getAsLong("user.long").getAsLong());
   }
@@ -119,8 +108,7 @@ public class JsonConfigurationTest {
         "    \"long\": 9223372036854775207\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals(50.87d, configuration.getAsDouble("user.my").getAsDouble(), DELTA);
   }
@@ -136,8 +124,7 @@ public class JsonConfigurationTest {
         "    \"world\": null\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
   }
 
   @Test
@@ -154,8 +141,7 @@ public class JsonConfigurationTest {
         "    ]\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     assertArrayEquals(new String[] {"M", "D", "E", "F", "G", "D"}, jsonConfiguration.getAsArray("user.name").get());
   }
@@ -169,8 +155,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     assertTrue(jsonConfiguration.getAsBoolean("user.world").get());
   }
@@ -187,8 +172,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     jsonConfiguration.getAsString("keymap.compile");
   }
@@ -205,8 +189,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     jsonConfiguration.getAsString("world");
   }
@@ -223,8 +206,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration jsonConfiguration = new JsonConfiguration();
-    jsonConfiguration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration jsonConfiguration = loadJson(json);
 
     jsonConfiguration.set("world", 5);
   }
@@ -237,8 +219,7 @@ public class JsonConfigurationTest {
         "    \"world\": true\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertFalse(configuration.getAsInt("user.my").isPresent());
 
@@ -255,8 +236,7 @@ public class JsonConfigurationTest {
         "    \"world\": true\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("keymap.compile", "F5");
 
@@ -280,8 +260,7 @@ public class JsonConfigurationTest {
         "    }\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
   }
 
   @Test
@@ -294,8 +273,7 @@ public class JsonConfigurationTest {
         "    \"long\": 9223372036854775207\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals(84, configuration.getAsInt("user.age").getAsInt());
 
@@ -314,8 +292,7 @@ public class JsonConfigurationTest {
         "    \"long\": 9223372036854775207\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals("world", configuration.getAsString("user.hello").get());
 
@@ -334,8 +311,7 @@ public class JsonConfigurationTest {
         "    \"long\": 8686.54\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertEquals(8686.54f, configuration.getAsFloat("user.long").get(), DELTA);
 
@@ -351,8 +327,7 @@ public class JsonConfigurationTest {
         "    \"long\": 9223372036854775207\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     configuration.save(outputStream);
@@ -372,8 +347,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("user.world", 50);
     configuration.set("user.hello", "Ciao");
@@ -394,8 +368,7 @@ public class JsonConfigurationTest {
         "    ]\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     configuration.save(byteArrayOutputStream);
@@ -415,8 +388,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("user.age", new String[] {"a", "b"});
 
@@ -434,8 +406,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("user.age", new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -454,8 +425,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("user.age", new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -479,8 +449,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
 
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("user.age", new boolean[] {true, false, true, true});
 
@@ -497,8 +466,7 @@ public class JsonConfigurationTest {
         "    \"long\": 9223372036854775207\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration original = new JsonConfiguration();
-    original.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration original = loadJson(json);
 
     final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     original.save(outputStream);
@@ -514,8 +482,7 @@ public class JsonConfigurationTest {
   @Test
   public void testSaveAnIntegerWhereBeforeThereWasAString() throws Exception {
     final String json = "{\"user\": {\"name\": \"ReVo_\"}}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.set("user.name", 10);
 
@@ -525,8 +492,7 @@ public class JsonConfigurationTest {
   @Test
   public void testReadAnArrayOfStringsAsValue() throws Exception {
     final String json = "{\"user\": {\"likes\": [\"Java\", \"C#\"]}}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertArrayEquals(new String[] {"Java", "C#"}, configuration.getAsArray("user.likes").get());
   }
@@ -534,8 +500,7 @@ public class JsonConfigurationTest {
   @Test
   public void testReadAnEmptyArrayAsValue() throws Exception {
     final String json = "{\"user\": {\"likes\": []}}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertThat(configuration.getAsArray("user.likes").get(), arrayWithSize(0));
   }
@@ -543,8 +508,7 @@ public class JsonConfigurationTest {
   @Test
   public void testReadAnInvalidFieldWithGetAsArray() throws Exception {
     final String json = "{\"user\": {\"likes\": \"me\"}}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertThat(configuration.getAsArray("user.me").isPresent(), is(false));
   }
@@ -557,8 +521,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertTrue(configuration.remove("user.age"));
   }
@@ -571,8 +534,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertTrue(configuration.remove("user.name"));
   }
@@ -585,8 +547,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertFalse(configuration.remove("user.work"));
   }
@@ -599,8 +560,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertTrue(configuration.remove("user"));
   }
@@ -613,8 +573,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertFalse(configuration.remove("keymap"));
   }
@@ -627,8 +586,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertTrue(configuration.remove("user"));
 
@@ -647,8 +605,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertTrue(configuration.remove("user.age"));
 
@@ -671,8 +628,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     configuration.remove("keymap.compile");
   }
@@ -685,8 +641,7 @@ public class JsonConfigurationTest {
         "    \"age\": \"98\"\n" +
         "  }\n" +
         "}";
-    final JsonConfiguration configuration = new JsonConfiguration();
-    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    final JsonConfiguration configuration = loadJson(json);
 
     assertTrue(configuration.remove("user.name"));
 
@@ -695,10 +650,16 @@ public class JsonConfigurationTest {
 
     final String output = byteArrayOutputStream.toString("UTF-8");
 
-    final JsonConfiguration newCopy = new JsonConfiguration();
-    newCopy.load(new ByteArrayInputStream(output.getBytes(UTF_8)));
+    final JsonConfiguration newCopy = loadJson(output);
 
     assertEquals(98, newCopy.getAsInt("user.age").getAsInt());
     assertFalse(newCopy.getAsString("user.name").isPresent());
+  }
+
+  @NotNull
+  private JsonConfiguration loadJson(final String json) throws ConfigurationLoadFailedException {
+    final JsonConfiguration configuration = new JsonConfiguration();
+    configuration.load(new ByteArrayInputStream(json.getBytes(UTF_8)));
+    return configuration;
   }
 }
