@@ -115,7 +115,7 @@ public class JsonConfigurationSection implements ConfigurationSection {
 
   @Override
   public <T> void set(@NotNull final String name,
-                      @Nullable final T value) {
+                      @NotNull final T value) {
     if (name.contains(".")) {
       setSubsection(name, value);
       return;
@@ -125,7 +125,7 @@ public class JsonConfigurationSection implements ConfigurationSection {
   }
 
   private <T> void setSubsection(@NotNull final String name,
-                                 @Nullable final T value) {
+                                 @NotNull final T value) {
     final int dotPosition = name.indexOf('.');
 
     if (dotPosition == -1) {
