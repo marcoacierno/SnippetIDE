@@ -197,6 +197,7 @@ public class IDEApplicationImpl implements IDEApplication {
       stage.initModality(Modality.WINDOW_MODAL);
       stage.initOwner(window);
       stage.setScene(scene);
+      stage.setTitle("Plugins");
 
       stage.show();
     } catch (IOException e) {
@@ -215,6 +216,7 @@ public class IDEApplicationImpl implements IDEApplication {
     stage.initOwner(window);
     stage.setResizable(false);
     stage.setScene(scene);
+    stage.setTitle("Keymap settings");
 
     stage.show();
   }
