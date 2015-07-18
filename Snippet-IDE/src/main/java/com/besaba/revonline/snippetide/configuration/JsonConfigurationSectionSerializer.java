@@ -20,8 +20,9 @@ public class JsonConfigurationSectionSerializer implements JsonSerializer<JsonCo
 
     for (final Map.Entry<String, Object> entry : src.getValues().entrySet()) {
       final Object value = entry.getValue();
+      final Class<?> valueClass = value.getClass();
 
-      if (value.getClass().isArray()) {
+      if (valueClass.isArray()) {
         final JsonArray jsonArray = new JsonArray();
         final String[] elements = (String[]) value;
 
@@ -30,6 +31,8 @@ public class JsonConfigurationSectionSerializer implements JsonSerializer<JsonCo
         }
 
         root.add(entry.getKey(), jsonArray);
+      } else if (JsonConfigurationSection.class.isAssignableFrom(valueClass)){
+        root.add(entry.getKey(), context.serialize(value));
       } else {
         root.add(entry.getKey(), new JsonPrimitive(value.toString()));
       }

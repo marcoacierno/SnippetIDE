@@ -244,9 +244,9 @@ public class JsonConfigurationTest {
   }
 
   @Test
-  public void testObjectsNotSupportedYet() throws Exception {
-    expectedException.expect(UnsupportedOperationException.class);
-    expectedException.expectMessage("Objects not supported yet");
+  public void testGetAnEntryFromAJsonObjectOrSubSection() throws Exception {
+//    expectedException.expect(UnsupportedOperationException.class);
+//    expectedException.expectMessage("Objects not supported yet");
 
     final String json = "{\n" +
         "  \"keymap\": {\n" +
@@ -261,6 +261,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
     final JsonConfiguration configuration = loadJson(json);
+    assertEquals("ANY", configuration.getAsString("keymap.compile.alt").get());
   }
 
   @Test
@@ -490,6 +491,16 @@ public class JsonConfigurationTest {
   }
 
   @Test
+  public void testSetWithASectionWhichDoesntExists() throws Exception {
+    final String json = "{\"user\": {\"name\": \"ReVo_\"}}";
+    final JsonConfiguration configuration = loadJson(json);
+
+    configuration.set("keymap.compile", "F1");
+
+    assertEquals("F1", configuration.getAsString("keymap.compile").get());
+  }
+
+  @Test
   public void testReadAnArrayOfStringsAsValue() throws Exception {
     final String json = "{\"user\": {\"likes\": [\"Java\", \"C#\"]}}";
     final JsonConfiguration configuration = loadJson(json);
@@ -654,6 +665,183 @@ public class JsonConfigurationTest {
 
     assertEquals(98, newCopy.getAsInt("user.age").getAsInt());
     assertFalse(newCopy.getAsString("user.name").isPresent());
+  }
+
+  @Test
+  public void testGetEntryInsideAnObject() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"work\": {\n" +
+        "      \"hours\": 5\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration jsonConfiguration = loadJson(json);
+
+    assertEquals(5, jsonConfiguration.getAsInt("user.work.hours").getAsInt());
+  }
+
+  @Test
+  public void testGetInvalidEntryInsideAnObject() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"work\": {\n" +
+        "      \"name\": \"Hello_World\"\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    
+    assertFalse(configuration.getAsInt("user.work.hours").isPresent());
+  }
+
+  @Test
+  public void testTryToGetValueFromAnObjectWhichDoesntExists() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Sub section home doesn't exists");
+
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"work\": {\n" +
+        "      \"name\": \"Hello_World\"\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    configuration.getAsLong("user.home.world");
+  }
+
+  @Test
+  public void testGetArrayFromAnObject() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"work\": {\n" +
+        "      \"name\": \"Hello_World\",\n" +
+        "      \"hours\": [1, 2, 3, 4, 5]\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    assertArrayEquals(new String[]{"1", "2", "3", "4", "5"}, configuration.getAsArray("user.work.hours").get());
+  }
+
+  @Test
+  public void testSaveAConfigurationWithAnObject() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"work\": {\n" +
+        "      \"name\": \"Hello_World\",\n" +
+        "      \"hours\": [1, 2, 3, 4, 5]\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    configuration.save(outputStream);
+    final String output = outputStream.toString("UTF-8");
+    assertEquals("{\"user\":{\"work\":{\"hours\":[\"1\",\"2\",\"3\",\"4\",\"5\"],\"name\":\"Hello_World\"}}}", output);
+  }
+
+  @Test
+  public void testTryToUseSubsectionSyntaxOnAnInt() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Sub section name doesn't exists");
+
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"ReVo_\",\n" +
+        "    \"work\": {\n" +
+        "      \"name\": \"Hello_World\",\n" +
+        "      \"hours\": [1, 2, 3, 4, 5]\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    configuration.getAsString("user.name.othername");
+  }
+
+  @Test
+  public void testSetAnObject() throws Exception {
+    final String json = "{\"user\": {\"work\": {\"name\":\"Hello\"}}}";
+    final JsonConfiguration jsonConfiguration = loadJson(json);
+    jsonConfiguration.set("user.family.members", 5);
+
+    assertEquals(5, jsonConfiguration.getAsInt("user.family.members").getAsInt());
+  }
+
+  @Test
+  public void testRemoveASubSection() throws Exception {
+    final String json = "{\"user\": {\"work\": {\"name\":\"Hello\"}}}";
+    final JsonConfiguration jsonConfiguration = loadJson(json);
+    assertTrue(jsonConfiguration.remove("user.work"));
+  }
+
+  @Test
+  public void testRemoveASubSectionWhichDoesntExists() throws Exception {
+    final String json = "{\"user\": {\"work\": {\"name\":\"Hello\"}}}";
+    final JsonConfiguration jsonConfiguration = loadJson(json);
+    assertFalse(jsonConfiguration.remove("user.keymaps"));
+  }
+
+  @Test
+  public void testRemoveAnEntryFromASubSection() throws Exception {
+    final String json = "{\"user\": {\"work\": {\"name\":\"Hello\"}}}";
+    final JsonConfiguration jsonConfiguration = loadJson(json);
+    assertTrue(jsonConfiguration.remove("user.work.name"));
+
+    assertFalse(jsonConfiguration.getAsString("user.work.name").isPresent());
+  }
+
+  @Test
+  public void testAddAsubSectiontoASubsection() throws Exception {
+    final String json = "{\"user\": {\"work\": {\"name\":\"Hello\"}}}";
+    final JsonConfiguration jsonConfiguration = loadJson(json);
+
+    jsonConfiguration.set("user.work.job.hour", 2);
+
+    assertEquals(2, jsonConfiguration.getAsInt("user.work.job.hour").getAsInt());
+  }
+
+  @Test
+  public void testSaveASubsectionOfASubSection() throws Exception {
+    final String json = "{\"my\":{\"sub\":{\"section\":\"yes\"}}}";
+    final JsonConfiguration configuration = loadJson(json);
+
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    configuration.save(outputStream);
+
+    final String output = outputStream.toString("UTF-8");
+    assertEquals(json, output);
+  }
+
+  @Test
+  public void testGetAValueFromASubsectionOfASubSection() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"my\": {\n" +
+        "      \"family\": {\n" +
+        "        \"members\": 5\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    assertEquals(5, configuration.getAsInt("user.my.family.members").getAsInt());
+  }
+
+  @Test
+  public void testRemoveASubsectionOfaSubsection() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"my\": {\n" +
+        "      \"family\": {\n" +
+        "        \"members\": 5\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    assertTrue(configuration.remove("user.my.family"));
   }
 
   @NotNull

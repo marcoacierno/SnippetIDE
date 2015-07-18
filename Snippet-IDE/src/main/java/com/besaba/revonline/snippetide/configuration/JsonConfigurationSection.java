@@ -11,6 +11,7 @@ import com.google.gson.stream.JsonWriter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,7 +55,17 @@ public class JsonConfigurationSection implements ConfigurationSection {
 
         values.put(key, result);
       } else if (value.isJsonObject()) {
-        throw new UnsupportedOperationException("Objects not supported yet");
+        final JsonObject object = value.getAsJsonObject();
+
+        final JsonConfigurationSection subSection = new JsonConfigurationSection();
+        subSection.load(
+            new ByteArrayInputStream(
+                object
+                    .toString()
+                    .getBytes(StandardCharsets.UTF_8))
+        );
+
+        values.put(key, subSection);
       }
     }
   }
@@ -74,18 +85,96 @@ public class JsonConfigurationSection implements ConfigurationSection {
   @NotNull
   @Override
   public <T> Optional<T> get(@NotNull final String name) {
+    if (name.contains(".")) {
+      return getSubsection(name);
+    }
+
     return Optional.ofNullable((T) values.get(name));
+  }
+
+  @NotNull
+  private <T> Optional<T> getSubsection(final String name) {
+    final int dotPosition = name.indexOf('.');
+
+    if (dotPosition == -1) {
+      throw new IllegalArgumentException(name + " is not a valid section query");
+    }
+
+    final String sectionName = name.substring(0, dotPosition);
+    final String entry = name.substring(dotPosition + 1);
+
+    final Object tempObject = values.get(sectionName);
+
+    if (tempObject == null || !JsonConfigurationSection.class.isAssignableFrom(tempObject.getClass())) {
+      throw new IllegalArgumentException("Sub section " + sectionName + " doesn't exists");
+    }
+
+    final JsonConfigurationSection subSection = (JsonConfigurationSection) tempObject;
+    return subSection.get(entry);
   }
 
   @Override
   public <T> void set(@NotNull final String name,
                       @Nullable final T value) {
+    if (name.contains(".")) {
+      setSubsection(name, value);
+      return;
+    }
+
     values.put(name, value);
+  }
+
+  private <T> void setSubsection(@NotNull final String name,
+                                 @Nullable final T value) {
+    final int dotPosition = name.indexOf('.');
+
+    if (dotPosition == -1) {
+      throw new IllegalArgumentException(name + " is not a valid query");
+    }
+
+    final String sectionName = name.substring(0, dotPosition);
+    final String entry = name.substring(dotPosition + 1);
+
+    final Object tempObject = values.get(sectionName);
+
+    final JsonConfigurationSection subsection;
+
+    if (tempObject == null || !JsonConfigurationSection.class.isAssignableFrom(tempObject.getClass())) {
+      subsection = new JsonConfigurationSection();
+      values.put(sectionName, subsection);
+    } else {
+      subsection = (JsonConfigurationSection) values.get(sectionName);
+    }
+
+    subsection.set(entry, value);
   }
 
   @Override
   public boolean remove(@NotNull final String name) {
+    if (name.contains(".")) {
+      return removeFromSubSection(name);
+    }
+
     return values.remove(name) != null;
+  }
+
+  private boolean removeFromSubSection(@NotNull final String name) {
+    final int dotPosition = name.indexOf('.');
+
+    if (dotPosition == -1) {
+      throw new IllegalArgumentException(name + " is not a valid query");
+    }
+
+    final String sectionName = name.substring(0, dotPosition);
+    final String entry = name.substring(dotPosition + 1);
+
+    final Object tempObject = values.get(sectionName);
+    if (tempObject == null || !JsonConfigurationSection.class.isAssignableFrom(tempObject.getClass())) {
+      throw new IllegalArgumentException(sectionName + " is not a valid sub section name");
+    }
+
+    final JsonConfigurationSection subSection = (JsonConfigurationSection) tempObject;
+    return subSection.remove(entry);
   }
 
   @NotNull
