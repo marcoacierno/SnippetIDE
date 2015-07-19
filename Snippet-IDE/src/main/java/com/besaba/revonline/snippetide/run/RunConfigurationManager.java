@@ -155,7 +155,7 @@ public class RunConfigurationManager {
 
     fillRunConfiguration.getDialogPane().setContent(root);
     fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.OK);
-    fillRunConfiguration.getDialogPane().getButtonTypes().add(new ButtonType("OK, save and reuse", ButtonBar.ButtonData.OK_DONE));
+    fillRunConfiguration.getDialogPane().getButtonTypes().add(new ButtonType("OK, save and reuse", ButtonBar.ButtonData.APPLY));
     fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 
     fillRunConfiguration.setResultConverter(param -> {
@@ -172,7 +172,7 @@ public class RunConfigurationManager {
 
       final RunConfigurationValues configuration = new RunConfigurationValues(activeTab.getRunConfiguration(), values);
 
-      if (param.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+      if (param.getButtonData() == ButtonBar.ButtonData.APPLY) {
         application.getConfiguration().set(
             ConfigurationSettingsContract.RunConfigurations.generateRunConfigurationsLanguageQuery(plugin, language) + "." +
                 configuration.getParentId(),
