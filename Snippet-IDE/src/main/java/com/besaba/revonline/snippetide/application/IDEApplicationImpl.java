@@ -158,54 +158,45 @@ public class IDEApplicationImpl implements IDEApplication {
   }
 
   @Override
-  public void openAboutWindow(@Nullable final Window window) {
-    try {
-      final Stage stage = new Stage();
+  public void openAboutWindow(@Nullable final Window window) throws IOException{
 
-      final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("."));
-      final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("about.fxml")));
-      scene.getStylesheets().add(IdeController.class.getResource("about.css").toExternalForm());
-      scene.setOnKeyPressed(event -> {
-        if (event.getCode() == KeyCode.ESCAPE) {
-          stage.close();
-        }
-      });
-      stage.focusedProperty().addListener(((observable, oldValue, newValue) -> {
-        if (!newValue) {
-          stage.close();
-        }
-      }));
+    final Stage stage = new Stage();
 
-      ((Text) scene.getRoot().lookup("#versionText")).setText("Version: " + getVersion().toString());
+    final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("."));
+    final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("about.fxml")));
+    scene.getStylesheets().add(IdeController.class.getResource("about.css").toExternalForm());
+    scene.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        stage.close();
+      }
+    });
+    stage.focusedProperty().addListener(((observable, oldValue, newValue) -> {
+      if (!newValue) {
+        stage.close();
+      }
+    }));
 
-      stage.initStyle(StageStyle.UNDECORATED);
-      stage.initOwner(window);
-      stage.setResizable(false);
-      stage.setScene(scene);
+    ((Text) scene.getRoot().lookup("#versionText")).setText("Version: " + getVersion().toString());
 
-      stage.show();
-    } catch (IOException e) {
-      new Alert(Alert.AlertType.ERROR, "Unable to open about window", ButtonType.OK).show();
-      logger.error("Failed to open about window", e);
-    }
+    stage.initStyle(StageStyle.UNDECORATED);
+    stage.initOwner(window);
+    stage.setResizable(false);
+    stage.setScene(scene);
+
+    stage.show();
   }
 
   @Override
-  public void openPluginsList(@Nullable final Window window) {
-    try {
-      final Stage stage = new Stage();
-      final Scene scene = new Scene(FXMLLoader.load(IdeController.class.getResource("pluginslist.fxml")));
+  public void openPluginsList(@Nullable final Window window) throws IOException {
+    final Stage stage = new Stage();
+    final Scene scene = new Scene(FXMLLoader.load(IdeController.class.getResource("pluginslist.fxml")));
 
-      stage.initModality(Modality.WINDOW_MODAL);
-      stage.initOwner(window);
-      stage.setScene(scene);
-      stage.setTitle("Plugins");
+    stage.initModality(Modality.WINDOW_MODAL);
+    stage.initOwner(window);
+    stage.setScene(scene);
+    stage.setTitle("Plugins");
 
-      stage.show();
-    } catch (IOException e) {
-      new Alert(Alert.AlertType.ERROR, "Unable to open plugins list", ButtonType.OK).show();
-      logger.error("Failed to open plugins list stage", e);
-    }
+    stage.show();
   }
 
   @Override

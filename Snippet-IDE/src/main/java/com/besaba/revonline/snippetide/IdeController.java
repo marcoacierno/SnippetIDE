@@ -466,11 +466,21 @@ public class IdeController {
   }
 
   public void showPluginsList(ActionEvent actionEvent) {
-    application.openPluginsList(runTextArea.getScene().getWindow());
+    try {
+      application.openPluginsList(runTextArea.getScene().getWindow());
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open plugins list", ButtonType.OK).show();
+      logger.error("Failed to open plugins list stage", e);
+    }
   }
 
   public void showAbout(final ActionEvent actionEvent) {
-    application.openAboutWindow(runTextArea.getScene().getWindow());
+    try {
+      application.openAboutWindow(runTextArea.getScene().getWindow());
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open about window", ButtonType.OK).show();
+      logger.error("Failed to open about window", e);
+    }
   }
 
   public void showKeymapUi(ActionEvent actionEvent) {

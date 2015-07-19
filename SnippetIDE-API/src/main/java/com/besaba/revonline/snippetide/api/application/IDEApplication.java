@@ -39,9 +39,9 @@ public interface IDEApplication {
 
   void openIdeInstance(final IDEInstanceContext IdeInstanceContext);
 
-  void openAboutWindow(@Nullable Window window);
+  void openAboutWindow(@Nullable Window window) throws IOException;
 
-  void openPluginsList(@Nullable Window window);
+  void openPluginsList(@Nullable Window window) throws IOException;
 
   void openKeymapSetting(@Nullable Window window) throws IOException;
 
