@@ -17,6 +17,7 @@ public class Plugin {
   private final Version minIdeVersion;
   private final String[] authors;
   private final ImmutableList<Language> languages;
+  private final int pluginId;
 
   public Plugin(final String name, final String description, final Version version, final Version minIdeVersion, final String[] authors, final List<Language> languages) {
     this.name = name;
@@ -25,6 +26,11 @@ public class Plugin {
     this.minIdeVersion = minIdeVersion;
     this.authors = authors;
     this.languages = ImmutableList.copyOf(languages);
+    this.pluginId = name.hashCode();
+  }
+
+  public int getPluginId() {
+    return pluginId;
   }
 
   public String getName() {
