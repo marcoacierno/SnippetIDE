@@ -95,8 +95,6 @@ public class RunSnippet implements Runnable {
 
     try(final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
       while (running) {
-        logger.debug("waiting for message");
-
         if (!running || workingThread.isInterrupted()) {
           logger.debug("running is " + running);
           logger.debug("workingThread.isInterrupted " + workingThread.isInterrupted());
