@@ -46,8 +46,6 @@ public class ManageRunConfigurationsController {
   @NotNull
   private final Language language;
   @NotNull
-  private final String pluginConfigurationKey;
-  @NotNull
   private final String languageConfigurationsQuery;
 
   private static final Logger logger = Logger.getLogger(ManageRunConfigurationsController.class);
@@ -58,9 +56,8 @@ public class ManageRunConfigurationsController {
     plugin = context.getPlugin();
     language = context.getLanguage();
 
-    pluginConfigurationKey =
-        ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." + plugin.getPluginId();
-    languageConfigurationsQuery = pluginConfigurationKey + "." + language.getName().hashCode();
+    languageConfigurationsQuery
+        = ConfigurationSettingsContract.RunConfigurations.generateRunConfigurationsLanguageQuery(plugin, language);
   }
 
   public void initialize() {
@@ -113,7 +110,7 @@ public class ManageRunConfigurationsController {
   private void addStoredConfigurationsToTable() {
     try {
       logger.debug("try to get default");
-      logger.debug("query -> " + pluginConfigurationKey + "." + language.hashCode() + ".default");
+      logger.debug("query -> " + languageConfigurationsQuery + ".default");
       final int defaultConfiguration = applicationConfiguration.getAsInt(
           languageConfigurationsQuery + ".default"
       ).orElse(-1);

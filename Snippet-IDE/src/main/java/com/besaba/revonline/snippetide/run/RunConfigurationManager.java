@@ -56,8 +56,7 @@ public class RunConfigurationManager {
 
     try {
       defaultConfiguration = application.getConfiguration().getAsInt(
-          ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
-              plugin.getPluginId() + "." + language.getName().hashCode() + ".default"
+          ConfigurationSettingsContract.RunConfigurations.generateLanguageDefaultRunConfigurationQuery(plugin, language)
       ).orElse(-1);
     } catch (IllegalArgumentException e) {
       logger.info("unable to access debug property", e);
@@ -100,8 +99,9 @@ public class RunConfigurationManager {
 
   private Optional<RunConfigurationValues> tryToLoadSpecificConfiguration(final int configurationId) {
     try {
-      final Optional<Map<String, Object>> values = application.getConfiguration().get(ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
-              plugin.getPluginId() + "." + language.getName().hashCode() + "." + configurationId
+      final Optional<Map<String, Object>> values = application.getConfiguration().get(
+          ConfigurationSettingsContract.RunConfigurations.generateRunConfigurationsLanguageQuery(plugin, language)
+            + "." + configurationId
       );
 
       if (values.isPresent()) {
@@ -174,9 +174,7 @@ public class RunConfigurationManager {
 
       if (param.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
         application.getConfiguration().set(
-            ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
-                plugin.getPluginId() + "." +
-                language.getName().hashCode() + "." +
+            ConfigurationSettingsContract.RunConfigurations.generateRunConfigurationsLanguageQuery(plugin, language) + "." +
                 configuration.getParentId(),
             configuration.getValues()
         );
