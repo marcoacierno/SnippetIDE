@@ -10,6 +10,8 @@ import org.junit.rules.ExpectedException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.*;
 import static org.hamcrest.Matchers.*;
@@ -406,6 +408,43 @@ public class JsonConfigurationTest {
 
     assertArrayEquals(new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}, configuration.getAsArray("user.age").get());
 
+  }
+
+  @Test
+  public void testConvertAMapToASubsection() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"My\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    final Map<String, String> works = new HashMap<>();
+    works.put("Google", "Yep");
+    works.put("Facebook", "lol");
+    works.put("Somewhere", "trust me");
+
+    configuration.set("user.works", works);
+
+    assertEquals("lol", configuration.getAsString("user.works.Facebook").get());
+  }
+
+  @Test
+  public void testSetAMapAndSaveConfiguration() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"name\": \"My\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    final Map<String, String> works = new HashMap<>();
+    works.put("Google", "Yep");
+    works.put("Facebook", "lol");
+    works.put("Somewhere", "trust me");
+
+    configuration.set("user.works", works);
+
+    final String output = saveJson(configuration);
+    assertEquals(output, "{\"user\":{\"works\":{\"Google\":\"Yep\",\"Somewhere\":\"trust me\",\"Facebook\":\"lol\"},\"name\":\"My\"}}");
   }
 
   @Test

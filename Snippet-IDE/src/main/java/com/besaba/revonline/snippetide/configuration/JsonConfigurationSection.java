@@ -121,7 +121,21 @@ public class JsonConfigurationSection implements ConfigurationSection {
       return;
     }
 
-    values.put(name, value);
+    if (Map.class.isAssignableFrom(value.getClass())) {
+      final Map<?, ?> map = (Map<?, ?>) value;
+      final JsonConfigurationSection subsectionFromMapValues = createSubsectionFromMapValues(map);
+      values.put(name, subsectionFromMapValues);
+    } else if (value.getClass().isArray()) {
+      values.put(name, JsonConfigurationUtils.transformAnyArrayToStringArray(value));
+    } else {
+      values.put(name, value.toString());
+    }
+  }
+
+  private JsonConfigurationSection createSubsectionFromMapValues(final Map<?, ?> map) {
+    final JsonConfigurationSection configuration = new JsonConfigurationSection();
+    map.forEach((key, value) -> configuration.set(key.toString(), value));
+    return configuration;
   }
 
   private <T> void setSubsection(@NotNull final String name,

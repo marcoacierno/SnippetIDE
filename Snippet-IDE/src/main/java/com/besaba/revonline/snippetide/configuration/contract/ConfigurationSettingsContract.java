@@ -10,4 +10,10 @@ public class ConfigurationSettingsContract {
     public static final String COMPILE_QUERY = SECTION_NAME + "." + COMPILE_ENTRY;
     public static final String RUN_QUERY = SECTION_NAME + "." + RUN_ENTRY;
   }
+
+  public static class RunConfigurations {
+    public static final String SECTION_NAME = "runconfigurations";
+
+
+  }
 }

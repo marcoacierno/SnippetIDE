@@ -17,6 +17,7 @@ import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.run.RunConfiguration;
+import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
 import com.besaba.revonline.snippetide.run.ConfigurationTab;
@@ -36,6 +37,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
@@ -301,6 +303,7 @@ public class IdeController {
 
     fillRunConfiguration.getDialogPane().setContent(root);
     fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.OK);
+    fillRunConfiguration.getDialogPane().getButtonTypes().add(new ButtonType("OK, save and reuse", ButtonBar.ButtonData.OK_DONE));
     fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 
     fillRunConfiguration.setResultConverter(param -> {
@@ -315,7 +318,18 @@ public class IdeController {
 
       propertySheet.getItems().forEach(item -> values.put(item.getName(), item.getValue()));
 
-      return new RunConfigurationValues(activeTab.getRunConfiguration(), values);
+      final RunConfigurationValues configuration = new RunConfigurationValues(activeTab.getRunConfiguration(), values);
+
+      if (param.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+        application.getConfiguration().set(
+            ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
+                plugin.getPluginId() + "." +
+                language.getName().hashCode(),
+            configuration.getValues()
+        );
+      }
+
+      return configuration;
     });
 
     final Optional<RunConfigurationValues> runConfigurationValues = fillRunConfiguration.showAndWait();
