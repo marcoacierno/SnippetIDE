@@ -1,0 +1,8 @@
+{
+  "name": "Javascript",
+  "description": "Javascript language",
+  "version": "1.0",
+  "minSupportedVersion": "0.1",
+  "authors": ["Marco Acierno"],
+  "languages": ["com.besaba.revonline.snippetide.lang.javascript.JavascriptLanguage"]
+}

@@ -28,6 +28,7 @@
       <element id="artifact" artifact-name="PlainText" />
       <element id="artifact" artifact-name="SnippetIDE-API" />
       <element id="artifact" artifact-name="Preloader" />
+      <element id="artifact" artifact-name="Javascript" />
     </root>
   </artifact>
 </component>
