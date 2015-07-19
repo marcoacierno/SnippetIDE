@@ -12,7 +12,11 @@ import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSetti
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -43,6 +47,9 @@ public class ManageRunConfigurationsController {
   private final Language language;
   @NotNull
   private final String pluginConfigurationKey;
+  @NotNull
+  private final String languageConfigurationsQuery;
+
   private static final Logger logger = Logger.getLogger(ManageRunConfigurationsController.class);
 
   public ManageRunConfigurationsController(final @NotNull ManageRunConfigurationsContext context) {
@@ -53,6 +60,7 @@ public class ManageRunConfigurationsController {
 
     pluginConfigurationKey =
         ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." + plugin.getPluginId();
+    languageConfigurationsQuery = pluginConfigurationKey + "." + language.getName().hashCode();
   }
 
   public void initialize() {
@@ -96,9 +104,9 @@ public class ManageRunConfigurationsController {
                                      final Boolean newValue,
                                      final int parentId) {
     if (newValue) {
-      applicationConfiguration.set(pluginConfigurationKey + "." + language.getName().hashCode() + ".default", parentId);
+      applicationConfiguration.set(languageConfigurationsQuery + ".default", parentId);
     } else {
-      applicationConfiguration.set(pluginConfigurationKey + "." + language.getName().hashCode() + ".default", -1);
+      applicationConfiguration.set(languageConfigurationsQuery + ".default", -1);
     }
   }
 
@@ -107,16 +115,16 @@ public class ManageRunConfigurationsController {
       logger.debug("try to get default");
       logger.debug("query -> " + pluginConfigurationKey + "." + language.hashCode() + ".default");
       final int defaultConfiguration = applicationConfiguration.getAsInt(
-          pluginConfigurationKey + "." + language.getName().hashCode() + ".default"
+          languageConfigurationsQuery + ".default"
       ).orElse(-1);
 
       for (final RunConfiguration configuration : language.getRunConfigurations()) {
         logger.debug("checking " + configuration.getName());
-        logger.debug("query -> " + (pluginConfigurationKey + "." + language.getName().hashCode() + "." + configuration.getId()));
+        logger.debug("query -> " + (languageConfigurationsQuery + "." + configuration.getId()));
 
         final Optional<Map<String, Object>> values =
-            applicationConfiguration.get(pluginConfigurationKey + "." + language.getName().hashCode() + "." + configuration.getId()
-            );
+            applicationConfiguration.get(languageConfigurationsQuery + "." + configuration.getId()
+        );
 
         if (!values.isPresent()) {
           continue;
@@ -135,5 +143,43 @@ public class ManageRunConfigurationsController {
       /* no configurations to show */
       logger.info("no configurations to show", e);
     }
+  }
+
+  public void deleteConfiguration(ActionEvent actionEvent) {
+    final ObservableList<RunConfigurationValuesManagerData> selectedItems
+        = runConfigurationsTable.getSelectionModel().getSelectedItems();
+    final int countElementsSelected = selectedItems.size();
+
+    if (countElementsSelected == 0) {
+      return;
+    }
+
+    final Optional<ButtonType> response = new Alert(
+        Alert.AlertType.CONFIRMATION,
+        "Are you sure you want to remove " + countElementsSelected + " configuration(s)?",
+        ButtonType.YES, ButtonType.NO
+    ).showAndWait();
+
+    response.ifPresent(button -> {
+      if (button == ButtonType.NO) {
+        return;
+      }
+
+      for (final RunConfigurationValuesManagerData item : selectedItems) {
+        final boolean removed = applicationConfiguration.remove(
+            languageConfigurationsQuery + "." + item.getRunConfigurationValues().getParentId()
+        );
+
+        if (!removed) {
+          new Alert(
+              Alert.AlertType.INFORMATION,
+              "Ops, failed to remove: " + item.getConfigurationName(),
+              ButtonType.OK
+          ).show();
+        } else {
+          runConfigurationsTable.getItems().remove(item);
+        }
+      }
+    });
   }
 }
