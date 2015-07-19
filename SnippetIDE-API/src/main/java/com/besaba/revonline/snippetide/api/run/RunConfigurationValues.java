@@ -6,24 +6,28 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class RunConfigurationValues {
-  @NotNull
-  private final RunConfiguration parent;
+  private final int parent;
   @NotNull
   private final ImmutableMap<String, Object> values;
 
   public RunConfigurationValues(@NotNull final RunConfiguration parent,
+                                @NotNull final Map<String, Object> values) {
+    this.parent = parent.getId();
+    this.values = ImmutableMap.copyOf(values);
+  }
+
+  public RunConfigurationValues(final int parent,
                                 @NotNull final Map<String, Object> values) {
     this.parent = parent;
     this.values = ImmutableMap.copyOf(values);
   }
 
   @NotNull
-  public RunConfiguration getParent() {
-    return parent;
-  }
-
-  @NotNull
   public ImmutableMap<String, Object> getValues() {
     return values;
+  }
+
+  public int getParentId() {
+    return parent;
   }
 }

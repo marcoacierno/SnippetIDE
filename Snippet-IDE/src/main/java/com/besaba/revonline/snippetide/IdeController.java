@@ -67,6 +67,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -271,6 +272,37 @@ public class IdeController {
       return;
     }
 
+    RunConfigurationValues runConfigurationValues = null;
+
+    try {
+      runConfigurationValues = tryToFindSavedRunConfiguration();
+    } catch (IllegalArgumentException e) {
+      logger.error("error while check saved configurations", e);
+    }
+
+    if (runConfigurationValues == null) {
+      final Optional<RunConfigurationValues> response = showRunConfigurationDialog();
+
+      if (!response.isPresent()) {
+        return;
+      }
+
+      runConfigurationValues = response.get();
+    }
+
+    eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), runConfigurationValues));
+  }
+
+  @NotNull
+  private Optional<RunConfigurationValues> showRunConfigurationDialog() {
+    final RunConfiguration[] configurations = language.getRunConfigurations();
+
+    if (configurations.length == 0) {
+      return Optional.of(
+          new RunConfigurationValues(-1, Collections.<String, Object>emptyMap())
+      );
+    }
+
     final Dialog<RunConfigurationValues> fillRunConfiguration = new Dialog<>();
     final Parent root;
 
@@ -278,11 +310,10 @@ public class IdeController {
       root = FXMLLoader.load(IdeController.class.getResource("fillrunconfiguration.fxml"));
     } catch (IOException e) {
       new Alert(Alert.AlertType.ERROR, "Unable to open run configuration dialog :(", ButtonType.OK).show();
-      return;
+      return Optional.empty();
     }
 
     final TabPane configurationsTabPane = ((TabPane) root.lookup("#configurations"));
-    final RunConfiguration[] configurations = language.getRunConfigurations();
 
     for (final RunConfiguration configuration : configurations) {
       final Tab tab = new ConfigurationTab(configuration.getName(), configuration);
@@ -324,7 +355,8 @@ public class IdeController {
         application.getConfiguration().set(
             ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
                 plugin.getPluginId() + "." +
-                language.getName().hashCode(),
+                language.getName().hashCode() + "." +
+                configuration.getParentId(),
             configuration.getValues()
         );
       }
@@ -332,10 +364,22 @@ public class IdeController {
       return configuration;
     });
 
-    final Optional<RunConfigurationValues> runConfigurationValues = fillRunConfiguration.showAndWait();
+    return fillRunConfiguration.showAndWait();
+  }
 
-    runConfigurationValues.ifPresent(value ->
-        eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value)));
+  private RunConfigurationValues tryToFindSavedRunConfiguration() {
+    RunConfigurationValues runConfigurationValues = null;
+
+    for (final RunConfiguration configuration : language.getRunConfigurations()) {
+      final Optional<Map<String, Object>> values = application.getConfiguration().get(ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
+              plugin.getPluginId() + "." + language.getName().hashCode() + "." + configuration.getId()
+      );
+
+      if (values.isPresent()) {
+        runConfigurationValues = new RunConfigurationValues(configuration.getId(), values.get());
+      }
+    }
+    return runConfigurationValues;
   }
 
   private void cleanRunTextArea() {

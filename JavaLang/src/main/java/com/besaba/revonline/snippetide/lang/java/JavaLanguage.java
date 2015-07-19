@@ -167,7 +167,7 @@ public class JavaLanguage implements Language {
 
     final RunConfigurationValues runConfigurationValues = runStartEvent.getRunConfigurationValues();
 
-    switch (runConfigurationValues.getParent().getId()) {
+    switch (runConfigurationValues.getParentId()) {
       case SIMPLE_RUN_CONFIGURATION_ID: {
         simpleRun(runStartEvent, runConfigurationValues);
         break;
