@@ -128,7 +128,7 @@ public class RunConfigurationManager {
     final Parent root;
 
     try {
-      root = FXMLLoader.load(IdeController.class.getResource("fillrunconfiguration.fxml"));
+      root = FXMLLoader.load(IdeController.class.getResource("runconfigurations/fillrunconfiguration.fxml"));
     } catch (IOException e) {
       new Alert(Alert.AlertType.ERROR, "Unable to open run configuration dialog :(", ButtonType.OK).show();
       return Optional.empty();
