@@ -16,34 +16,25 @@ import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
-import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
+import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
-import com.besaba.revonline.snippetide.run.ConfigurationTab;
-import com.besaba.revonline.snippetide.run.CustomPropertyEditorFactory;
-import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
+import com.besaba.revonline.snippetide.run.RunConfigurationManager;
 import com.besaba.revonline.snippetide.run.RunSnippet;
-import com.besaba.revonline.snippetide.run.SimplePropertySheetItem;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -53,7 +44,6 @@ import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
-import org.controlsfx.control.PropertySheet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,9 +57,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -80,6 +67,8 @@ public class IdeController {
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
+  @FXML
+  private Button manageRunConfigurations;
   @FXML
   private TabPane compileAndRunPane;
 
@@ -121,6 +110,7 @@ public class IdeController {
   private final Optional<Path> originalFile;
   @NotNull
   private Optional<RunSnippet> runSnippetThread = Optional.empty();
+  private RunConfigurationManager runConfigurationManager;
 
   /**
    * @param language What will be the language used by this view?
@@ -128,15 +118,13 @@ public class IdeController {
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin,
                        @Nullable final Path originalFile) {
-    this.language = language;
-    this.plugin = plugin;
+    changeLanguage(plugin, language);
     this.originalFile = Optional.ofNullable(originalFile);
   }
 
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin) {
-    this.language = language;
-    this.plugin = plugin;
+    changeLanguage(plugin, language);
     this.originalFile = Optional.empty();
   }
 
@@ -151,6 +139,7 @@ public class IdeController {
   private void prepareIde() {
     final boolean present = originalFile.isPresent();
     saveToOriginalFile.setDisable(!present);
+    manageRunConfigurations.setText("Manage run configurations for " + language.getName());
 
     if (!present) {
       prepareCodeAreaWithTemplate();
@@ -212,8 +201,7 @@ public class IdeController {
     });
 
     languagesChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      language = newValue.getLanguage();
-      plugin = newValue.getPlugin();
+      changeLanguage(newValue.getPlugin(), newValue.getLanguage());
     });
 
     pluginManager.getPlugins().forEach(plugin -> {
@@ -223,6 +211,18 @@ public class IdeController {
     });
 
     languagesChoice.setValue(new PluginLanguage(language, plugin));
+  }
+
+  private void changeLanguage(@NotNull final Plugin plugin,
+                              @NotNull final Language language) {
+    this.plugin = plugin;
+    this.language = language;
+    this.runConfigurationManager = new RunConfigurationManager(language, plugin);
+
+    // update text only if available, since this method is excepted to be called from constructor too
+    if (manageRunConfigurations != null) {
+      manageRunConfigurations.setText("Manage run configurations for " + language.getName());
+    }
   }
 
   private void prepareCompilationTable() {
@@ -272,104 +272,13 @@ public class IdeController {
       return;
     }
 
-    Optional<RunConfigurationValues> runConfigurationValues = Optional.ofNullable(
-        tryToFindSavedRunConfiguration().orElseGet(() -> showRunConfigurationDialog().orElseGet(() -> null))
-    );
-
-    runConfigurationValues.ifPresent(value -> eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value)));
-  }
-
-  @NotNull
-  private Optional<RunConfigurationValues> showRunConfigurationDialog() {
-    final RunConfiguration[] configurations = language.getRunConfigurations();
-
-    if (configurations.length == 0) {
-      return Optional.of(
-          new RunConfigurationValues(-1, Collections.<String, Object>emptyMap())
-      );
-    }
-
-    final Dialog<RunConfigurationValues> fillRunConfiguration = new Dialog<>();
-    final Parent root;
-
-    try {
-      root = FXMLLoader.load(IdeController.class.getResource("fillrunconfiguration.fxml"));
-    } catch (IOException e) {
-      new Alert(Alert.AlertType.ERROR, "Unable to open run configuration dialog :(", ButtonType.OK).show();
-      return Optional.empty();
-    }
-
-    final TabPane configurationsTabPane = ((TabPane) root.lookup("#configurations"));
-
-    for (final RunConfiguration configuration : configurations) {
-      final Tab tab = new ConfigurationTab(configuration.getName(), configuration);
-      final ObservableList<PropertySheet.Item> items = FXCollections.observableArrayList();
-
-      configuration.getFields().forEach((name, fieldInfo) -> items.add(new SimplePropertySheetItem(name, fieldInfo)));
-
-      final PropertySheet propertySheet = new PropertySheet(items);
-      propertySheet.searchBoxVisibleProperty().set(false);
-      propertySheet.setModeSwitcherVisible(false);
-
-      propertySheet.setPropertyEditorFactory(new CustomPropertyEditorFactory());
-
-      tab.setContent(propertySheet);
-
-      configurationsTabPane.getTabs().add(tab);
-    }
-
-    fillRunConfiguration.getDialogPane().setContent(root);
-    fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.OK);
-    fillRunConfiguration.getDialogPane().getButtonTypes().add(new ButtonType("OK, save and reuse", ButtonBar.ButtonData.OK_DONE));
-    fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-
-    fillRunConfiguration.setResultConverter(param -> {
-      if (param == ButtonType.CLOSE) {
-        return null;
-      }
-
-      final ConfigurationTab activeTab = (ConfigurationTab) configurationsTabPane.getSelectionModel().getSelectedItem();
-      final PropertySheet propertySheet = (PropertySheet) activeTab.getContent().lookup("PropertySheet");
-
-      final Map<String, Object> values = new HashMap<>();
-
-      propertySheet.getItems().forEach(item -> values.put(item.getName(), item.getValue()));
-
-      final RunConfigurationValues configuration = new RunConfigurationValues(activeTab.getRunConfiguration(), values);
-
-      if (param.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-        application.getConfiguration().set(
-            ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
-                plugin.getPluginId() + "." +
-                language.getName().hashCode() + "." +
-                configuration.getParentId(),
-            configuration.getValues()
+    runConfigurationManager
+        .getRunConfiguration()
+        .ifPresent(value -> eventManager.post(
+                new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value))
         );
-      }
-
-      return configuration;
-    });
-
-    return fillRunConfiguration.showAndWait();
   }
 
-  private Optional<RunConfigurationValues> tryToFindSavedRunConfiguration() {
-    try {
-      for (final RunConfiguration configuration : language.getRunConfigurations()) {
-        final Optional<Map<String, Object>> values = application.getConfiguration().get(ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
-                plugin.getPluginId() + "." + language.getName().hashCode() + "." + configuration.getId()
-        );
-
-        if (values.isPresent()) {
-          return Optional.of(new RunConfigurationValues(configuration.getId(), values.get()));
-        }
-      }
-    } catch (IllegalArgumentException e) {
-      return Optional.empty();
-    }
-
-    return Optional.empty();
-  }
 
   private void cleanRunTextArea() {
     runTextArea.clear();
@@ -570,6 +479,17 @@ public class IdeController {
     } catch (IOException e) {
       logger.fatal("unable to keymap settings", e);
       new Alert(Alert.AlertType.ERROR, "Unable to keymap settings page", ButtonType.OK).show();
+    }
+  }
+
+  @FXML
+  private void openManageConfigurations(ActionEvent actionEvent) {
+    try {
+      final ManageRunConfigurationsContext context = new ManageRunConfigurationsContext(plugin, language);
+      application.openManageConfigurations(context, runTextArea.getScene().getWindow());
+    } catch (IOException e) {
+      logger.fatal("unable to keymap settings", e);
+      new Alert(Alert.AlertType.ERROR, "Unable to open manage configurations page", ButtonType.OK).show();
     }
   }
 }

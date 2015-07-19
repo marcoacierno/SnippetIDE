@@ -10,6 +10,8 @@ import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.Version;
+import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
+import com.besaba.revonline.snippetide.run.ManageRunConfigurationsController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -217,6 +219,29 @@ public class IDEApplicationImpl implements IDEApplication {
     stage.setResizable(false);
     stage.setScene(scene);
     stage.setTitle("Keymap settings");
+
+    stage.show();
+  }
+
+  @Override
+  public void openManageConfigurations(@NotNull final ManageRunConfigurationsContext runConfigurationsContext,
+                                       @Nullable final Window window)
+      throws IOException {
+    final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("runconfigurations/"));
+    loader.setControllerFactory(param -> param == ManageRunConfigurationsController.class ?
+        new ManageRunConfigurationsController(runConfigurationsContext) :
+        null
+    );
+    final Stage stage = new Stage();
+    final Scene scene = new Scene(
+        loader.load(IdeController.class.getResourceAsStream("runconfigurations/managerunconfigurations.fxml"))
+    );
+
+    stage.initModality(Modality.WINDOW_MODAL);
+    stage.initOwner(window);
+    stage.setResizable(false);
+    stage.setScene(scene);
+    stage.setTitle("Manage run configurations for " + runConfigurationsContext.getLanguage().getName());
 
     stage.show();
   }

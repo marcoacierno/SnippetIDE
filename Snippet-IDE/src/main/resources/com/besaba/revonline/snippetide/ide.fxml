@@ -40,7 +40,7 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TextArea editable="false" fx:id="runTextArea" layoutX="66.0" layoutY="-41.0" prefHeight="173.0" prefWidth="1119.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <TextArea fx:id="runTextArea" editable="false" layoutX="66.0" layoutY="-41.0" prefHeight="173.0" prefWidth="1119.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -60,27 +60,27 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem onAction="#newFile" mnemonicParsing="false" text="New" />
-                  <MenuItem onAction="#openFile" mnemonicParsing="false" text="Open" />
+                  <MenuItem mnemonicParsing="false" onAction="#newFile" text="New" />
+                  <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open" />
               <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem mnemonicParsing="false" text="Save to original file" onAction="#saveToOriginalPath" fx:id="saveToOriginalFile" />
-              <MenuItem mnemonicParsing="false" text="Save copy" onAction="#saveFileCopy" />
+              <MenuItem fx:id="saveToOriginalFile" mnemonicParsing="false" onAction="#saveToOriginalPath" text="Save to original file" />
+              <MenuItem mnemonicParsing="false" onAction="#saveFileCopy" text="Save copy" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem onAction="#closeApplication" mnemonicParsing="false" text="Close" />
+                  <MenuItem mnemonicParsing="false" onAction="#closeApplication" text="Close" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Snippet">
             <items>
-              <MenuItem onAction="#compile" mnemonicParsing="false" text="Compile" />
-                  <MenuItem onAction="#run" mnemonicParsing="false" text="Run" />
+              <MenuItem mnemonicParsing="false" onAction="#compile" text="Compile" />
+                  <MenuItem mnemonicParsing="false" onAction="#run" text="Run" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="?">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" onAction="#showAbout" />
-              <MenuItem mnemonicParsing="false" text="Plugins" onAction="#showPluginsList" />
-              <MenuItem mnemonicParsing="false" text="Keymap" onAction="#showKeymapUi" />
-              <MenuItem mnemonicParsing="false" text="Show logs" onAction="#showLogs" />
+              <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#showPluginsList" text="Plugins" />
+              <MenuItem mnemonicParsing="false" onAction="#showKeymapUi" text="Keymap" />
+              <MenuItem mnemonicParsing="false" onAction="#showLogs" text="Show logs" />
             </items>
           </Menu>
         </menus>
@@ -90,6 +90,7 @@
       <ToolBar prefHeight="14.0" prefWidth="1121.0" BorderPane.alignment="CENTER">
          <items>
             <ComboBox fx:id="languagesChoice" prefWidth="150.0" />
+            <Button fx:id="manageRunConfigurations" onAction="#openManageConfigurations" mnemonicParsing="false" text="Manage run configurations for X" />
          </items>
       </ToolBar>
    </bottom>

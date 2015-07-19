@@ -4,6 +4,7 @@ import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.Version;
+import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
 import javafx.stage.Window;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,8 @@ public interface IDEApplication {
   void openPluginsList(@Nullable Window window);
 
   void openKeymapSetting(@Nullable Window window) throws IOException;
+
+  void openManageConfigurations(@NotNull final ManageRunConfigurationsContext runConfigurationsContext, @Nullable final Window window) throws IOException;
 
   @NotNull
   Version getVersion();
