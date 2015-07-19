@@ -272,25 +272,11 @@ public class IdeController {
       return;
     }
 
-    RunConfigurationValues runConfigurationValues = null;
+    Optional<RunConfigurationValues> runConfigurationValues = Optional.ofNullable(
+        tryToFindSavedRunConfiguration().orElseGet(() -> showRunConfigurationDialog().orElseGet(() -> null))
+    );
 
-    try {
-      runConfigurationValues = tryToFindSavedRunConfiguration();
-    } catch (IllegalArgumentException e) {
-      logger.error("error while check saved configurations", e);
-    }
-
-    if (runConfigurationValues == null) {
-      final Optional<RunConfigurationValues> response = showRunConfigurationDialog();
-
-      if (!response.isPresent()) {
-        return;
-      }
-
-      runConfigurationValues = response.get();
-    }
-
-    eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), runConfigurationValues));
+    runConfigurationValues.ifPresent(value -> eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value)));
   }
 
   @NotNull
@@ -367,19 +353,22 @@ public class IdeController {
     return fillRunConfiguration.showAndWait();
   }
 
-  private RunConfigurationValues tryToFindSavedRunConfiguration() {
-    RunConfigurationValues runConfigurationValues = null;
+  private Optional<RunConfigurationValues> tryToFindSavedRunConfiguration() {
+    try {
+      for (final RunConfiguration configuration : language.getRunConfigurations()) {
+        final Optional<Map<String, Object>> values = application.getConfiguration().get(ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
+                plugin.getPluginId() + "." + language.getName().hashCode() + "." + configuration.getId()
+        );
 
-    for (final RunConfiguration configuration : language.getRunConfigurations()) {
-      final Optional<Map<String, Object>> values = application.getConfiguration().get(ConfigurationSettingsContract.RunConfigurations.SECTION_NAME + "." +
-              plugin.getPluginId() + "." + language.getName().hashCode() + "." + configuration.getId()
-      );
-
-      if (values.isPresent()) {
-        runConfigurationValues = new RunConfigurationValues(configuration.getId(), values.get());
+        if (values.isPresent()) {
+          return Optional.of(new RunConfigurationValues(configuration.getId(), values.get()));
+        }
       }
+    } catch (IllegalArgumentException e) {
+      return Optional.empty();
     }
-    return runConfigurationValues;
+
+    return Optional.empty();
   }
 
   private void cleanRunTextArea() {
