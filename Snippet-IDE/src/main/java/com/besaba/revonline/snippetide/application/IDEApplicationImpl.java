@@ -249,6 +249,6 @@ public class IDEApplicationImpl implements IDEApplication {
   @NotNull
   @Override
   public Version getVersion() {
-    return Version.parse("0.1");
+    return Version.parse("0.1+alpha4");
   }
 }
