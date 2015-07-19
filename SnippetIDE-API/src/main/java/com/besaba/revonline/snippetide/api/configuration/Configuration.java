@@ -91,6 +91,8 @@ public interface Configuration {
 
   Optional<String[]> getAsArray(@NotNull final String name);
 
+  <T> Optional<T> get(@NotNull final String name);
+
   /**
    * Removes an entry from the settings.
    *

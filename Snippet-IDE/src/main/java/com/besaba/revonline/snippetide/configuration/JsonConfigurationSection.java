@@ -9,7 +9,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,7 +89,18 @@ public class JsonConfigurationSection implements ConfigurationSection {
       return getSubsection(name);
     }
 
-    return Optional.ofNullable((T) values.get(name));
+    final Object value = values.get(name);
+
+    if (value instanceof JsonConfigurationSection) {
+      final Map<Object, Object> values = new HashMap<>();
+
+      final JsonConfigurationSection section = (JsonConfigurationSection) value;
+      section.getValues().forEach((k, v) -> values.put(k, v.toString()));
+
+      return Optional.of((T) values);
+    }
+
+    return Optional.ofNullable((T) value);
   }
 
   @NotNull

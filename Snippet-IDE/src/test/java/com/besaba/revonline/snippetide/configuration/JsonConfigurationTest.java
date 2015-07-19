@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.*;
 import static org.hamcrest.Matchers.*;
@@ -483,6 +484,16 @@ public class JsonConfigurationTest {
     configuration.set("user.age", new boolean[] {true, false, true, true});
 
     assertArrayEquals(new String[] {"true", "false", "true", "true"}, configuration.getAsArray("user.age").get());
+  }
+
+  @Test
+  public void testGetAnObject() throws Exception {
+    final String json = "{\"user\":{\"my\": {\"work\": \"Lol\", \"name\": \"lul\"}}}";
+    final JsonConfiguration configuration = loadJson(json);
+    final Optional<Map<String, String>> values = configuration.get("user.my");
+
+    assertThat(values.get(), hasEntry("work", "Lol"));
+    assertThat(values.get(), hasEntry("name", "lul"));
   }
 
   @Test
