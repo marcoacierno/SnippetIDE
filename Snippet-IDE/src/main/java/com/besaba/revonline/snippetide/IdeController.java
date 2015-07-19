@@ -436,6 +436,10 @@ public class IdeController {
 
     stopIfAlreadyRunningRunThread();
 
+    if (!runInformationEvent.needExternalProcess()) {
+      return;
+    }
+
     final RunSnippet runSnippet = new RunSnippet(runInformationEvent, eventManager);
     runSnippet.start();
   }
