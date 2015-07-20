@@ -1,6 +1,6 @@
 # SnippetIDE
 
-[![Build status](https://ci.appveyor.com/api/projects/status/883piyu8gio9tc20?svg=true)](https://ci.appveyor.com/project/rrev/snippetide)
+[![Build status](https://ci.appveyor.com/api/projects/status/9ptq41x6567m9hjj?svg=true)](https://ci.appveyor.com/project/rrev/snippetide)
 
 Just an application to compile and run snippets. Uses Java 8. Screenshot beta layout, [here](http://i.imgur.com/pka5IYI.png)
 
