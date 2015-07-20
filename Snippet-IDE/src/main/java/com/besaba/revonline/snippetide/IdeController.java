@@ -111,6 +111,7 @@ public class IdeController {
   @NotNull
   private Optional<RunSnippet> runSnippetThread = Optional.empty();
   private RunConfigurationManager runConfigurationManager;
+  private boolean dirtyCodeArea = false;
 
   /**
    * @param language What will be the language used by this view?
@@ -143,10 +144,12 @@ public class IdeController {
 
     if (!present) {
       prepareCodeAreaWithTemplate();
-      return;
+    } else {
+      prepareCodeAreaWithOriginalFile();
+      dirtyCodeArea = true;
     }
 
-    prepareCodeAreaWithOriginalFile();
+    codeArea.setOnKeyTyped(event -> dirtyCodeArea = true);
   }
 
   private void prepareCodeAreaWithTemplate() {
@@ -222,6 +225,10 @@ public class IdeController {
     // update text only if available, since this method is excepted to be called from constructor too
     if (manageRunConfigurations != null) {
       manageRunConfigurations.setText("Manage run configurations for " + language.getName());
+    }
+
+    if (!dirtyCodeArea && codeArea != null) {
+      codeArea.setText(language.getTemplate());
     }
   }
 
