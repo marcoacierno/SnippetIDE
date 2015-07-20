@@ -19,6 +19,7 @@
     <module>JavaLang</module>
     <module>PlainText</module>
     <module>Preloader</module>
+    <module>JavascriptLang</module>
   </modules>
 
   <build>
