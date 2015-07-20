@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class JsonConfigurationSection implements ConfigurationSection {
+class JsonConfigurationSection implements ConfigurationSection {
   @NotNull
   private ConcurrentMap<String, Object> values = new ConcurrentHashMap<>();
 

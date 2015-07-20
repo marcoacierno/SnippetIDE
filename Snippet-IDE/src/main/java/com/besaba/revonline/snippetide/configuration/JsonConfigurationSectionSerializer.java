@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
 
-public class JsonConfigurationSectionSerializer implements JsonSerializer<JsonConfigurationSection> {
+class JsonConfigurationSectionSerializer implements JsonSerializer<JsonConfigurationSection> {
   @Override
   public JsonElement serialize(final JsonConfigurationSection src,
                                final Type typeOfSrc,

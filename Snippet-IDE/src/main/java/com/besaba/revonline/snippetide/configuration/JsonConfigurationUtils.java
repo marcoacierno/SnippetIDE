@@ -2,7 +2,7 @@ package com.besaba.revonline.snippetide.configuration;
 
 import java.util.Arrays;
 
-public class JsonConfigurationUtils {
+class JsonConfigurationUtils {
   public static <T> String[] transformAnyArrayToStringArray(final T value) {
     if (!value.getClass().isArray()) {
       throw new IllegalArgumentException(value + " is not an array");

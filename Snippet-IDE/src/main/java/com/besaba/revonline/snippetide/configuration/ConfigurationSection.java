@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
 
-public interface ConfigurationSection {
+interface ConfigurationSection {
   void load(@NotNull final InputStream inputStream);
   void save(@NotNull final OutputStream outputStream) throws IOException;
   <T> Optional<T> get(@NotNull final String name);
