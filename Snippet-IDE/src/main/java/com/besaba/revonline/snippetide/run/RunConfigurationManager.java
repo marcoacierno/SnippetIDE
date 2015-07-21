@@ -9,6 +9,7 @@ import com.besaba.revonline.snippetide.api.run.FieldInfo;
 import com.besaba.revonline.snippetide.api.run.RunConfiguration;
 import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
+import com.besaba.revonline.snippetide.converter.Converters;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -24,8 +25,6 @@ import org.controlsfx.control.PropertySheet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -138,18 +137,9 @@ public class RunConfigurationManager {
       final Class<?> destinationType = keyInfo.getType();
       // source type is always string
       final String valueString = value.toString();
-
-      // TODO Need to fix it.
-      // TODO See this Stackoverflow post http://stackoverflow.com/questions/31549452/transform-one-type-to-another
-      if (Path.class.isAssignableFrom(destinationType)) {
-        fixedValues.put(key, Paths.get(valueString));
-      } else if (Integer.class.isAssignableFrom(destinationType) || Integer.TYPE.isAssignableFrom(destinationType)) {
-        fixedValues.put(key, Integer.parseInt(valueString));
-      } else if (Short.class.isAssignableFrom(destinationType) || Short.TYPE.isAssignableFrom(destinationType)) {
-        fixedValues.put(key, Short.parseShort(valueString));
-      } else {
-        fixedValues.put(key, valueString);
-      }
+      final Converters converters = new Converters();
+      final Object fixedValue = converters.convert(String.class, destinationType, valueString);
+      fixedValues.put(key, fixedValue);
     });
 
     return fixedValues;
