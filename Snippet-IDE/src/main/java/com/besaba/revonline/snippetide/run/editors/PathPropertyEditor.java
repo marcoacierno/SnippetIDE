@@ -29,7 +29,11 @@ public class PathPropertyEditor extends AbstractPropertyEditor<Path, TextField> 
     });
 
     valueProperty.addListener(((observable, oldValue, newValue) -> {
-      editor.setText(newValue.toString());
+      if (newValue == null) {
+        return;
+      }
+
+      getEditor().setText(newValue.toString());
     }));
   }
 
