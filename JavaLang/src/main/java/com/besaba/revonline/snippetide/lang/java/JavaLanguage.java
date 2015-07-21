@@ -46,7 +46,7 @@ public class JavaLanguage implements Language {
           "JRE Location",
           new FieldInfo(
               Path.class,
-              System.getenv("JAVA_HOME"),
+              Paths.get(System.getenv("JAVA_HOME")),
               "Location to your JRE/JDK"
           )
       )
