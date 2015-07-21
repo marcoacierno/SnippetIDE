@@ -32,7 +32,7 @@ public class JavascriptLanguage implements Language {
 
   @NotNull
   public String getTemplate() {
-    return "function helloWorld() { console.log(\"Hello world\"); }\nhelloWorld();";
+    return "print(\"Hello world!\");";
   }
 
   @NotNull
