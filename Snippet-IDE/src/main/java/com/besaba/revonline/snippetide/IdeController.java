@@ -13,6 +13,7 @@ import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
+import com.besaba.revonline.snippetide.api.events.run.SendMessageToProcessEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
@@ -39,6 +40,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -67,6 +70,8 @@ public class IdeController {
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
+  @FXML
+  private TextField inputField;
   @FXML
   private Button manageRunConfigurations;
   @FXML
@@ -150,6 +155,21 @@ public class IdeController {
     }
 
     codeArea.setOnKeyTyped(event -> dirtyCodeArea = true);
+    inputField.setOnKeyPressed(this::onInputSubmit);
+  }
+
+  private void onInputSubmit(final KeyEvent keyEvent) {
+    if (keyEvent.getCode() != KeyCode.ENTER) {
+      logger.debug("pressed something else");
+      return;
+    }
+
+    logger.debug("pressing send SEND IT!");
+
+    runSnippetThread.ifPresent(runSnippet -> {
+      eventManager.post(new SendMessageToProcessEvent(inputField.getText()));
+      inputField.clear();
+    });
   }
 
   private void prepareCodeAreaWithTemplate() {
@@ -448,6 +468,7 @@ public class IdeController {
     }
 
     final RunSnippet runSnippet = new RunSnippet(runInformationEvent, eventManager);
+    runSnippetThread = Optional.of(runSnippet);
     runSnippet.start();
   }
 
