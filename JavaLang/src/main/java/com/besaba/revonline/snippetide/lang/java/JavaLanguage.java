@@ -44,7 +44,7 @@ public class JavaLanguage implements Language {
       .addField(
           "JRE Location",
           new FieldInfo(
-              String.class,
+              Path.class,
               System.getenv("JAVA_HOME"),
               "Location to your JRE/JDK"
           )
@@ -177,7 +177,7 @@ public class JavaLanguage implements Language {
 
   private void simpleRun(final RunStartEvent runStartEvent,
                          final RunConfigurationValues runConfigurationValues) {
-    final String javaHome = (String) runConfigurationValues.getValues().get("JRE Location");
+    final String javaHome = ((Path) runConfigurationValues.getValues().get("JRE Location")).toAbsolutePath().toString();
 
     final Path classFile = Paths.get(
         Files.getNameWithoutExtension(runStartEvent.getSourceFile().getFileName().toString())

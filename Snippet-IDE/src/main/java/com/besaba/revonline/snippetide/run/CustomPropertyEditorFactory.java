@@ -1,9 +1,9 @@
 package com.besaba.revonline.snippetide.run;
 
+import com.besaba.revonline.snippetide.run.editors.PathPropertyEditor;
 import javafx.util.Callback;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
-import org.controlsfx.property.editor.Editors;
 import org.controlsfx.property.editor.PropertyEditor;
 
 import java.io.File;
@@ -22,6 +22,6 @@ public class CustomPropertyEditorFactory implements Callback<PropertySheet.Item,
   }
 
   private PropertyEditor<?> createPathField(final PropertySheet.Item property) {
-    return Editors.createTextEditor(property);
+    return new PathPropertyEditor(property);
   }
 }
