@@ -27,6 +27,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -188,7 +189,7 @@ public class JavaLanguage implements Language {
       return;
     }
 
-    final String command = "\"" + javaHome + "\\bin\\java\" " + classFile + " -cp \"" + runStartEvent.getSourceFile().getParent() + "\"";
+    final String command = "\"" + javaHome + File.separator + "bin"  + File.separator + "java\" " + classFile + " -cp \"" + runStartEvent.getSourceFile().getParent() + "\"";
     application.getEventManager().post(new RunInformationEvent(command, runStartEvent));
   }
 }
