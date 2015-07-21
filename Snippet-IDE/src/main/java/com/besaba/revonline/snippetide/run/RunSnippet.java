@@ -73,7 +73,7 @@ public class RunSnippet implements Runnable {
 
     this.eventManager.registerListener(this);
     running = true;
-    workingThread = new Thread(this);
+    workingThread = new Thread(this, "RunSnippet-Thread");
     workingThread.start();
   }
 
