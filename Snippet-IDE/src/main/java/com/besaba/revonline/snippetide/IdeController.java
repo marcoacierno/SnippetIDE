@@ -474,8 +474,10 @@ public class IdeController {
 
   @Subscribe
   public void onMessageFromSubprocess(final MessageFromProcess messageFromProcess) {
-    runTextArea.appendText(messageFromProcess.getMessage());
-    runTextArea.appendText(System.lineSeparator());
+    Platform.runLater(() -> {
+      runTextArea.appendText(messageFromProcess.getMessage());
+      runTextArea.appendText(System.lineSeparator());
+    });
   }
 
   private void stopIfAlreadyRunningRunThread() {
