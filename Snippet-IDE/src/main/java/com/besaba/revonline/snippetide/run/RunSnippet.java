@@ -3,14 +3,19 @@ package com.besaba.revonline.snippetide.run;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
+import com.besaba.revonline.snippetide.api.events.run.SendMessageToProcessEvent;
+import com.google.common.eventbus.Subscribe;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 /**
@@ -24,6 +29,8 @@ public class RunSnippet implements Runnable {
   private final RunInformationEvent runInformationEvent;
   @NotNull
   private final EventManager eventManager;
+  private BufferedWriter processWriter;
+  private final Object processWriterLock = new Object();
 
   public RunSnippet(@NotNull final RunInformationEvent runInformationEvent,
                     @NotNull final EventManager eventManager) {
@@ -37,9 +44,19 @@ public class RunSnippet implements Runnable {
   public void stop() {
     if (workingThread != null) {
       workingThread.interrupt();
-      workingThread = null;
     }
 
+    synchronized (processWriterLock) {
+      try {
+        processWriter.close();
+      } catch (IOException e) {
+        logger.fatal("unable to close processwriter", e);
+      }
+
+      processWriter = null;
+    }
+
+    this.eventManager.unregisterListener(this);
     running = false;
   }
 
@@ -54,8 +71,9 @@ public class RunSnippet implements Runnable {
       workingThread = null;
     }
 
+    this.eventManager.registerListener(this);
     running = true;
-    workingThread = new Thread(this);
+    workingThread = new Thread(this, "RunSnippet-Thread");
     workingThread.start();
   }
 
@@ -93,13 +111,17 @@ public class RunSnippet implements Runnable {
         .directory(workingDirectory.getParent().toFile())
         .start();
 
+    synchronized (processWriterLock) {
+      processWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+    }
+
     try(final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
       while (running) {
         if (!running || workingThread.isInterrupted()) {
           logger.debug("running is " + running);
           logger.debug("workingThread.isInterrupted " + workingThread.isInterrupted());
           logger.debug("process is alive " + process.isAlive());
-          throw new IOException("Exit forced by someone");
+          throw new IOException("Exit forced");
         }
 
         if (!process.isAlive()) {
@@ -130,6 +152,32 @@ public class RunSnippet implements Runnable {
       logger.fatal("something went wrong in the message reading / exit process", e);
       process.destroyForcibly();
       throw e;
+    } finally {
+      workingThread = null;
+    }
+  }
+
+  @Subscribe
+  public void onSendMessageToProcess(@NotNull final SendMessageToProcessEvent event) {
+    final String message = event.getMessage();
+
+    synchronized (processWriterLock) {
+      logger.debug("send -> " + message);
+      try {
+        processWriter.write(message);
+        processWriter.write(System.lineSeparator());
+
+        logger.debug("write ok");
+      } catch (IOException e) {
+        logger.fatal("unable to send message -> ", e);
+      } finally {
+        try {
+          processWriter.flush();
+          logger.debug("flush ok");
+        } catch (IOException e) {
+          logger.fatal("unable to flush writer", e);
+        }
+      }
     }
   }
 }

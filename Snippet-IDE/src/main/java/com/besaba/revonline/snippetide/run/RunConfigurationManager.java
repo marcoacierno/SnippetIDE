@@ -5,9 +5,11 @@ import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
+import com.besaba.revonline.snippetide.api.run.FieldInfo;
 import com.besaba.revonline.snippetide.api.run.RunConfiguration;
 import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
+import com.besaba.revonline.snippetide.converter.Converters;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -105,13 +107,42 @@ public class RunConfigurationManager {
       );
 
       if (values.isPresent()) {
-        return Optional.of(new RunConfigurationValues(configurationId, values.get()));
+        RunConfiguration originalConfiguration = null;
+
+        for (final RunConfiguration runConfiguration : language.getRunConfigurations()) {
+          if (runConfiguration.getId() == configurationId) {
+            originalConfiguration = runConfiguration;
+          }
+        }
+
+        if (originalConfiguration == null) {
+          throw new AssertionError("originalConfiguration cannot be null here");
+        }
+
+        return Optional.of(new RunConfigurationValues(configurationId, tryToFixValues(values.get(), originalConfiguration)));
       }
     } catch (IllegalArgumentException e) {
       return Optional.empty();
     }
 
     return Optional.empty();
+  }
+
+  private Map<String, Object> tryToFixValues(final Map<String, Object> restoredValues, final RunConfiguration originalConfiguration) {
+    final Map<String, FieldInfo> originalRun = originalConfiguration.getFields();
+    final Map<String, Object> fixedValues = new HashMap<>();
+
+    restoredValues.forEach((key, value) -> {
+      final FieldInfo keyInfo = originalRun.get(key);
+      final Class<?> destinationType = keyInfo.getType();
+      // source type is always string
+      final String valueString = value.toString();
+      final Converters converters = new Converters();
+      final Object fixedValue = converters.convert(String.class, destinationType, valueString);
+      fixedValues.put(key, fixedValue);
+    });
+
+    return fixedValues;
   }
 
   @NotNull

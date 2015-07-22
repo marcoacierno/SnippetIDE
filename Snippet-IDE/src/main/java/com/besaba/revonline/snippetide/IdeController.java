@@ -6,6 +6,7 @@ import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblem;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblemType;
 import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
+import com.besaba.revonline.snippetide.api.events.boot.UnBootEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
@@ -13,6 +14,7 @@ import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
+import com.besaba.revonline.snippetide.api.events.run.SendMessageToProcessEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
@@ -39,6 +41,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -67,6 +71,8 @@ public class IdeController {
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
+  @FXML
+  private TextField inputField;
   @FXML
   private Button manageRunConfigurations;
   @FXML
@@ -119,14 +125,20 @@ public class IdeController {
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin,
                        @Nullable final Path originalFile) {
+    initUnbootWorker();
     changeLanguage(plugin, language);
     this.originalFile = Optional.ofNullable(originalFile);
   }
 
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin) {
+    initUnbootWorker();
     changeLanguage(plugin, language);
     this.originalFile = Optional.empty();
+  }
+
+  private void initUnbootWorker() {
+    new UnBootWorker();
   }
 
   public void initialize() {
@@ -150,6 +162,24 @@ public class IdeController {
     }
 
     codeArea.setOnKeyTyped(event -> dirtyCodeArea = true);
+    inputField.setOnKeyPressed(this::onInputSubmit);
+  }
+
+  private void onInputSubmit(final KeyEvent keyEvent) {
+    if (keyEvent.getCode() != KeyCode.ENTER) {
+      logger.debug("pressed something else");
+      return;
+    }
+
+    logger.debug("pressing send SEND IT!");
+
+    runSnippetThread.ifPresent(runSnippet -> {
+      final String messageToSend = inputField.getText();
+      runTextArea.appendText(messageToSend);
+      runTextArea.appendText(System.lineSeparator());
+      eventManager.post(new SendMessageToProcessEvent(messageToSend));
+      inputField.clear();
+    });
   }
 
   private void prepareCodeAreaWithTemplate() {
@@ -448,13 +478,16 @@ public class IdeController {
     }
 
     final RunSnippet runSnippet = new RunSnippet(runInformationEvent, eventManager);
+    runSnippetThread = Optional.of(runSnippet);
     runSnippet.start();
   }
 
   @Subscribe
   public void onMessageFromSubprocess(final MessageFromProcess messageFromProcess) {
-    runTextArea.appendText(messageFromProcess.getMessage());
-    runTextArea.appendText(System.lineSeparator());
+    Platform.runLater(() -> {
+      runTextArea.appendText(messageFromProcess.getMessage());
+      runTextArea.appendText(System.lineSeparator());
+    });
   }
 
   private void stopIfAlreadyRunningRunThread() {
@@ -511,6 +544,24 @@ public class IdeController {
     } catch (IOException e) {
       logger.fatal("unable to keymap settings", e);
       new Alert(Alert.AlertType.ERROR, "Unable to open manage configurations page", ButtonType.OK).show();
+    }
+  }
+
+  public void stopRunSnippetThread(ActionEvent actionEvent) {
+    stopIfAlreadyRunningRunThread();
+  }
+
+  public class UnBootWorker {
+    public UnBootWorker() {
+      logger.debug("unboot worker, register");
+      eventManager.registerListener(this);
+    }
+
+    @Subscribe
+    public void unbootEvent(final UnBootEvent unBootEvent) {
+      logger.debug("unboot event");
+      runSnippetThread.ifPresent(RunSnippet::stop);
+      runSnippetThread = Optional.empty();
     }
   }
 }
