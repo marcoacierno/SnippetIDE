@@ -21,6 +21,9 @@
     <RunnerSettings RunnerId="Debug with VisualVM">
       <option name="visualVMId" value="108077452090399" />
     </RunnerSettings>
+    <RunnerSettings RunnerId="JProfiler">
+      <option name="WINDOW" value="false" />
+    </RunnerSettings>
     <method>
       <option name="BuildArtifacts" enabled="true">
         <artifact name="Java" />
