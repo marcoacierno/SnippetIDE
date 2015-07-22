@@ -120,7 +120,7 @@ public class RunSnippet implements Runnable {
           logger.debug("running is " + running);
           logger.debug("workingThread.isInterrupted " + workingThread.isInterrupted());
           logger.debug("process is alive " + process.isAlive());
-          throw new IOException("Exit forced by someone");
+          throw new IOException("Exit forced");
         }
 
         if (!process.isAlive()) {
