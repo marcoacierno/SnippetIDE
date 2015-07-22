@@ -2,7 +2,6 @@ package com.besaba.revonline.snippetide.api.configuration;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
