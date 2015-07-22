@@ -174,7 +174,10 @@ public class IdeController {
     logger.debug("pressing send SEND IT!");
 
     runSnippetThread.ifPresent(runSnippet -> {
-      eventManager.post(new SendMessageToProcessEvent(inputField.getText()));
+      final String messageToSend = inputField.getText();
+      runTextArea.appendText(messageToSend);
+      runTextArea.appendText(System.lineSeparator());
+      eventManager.post(new SendMessageToProcessEvent(messageToSend));
       inputField.clear();
     });
   }
