@@ -89,8 +89,19 @@ public interface Configuration {
   @NotNull
   Optional<Float> getAsFloat(@NotNull final String name);
 
+  /**
+   * @param name The setting name
+   * @return The setting name as array of strings.
+   */
   Optional<String[]> getAsArray(@NotNull final String name);
 
+  /**
+   * Gets a generic element from the configuration.
+   *
+   * @param name The setting name
+   * @param <T> The type
+   * @return The setting
+   */
   <T> Optional<T> get(@NotNull final String name);
 
   /**
