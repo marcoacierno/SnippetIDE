@@ -536,4 +536,8 @@ public class IdeController {
       new Alert(Alert.AlertType.ERROR, "Unable to open manage configurations page", ButtonType.OK).show();
     }
   }
+
+  public void stopRunSnippetThread(ActionEvent actionEvent) {
+    stopIfAlreadyRunningRunThread();
+  }
 }

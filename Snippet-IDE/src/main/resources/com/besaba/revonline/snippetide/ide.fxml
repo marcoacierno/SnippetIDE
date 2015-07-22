@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -45,7 +46,16 @@
                                           <TextArea fx:id="runTextArea" editable="false" prefHeight="173.0" prefWidth="1119.0" />
                                        </center>
                                        <bottom>
-                                          <TextField fx:id="inputField" BorderPane.alignment="CENTER" />
+                                          <HBox BorderPane.alignment="CENTER">
+                                             <children>
+                                                <TextField fx:id="inputField" prefHeight="25.0" prefWidth="1064.0" HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </TextField>
+                                                <Button onAction="#stopRunSnippetThread" mnemonicParsing="false" text="Stop" />
+                                             </children>
+                                          </HBox>
                                        </bottom>
                                     </BorderPane>
                                  </children>
