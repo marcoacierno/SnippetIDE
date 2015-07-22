@@ -66,10 +66,17 @@ public class JavaLanguage implements Language {
   @NotNull
   @Override
   public String getTemplate() {
-    return "public class Solution {\n" +
-        "\tpublic static void main(final String[] args) {\n" +
-        "\t\tSystem.out.println(\"Hello world\");\n" +
-        "\t}\n" +
+    return "import java.io.BufferedReader;\n" +
+        "import java.io.IOException;\n" +
+        "import java.io.InputStreamReader;\n" +
+        "\n" +
+        "public class Solution {\n" +
+        "  public static void main(final String[] args) throws IOException {\n" +
+        "    final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));\n" +
+        "    System.out.println(\"Write your message!\");\n" +
+        "    final String message = bufferedReader.readLine();\n" +
+        "    System.out.println(message);\n" +
+        "  }\n" +
         "}";
   }
 
