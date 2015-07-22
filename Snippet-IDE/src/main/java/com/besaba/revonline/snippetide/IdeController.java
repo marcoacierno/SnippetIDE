@@ -6,6 +6,7 @@ import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblem;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblemType;
 import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
+import com.besaba.revonline.snippetide.api.events.boot.UnBootEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEventBuilder;
@@ -124,14 +125,20 @@ public class IdeController {
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin,
                        @Nullable final Path originalFile) {
+    initUnbootWorker();
     changeLanguage(plugin, language);
     this.originalFile = Optional.ofNullable(originalFile);
   }
 
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin) {
+    initUnbootWorker();
     changeLanguage(plugin, language);
     this.originalFile = Optional.empty();
+  }
+
+  private void initUnbootWorker() {
+    new UnBootWorker();
   }
 
   public void initialize() {
@@ -539,5 +546,19 @@ public class IdeController {
 
   public void stopRunSnippetThread(ActionEvent actionEvent) {
     stopIfAlreadyRunningRunThread();
+  }
+
+  public class UnBootWorker {
+    public UnBootWorker() {
+      logger.debug("unboot worker, register");
+      eventManager.registerListener(this);
+    }
+
+    @Subscribe
+    public void unbootEvent(final UnBootEvent unBootEvent) {
+      logger.debug("unboot event");
+      runSnippetThread.ifPresent(RunSnippet::stop);
+      runSnippetThread = Optional.empty();
+    }
   }
 }
