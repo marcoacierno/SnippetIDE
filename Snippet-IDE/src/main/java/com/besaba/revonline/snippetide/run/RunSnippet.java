@@ -43,7 +43,6 @@ public class RunSnippet implements Runnable {
   public void stop() {
     if (workingThread != null) {
       workingThread.interrupt();
-      workingThread = null;
     }
 
     synchronized (processWriterLock) {
@@ -152,6 +151,8 @@ public class RunSnippet implements Runnable {
       logger.fatal("something went wrong in the message reading / exit process", e);
       process.destroyForcibly();
       throw e;
+    } finally {
+      workingThread = null;
     }
   }
 
