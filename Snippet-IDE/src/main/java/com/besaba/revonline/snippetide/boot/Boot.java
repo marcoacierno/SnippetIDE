@@ -6,6 +6,7 @@ import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.configuration.ConfigurationLoadFailedException;
 import com.besaba.revonline.snippetide.api.configuration.ConfigurationSaveFailedException;
+import com.besaba.revonline.snippetide.api.events.boot.UnBootEvent;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.configuration.JsonConfiguration;
@@ -184,6 +185,9 @@ public class Boot {
 
   public void unboot() {
     logger.info("Unboot phase started");
+
+    // say to everyone who cares that the unboot phase started
+    ideApplication.getEventManager().post(new UnBootEvent());
 
     try {
       cleanDirectory(ideApplication.getTemporaryDirectory());
