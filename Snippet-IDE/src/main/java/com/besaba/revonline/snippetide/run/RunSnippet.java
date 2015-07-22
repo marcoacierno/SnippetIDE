@@ -164,11 +164,13 @@ public class RunSnippet implements Runnable {
       logger.debug("send -> " + message);
       try {
         processWriter.write(message);
+        logger.debug("write ok");
       } catch (IOException e) {
         logger.fatal("unable to send message -> ", e);
       } finally {
         try {
           processWriter.flush();
+          logger.debug("flush ok");
         } catch (IOException e) {
           logger.fatal("unable to flush writer", e);
         }
