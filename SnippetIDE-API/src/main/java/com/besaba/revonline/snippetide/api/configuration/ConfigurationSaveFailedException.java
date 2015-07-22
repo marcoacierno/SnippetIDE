@@ -1,5 +1,9 @@
 package com.besaba.revonline.snippetide.api.configuration;
 
+/**
+ * Called when the configuration failed to write
+ * the settings to the OutputStream passed.
+ */
 public class ConfigurationSaveFailedException extends Exception {
   public ConfigurationSaveFailedException() {
   }
