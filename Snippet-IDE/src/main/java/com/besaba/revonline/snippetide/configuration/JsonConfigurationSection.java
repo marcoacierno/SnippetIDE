@@ -117,7 +117,7 @@ class JsonConfigurationSection implements ConfigurationSection {
     final Object tempObject = values.get(sectionName);
 
     if (tempObject == null || !JsonConfigurationSection.class.isAssignableFrom(tempObject.getClass())) {
-      throw new IllegalArgumentException("Sub section " + sectionName + " doesn't exists");
+      return Optional.empty();
     }
 
     final JsonConfigurationSection subSection = (JsonConfigurationSection) tempObject;
@@ -195,7 +195,7 @@ class JsonConfigurationSection implements ConfigurationSection {
 
     final Object tempObject = values.get(sectionName);
     if (tempObject == null || !JsonConfigurationSection.class.isAssignableFrom(tempObject.getClass())) {
-      throw new IllegalArgumentException(sectionName + " is not a valid sub section name");
+      return false;
     }
 
     final JsonConfigurationSection subSection = (JsonConfigurationSection) tempObject;

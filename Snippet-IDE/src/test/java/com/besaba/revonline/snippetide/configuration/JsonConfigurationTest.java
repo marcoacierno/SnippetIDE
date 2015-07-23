@@ -727,9 +727,6 @@ public class JsonConfigurationTest {
 
   @Test
   public void testTryToGetValueFromAnObjectWhichDoesntExists() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Sub section home doesn't exists");
-
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"work\": {\n" +
@@ -738,7 +735,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
     final JsonConfiguration configuration = loadJson(json);
-    configuration.getAsLong("user.home.world");
+    assertFalse(configuration.getAsLong("user.home.world").isPresent());
   }
 
   @Test
@@ -772,9 +769,6 @@ public class JsonConfigurationTest {
 
   @Test
   public void testTryToUseSubsectionSyntaxOnAnInt() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Sub section name doesn't exists");
-
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"name\": \"ReVo_\",\n" +
@@ -784,8 +778,9 @@ public class JsonConfigurationTest {
         "    }\n" +
         "  }\n" +
         "}";
+
     final JsonConfiguration configuration = loadJson(json);
-    configuration.getAsString("user.name.othername");
+    assertFalse(configuration.getAsString("user.name.othername").isPresent());
   }
 
   @Test
