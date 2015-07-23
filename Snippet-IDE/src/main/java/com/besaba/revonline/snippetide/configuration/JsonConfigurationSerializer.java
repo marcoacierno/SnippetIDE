@@ -8,12 +8,11 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Map;
 
-class JsonConfigurationSectionSerializer implements JsonSerializer<JsonConfigurationSection> {
+class JsonConfigurationSerializer implements JsonSerializer<JsonConfiguration> {
   @Override
-  public JsonElement serialize(final JsonConfigurationSection src,
+  public JsonElement serialize(final JsonConfiguration src,
                                final Type typeOfSrc,
                                final JsonSerializationContext context) {
     final JsonObject root = new JsonObject();
@@ -31,7 +30,7 @@ class JsonConfigurationSectionSerializer implements JsonSerializer<JsonConfigura
         }
 
         root.add(entry.getKey(), jsonArray);
-      } else if (JsonConfigurationSection.class.isAssignableFrom(valueClass)){
+      } else if (JsonConfiguration.class.isAssignableFrom(valueClass)){
         root.add(entry.getKey(), context.serialize(value));
       } else {
         root.add(entry.getKey(), new JsonPrimitive(value.toString()));

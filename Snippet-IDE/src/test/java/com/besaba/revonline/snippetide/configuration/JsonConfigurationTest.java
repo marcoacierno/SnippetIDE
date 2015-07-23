@@ -167,9 +167,6 @@ public class JsonConfigurationTest {
 
   @Test
   public void testGetSectionWhichDoesntExists() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Section keymap doesn't exists.");
-
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"name\": \"hello\",\n" +
@@ -179,14 +176,11 @@ public class JsonConfigurationTest {
 
     final JsonConfiguration jsonConfiguration = loadJson(json);
 
-    jsonConfiguration.getAsString("keymap.compile");
+    assertFalse(jsonConfiguration.getAsString("keymap.compile").isPresent());
   }
 
   @Test
   public void testGetWithAWrongQuery() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("world is not a correct user preference setting name");
-
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"name\": \"hello\",\n" +
@@ -196,14 +190,11 @@ public class JsonConfigurationTest {
 
     final JsonConfiguration jsonConfiguration = loadJson(json);
 
-    jsonConfiguration.getAsString("world");
+    assertFalse(jsonConfiguration.getAsString("world").isPresent());
   }
 
   @Test
   public void testSetWithAWrongQuery() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("world is not a correct user preference setting name");
-
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"name\": \"hello\",\n" +
@@ -214,6 +205,37 @@ public class JsonConfigurationTest {
     final JsonConfiguration jsonConfiguration = loadJson(json);
 
     jsonConfiguration.set("world", 5);
+
+    assertEquals(5, jsonConfiguration.getAsInt("world").getAsInt());
+  }
+
+  @Test
+  public void testSaveWithAnElementWhichIsJustAKeyValuePair() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"lol\": \"ciao\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    configuration.set("key", "world");
+
+    final String output = saveJson(configuration);
+    assertEquals("{\"user\":{\"lol\":\"ciao\"},\"key\":\"world\"}", output);
+  }
+
+  @Test
+  public void testLoadWithAnEntryWhichIsAsimpleKeyValuePair() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": \"test\",\n" +
+        "  \"my\": {\n" +
+        "    \"world\": \"lol\"\n" +
+        "  },\n" +
+        "  \"int\": 210\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+
+    assertEquals("test", configuration.getAsString("user").get());
+    assertEquals(210, configuration.getAsInt("int").getAsInt());
   }
 
   @Test
@@ -664,9 +686,6 @@ public class JsonConfigurationTest {
 
   @Test
   public void testRemoveAnEntryFromASectionWhichDoesntExists() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("Section keymap doesn't exists.");
-
     final String json = "{\n" +
         "  \"user\": {\n" +
         "    \"name\": \"ReVo_\",\n" +
@@ -675,7 +694,7 @@ public class JsonConfigurationTest {
         "}";
     final JsonConfiguration configuration = loadJson(json);
 
-    configuration.remove("keymap.compile");
+    assertFalse(configuration.remove("keymap.compile"));
   }
 
   @Test
