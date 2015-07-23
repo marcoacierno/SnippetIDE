@@ -183,6 +183,34 @@ class JsonConfigurationSection implements ConfigurationSection {
     return values.remove(name) != null;
   }
 
+  @Override
+  public boolean isPresent(final String entry) {
+    final int dotPosition = entry.indexOf('.');
+
+    if (dotPosition != -1) {
+      return isPresentSubsection(entry);
+    }
+
+    return values.get(entry) != null;
+  }
+
+  private boolean isPresentSubsection(final String value) {
+    final int dotPosition = value.indexOf('.');
+
+    final String sectionName = value.substring(0, dotPosition);
+    final String entry = value.substring(dotPosition + 1);
+
+
+    final Object tempObject = values.get(sectionName);
+
+    if (tempObject == null || !JsonConfigurationSection.class.isAssignableFrom(tempObject.getClass())) {
+      return false;
+    }
+
+    final JsonConfigurationSection subSection = (JsonConfigurationSection) tempObject;
+    return subSection.isPresent(entry);
+  }
+
   private boolean removeFromSubSection(@NotNull final String name) {
     final int dotPosition = name.indexOf('.');
 

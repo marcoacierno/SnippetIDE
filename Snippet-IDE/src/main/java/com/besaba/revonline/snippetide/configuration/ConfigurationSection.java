@@ -13,4 +13,6 @@ interface ConfigurationSection {
   <T> Optional<T> get(@NotNull final String name);
   <T> void set(@NotNull final String name, @NotNull final T value);
   boolean remove(@NotNull final String name);
+
+  boolean isPresent(String entry);
 }

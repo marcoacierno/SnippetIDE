@@ -120,4 +120,14 @@ public interface Configuration {
    * @param <T> The type of the value
    */
   <T> void set(@NotNull final String name, @NotNull final T value);
+
+  /**
+   * Checks if there is a value in the configuration
+   * assigned to the name passed as argument
+   *
+   * @param name The name of the setting
+   * @return True if a call to getXXX would return a valid optional
+   *         False otherwise
+   */
+  boolean isPresent(@NotNull final String name);
 }

@@ -192,4 +192,24 @@ public class JsonConfiguration implements Configuration {
 
     section.set(element, value);
   }
+
+  @Override
+  public boolean isPresent(@NotNull final String name) {
+    final int dotSeparatorPosition = name.indexOf('.');
+
+    if (dotSeparatorPosition == -1) {
+      throw new IllegalArgumentException(name + " is not a valid query");
+    }
+
+    final String sectionName = name.substring(0, dotSeparatorPosition);
+    final String entry = name.substring(dotSeparatorPosition + 1);
+
+    final ConfigurationSection section = configurations.get(sectionName);
+
+    if (section == null) {
+      return false;
+    }
+
+    return section.isPresent(entry);
+  }
 }

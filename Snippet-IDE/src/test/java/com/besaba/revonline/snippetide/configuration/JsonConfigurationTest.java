@@ -370,7 +370,7 @@ public class JsonConfigurationTest {
         "}";
     final JsonConfiguration configuration = loadJson(json);
 
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output = saveJson(configuration);
     assertEquals("{\"user\":{\"arr\":[\"a\",\"b\",\"c\",\"d\",\"e\"]}}", output);
   }
 
@@ -463,7 +463,7 @@ public class JsonConfigurationTest {
 
     configuration.set("user.age", new int[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output = saveJson(configuration);
 
     assertEquals("{\"user\":{\"world\":\"1\",\"hello\":\"World\",\"age\":[\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\",\"10\"],\"long\":\"9223372036854775207\"}}", output);
   }
@@ -640,7 +640,7 @@ public class JsonConfigurationTest {
 
     assertTrue(configuration.remove("user"));
 
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output = saveJson(configuration);
     assertEquals("{}", output);
   }
 
@@ -656,7 +656,8 @@ public class JsonConfigurationTest {
 
     assertTrue(configuration.remove("user.age"));
 
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output;
+    output = saveJson(configuration);
 
     assertEquals("{\"user\":{\"name\":\"ReVo_\"}}", output);
   }
@@ -689,7 +690,7 @@ public class JsonConfigurationTest {
 
     assertTrue(configuration.remove("user.name"));
 
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output = saveJson(configuration);
 
     final JsonConfiguration newCopy = loadJson(output);
 
@@ -763,7 +764,7 @@ public class JsonConfigurationTest {
         "  }\n" +
         "}";
     final JsonConfiguration configuration = loadJson(json);
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output = saveJson(configuration);
     assertEquals("{\"user\":{\"work\":{\"hours\":[\"1\",\"2\",\"3\",\"4\",\"5\"],\"name\":\"Hello_World\"}}}", output);
   }
 
@@ -830,7 +831,7 @@ public class JsonConfigurationTest {
     final String json = "{\"my\":{\"sub\":{\"section\":\"yes\"}}}";
     final JsonConfiguration configuration = loadJson(json);
 
-    final String output = saveJson((JsonConfiguration) configuration);
+    final String output = saveJson(configuration);
     assertEquals(json, output);
   }
 
@@ -862,6 +863,55 @@ public class JsonConfigurationTest {
         "}";
     final JsonConfiguration configuration = loadJson(json);
     assertTrue(configuration.remove("user.my.family"));
+  }
+
+  @Test
+  public void testCheckIfAValueIsPresent() throws Exception {
+    final String json = "{\n" +
+        "  \"users\": {\n" +
+        "    \"my\": 50,\n" +
+        "    \"do\": 1\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+
+    assertTrue(configuration.isPresent("users.my"));
+  }
+
+  @Test
+  public void testCheckIsPresentWithANonExistentValue() throws Exception {
+    final String json = "{\n" +
+        "  \"you\": {\n" +
+        "    \"me\": \"no\"\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    assertFalse(configuration.isPresent("you.you"));
+  }
+
+  @Test
+  public void testCheckIfAValueIsPresentInASubsection() throws Exception {
+    final String json = "{\n" +
+        "  \"user\": {\n" +
+        "    \"me\": {\n" +
+        "      \"photo\": \"link\"\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    assertTrue(configuration.isPresent("user.me.photo"));
+  }
+
+  @Test
+  public void testCheckIfAValueIsPresentAfterRemove() throws Exception {
+    final String json = "{\n" +
+        "  \"my\": {\n" +
+        "    \"field_to_remove\": false\n" +
+        "  }\n" +
+        "}";
+    final JsonConfiguration configuration = loadJson(json);
+    assertTrue(configuration.remove("my.field_to_remove"));
+    assertFalse(configuration.isPresent("my.field_to_remove"));
   }
 
   @NotNull
