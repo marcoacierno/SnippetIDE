@@ -36,6 +36,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -71,6 +72,8 @@ public class IdeController {
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
+  @FXML
+  private Menu shareOnMenu;
   @FXML
   private TextField inputField;
   @FXML
