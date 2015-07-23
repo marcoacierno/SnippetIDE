@@ -44,10 +44,11 @@ public class JavaLanguage implements Language {
       .setName("Run")
       .addField(
           "JRE Location",
-          new FieldInfo(
+          new FieldInfo<>(
               Path.class,
               System.getenv("JAVA_HOME") != null ? Paths.get(System.getenv("JAVA_HOME")) : Paths.get("."),
-              "Location to your JRE/JDK"
+              "Location to your JRE/JDK",
+              path -> path != null && !java.nio.file.Files.isDirectory(path)
           )
       )
       .create();

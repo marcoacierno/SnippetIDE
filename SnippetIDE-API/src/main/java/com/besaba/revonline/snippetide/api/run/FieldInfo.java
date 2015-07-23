@@ -1,21 +1,29 @@
 package com.besaba.revonline.snippetide.api.run;
 
-public class FieldInfo {
-  private final Class<?> type;
+import java.util.function.Predicate;
+
+public class FieldInfo<T> {
+  private final Class<T> type;
   private final Object defaultValue;
   private final String description;
+  private final Predicate<T> validator;
 
-  public FieldInfo(final Class<?> type, final Object defaultValue, final String description) {
+  public FieldInfo(final Class<T> type, final T defaultValue, final String description, final Predicate<T> validator) {
     this.type = type;
     this.defaultValue = defaultValue;
     this.description = description;
+    this.validator = validator;
+  }
+
+  public Predicate<T> getValidator() {
+    return validator;
   }
 
   public String getDescription() {
     return description;
   }
 
-  public Class<?> getType() {
+  public Class<T> getType() {
     return type;
   }
 

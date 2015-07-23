@@ -22,6 +22,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RunConfigurationManager {
   private final static Logger logger = Logger.getLogger(RunConfigurationManager.class);
@@ -119,7 +121,14 @@ public class RunConfigurationManager {
           throw new AssertionError("originalConfiguration cannot be null here");
         }
 
-        return Optional.of(new RunConfigurationValues(configurationId, tryToFixValues(values.get(), originalConfiguration)));
+        final Map<String, Object> fixedValues = tryToFixValues(values.get(), originalConfiguration);
+
+        if (fixedValues == null) {
+          logger.error("unable to restore stored configuration");
+          return Optional.empty();
+        }
+
+        return Optional.of(new RunConfigurationValues(configurationId, fixedValues));
       }
     } catch (IllegalArgumentException e) {
       return Optional.empty();
@@ -131,16 +140,24 @@ public class RunConfigurationManager {
   private Map<String, Object> tryToFixValues(final Map<String, Object> restoredValues, final RunConfiguration originalConfiguration) {
     final Map<String, FieldInfo> originalRun = originalConfiguration.getFields();
     final Map<String, Object> fixedValues = new HashMap<>();
+    final Converters converters = new Converters();
 
-    restoredValues.forEach((key, value) -> {
+    for (final Map.Entry<String, Object> entry : restoredValues.entrySet()) {
+      final String key = entry.getKey();
+
       final FieldInfo keyInfo = originalRun.get(key);
       final Class<?> destinationType = keyInfo.getType();
       // source type is always string
-      final String valueString = value.toString();
-      final Converters converters = new Converters();
+      final String valueString = entry.getValue().toString();
       final Object fixedValue = converters.convert(String.class, destinationType, valueString);
+
+      // check if the value is still valid
+      if (!keyInfo.getValidator().test(fixedValue)) {
+        return null;
+      }
+
       fixedValues.put(key, fixedValue);
-    });
+    }
 
     return fixedValues;
   }
@@ -197,9 +214,19 @@ public class RunConfigurationManager {
       final ConfigurationTab activeTab = (ConfigurationTab) configurationsTabPane.getSelectionModel().getSelectedItem();
       final PropertySheet propertySheet = (PropertySheet) activeTab.getContent().lookup("PropertySheet");
 
-      final Map<String, Object> values = new HashMap<>();
+      final boolean allFieldsCorrect = propertySheet
+          .getItems()
+          .stream()
+          .anyMatch(item -> ((SimplePropertySheetItem) item).check(item.getValue()));
 
-      propertySheet.getItems().forEach(item -> values.put(item.getName(), item.getValue()));
+      if (!allFieldsCorrect) {
+        return null;
+      }
+
+      final Map<String, Object> values = propertySheet
+          .getItems()
+          .stream()
+          .collect(Collectors.toMap(PropertySheet.Item::getName, PropertySheet.Item::getValue));
 
       final RunConfigurationValues configuration = new RunConfigurationValues(activeTab.getRunConfiguration(), values);
 
