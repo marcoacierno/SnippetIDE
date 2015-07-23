@@ -142,7 +142,7 @@ public class JarPluginManager implements PluginManager {
       try {
         instance = (ShareService) languageClass.newInstance();
       } catch (InstantiationException | IllegalAccessException e) {
-        throw new UnableToLoadPluginException("Unable to create an instance of the class language " + fullName, e, file, this);
+        throw new UnableToLoadPluginException("Unable to create an instance of the class ShareService " + fullName, e, file, this);
       }
 
       shareServices.add(instance);
