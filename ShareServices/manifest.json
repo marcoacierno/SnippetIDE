@@ -1,0 +1,11 @@
+{
+  "name": "Share Services",
+  "description": "Adds the possibility to share your code on Gist",
+  "version": "1.0",
+  "minSupportedVersion": "0.1",
+  "authors": [
+    "Marco Acierno"
+  ],
+  "languages": [],
+  "shareServices": ["com.besaba.revonline.snippetide.shareservices.GistShareService"]
+}

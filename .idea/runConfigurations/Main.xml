@@ -29,6 +29,7 @@
         <artifact name="Java" />
         <artifact name="Javascript" />
         <artifact name="PlainText" />
+        <artifact name="ShareService" />
       </option>
       <option name="Make" enabled="true" />
     </method>
