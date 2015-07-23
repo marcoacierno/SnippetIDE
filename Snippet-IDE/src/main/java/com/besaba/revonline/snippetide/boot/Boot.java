@@ -15,9 +15,6 @@ import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.UnableToLoadPluginException;
 import com.besaba.revonline.snippetide.application.IDEApplicationImpl;
 import com.besaba.revonline.snippetide.plugins.JarPluginManager;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +31,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Prepare the application
