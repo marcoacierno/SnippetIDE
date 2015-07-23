@@ -42,6 +42,11 @@ public class RunSnippet implements Runnable {
    * Call it only from one thread (javafx thread?)
    */
   public void stop() {
+    if (!running) {
+      // stop only if running
+      return;
+    }
+
     if (workingThread != null) {
       workingThread.interrupt();
     }
