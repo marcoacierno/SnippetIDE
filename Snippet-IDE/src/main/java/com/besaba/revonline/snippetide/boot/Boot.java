@@ -161,6 +161,7 @@ public class Boot {
             final Plugin plugin = pluginManager.loadPlugin(file, ideApplication.getVersion());
             // we need to register the languages created by the plugin not the plugin class!
             plugin.getLanguages().forEach(eventManager::registerListener);
+            plugin.getShareServices().forEach(eventManager::registerListener);
             logger.info("Loaded plugin " + file + "!");
 
           } catch (UnableToLoadPluginException e) {

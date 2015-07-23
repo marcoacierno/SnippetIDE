@@ -3,6 +3,7 @@ package com.besaba.revonline.snippetide.shareservices;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.events.share.ShareCompletedEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareFailedEvent;
 import com.besaba.revonline.snippetide.api.events.share.ShareRequestEvent;
 import com.besaba.revonline.snippetide.api.shareservices.ShareService;
 import com.google.common.eventbus.Subscribe;
@@ -38,7 +39,7 @@ public class GistShareService implements ShareService {
     final String code = event.getCode();
 
     final HttpURLConnection httpURLConnection
-        = ((HttpURLConnection) new URL("https://api.github.com/gists/").openConnection());
+        = ((HttpURLConnection) new URL("https://api.github.com/gists").openConnection());
     final String completeJson = prepareJsonResponse(fileName, code);
 
     httpURLConnection.setDoOutput(true);
@@ -52,11 +53,14 @@ public class GistShareService implements ShareService {
       final int response = httpURLConnection.getResponseCode();
 
       if (response != 201) {
-        throw new IOException("Unable to post it :( (" + response + ")");
+        eventManager.post(new ShareFailedEvent(null, "Unable to post. Code: " + response, this));
+        return;
       }
 
       final String location = httpURLConnection.getHeaderField("Location");
-      eventManager.post(new ShareCompletedEvent(location, this));
+      final String gistId = location.substring(location.lastIndexOf('/') + 1);
+      final String webUrl = "https://gist.github.com/anonymous/" + gistId;
+      eventManager.post(new ShareCompletedEvent(webUrl, this));
     } finally {
       httpURLConnection.disconnect();
     }

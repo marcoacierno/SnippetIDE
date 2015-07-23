@@ -15,6 +15,9 @@ import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.events.run.SendMessageToProcessEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareCompletedEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareFailedEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareRequestEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
@@ -33,6 +36,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
@@ -43,6 +47,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
@@ -148,8 +154,23 @@ public class IdeController {
     eventManager.registerListener(this);
 
     prepareIde();
+    prepareShareOnMenu();
     prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void prepareShareOnMenu() {
+    pluginManager.getPlugins().forEach(p -> {
+      p.getShareServices().forEach(service -> {
+        final MenuItem menuItem = new MenuItem(service.getServiceName());
+
+        menuItem.setOnAction(event -> {
+          eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText()));
+        });
+
+        shareOnMenu.getItems().add(menuItem);
+      });
+    });
   }
 
   private void prepareIde() {
@@ -552,6 +573,30 @@ public class IdeController {
 
   public void stopRunSnippetThread(ActionEvent actionEvent) {
     stopIfAlreadyRunningRunThread();
+  }
+
+  @Subscribe
+  public void onSuccessfulShare(@NotNull final ShareCompletedEvent event) {
+    final Optional<ButtonType> buttonType
+        = new Alert(Alert.AlertType.INFORMATION,
+                    "Shared: " + event.getData(), ButtonType.OK,
+                    new ButtonType("Copy", ButtonBar.ButtonData.APPLY)
+      ).showAndWait();
+
+    buttonType.ifPresent(button -> {
+      if (button.getButtonData() == ButtonBar.ButtonData.APPLY) {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString(event.getData());
+        clipboard.setContent(content);
+      }
+    });
+  }
+
+  @Subscribe
+  public void onFailedShare(@NotNull final ShareFailedEvent event) {
+    new Alert(Alert.AlertType.ERROR, "Unable to share your code! :( " + event.getReason(), ButtonType.OK).show();
+    logger.error("share failed", event.getThrowable());
   }
 
   public class UnBootWorker {
