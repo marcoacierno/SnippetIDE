@@ -56,7 +56,7 @@ public class GistShareService implements ShareService {
       }
 
       final String location = httpURLConnection.getHeaderField("Location");
-      eventManager.post(new ShareCompletedEvent(location));
+      eventManager.post(new ShareCompletedEvent(location, this));
     } finally {
       httpURLConnection.disconnect();
     }
