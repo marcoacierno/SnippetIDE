@@ -47,6 +47,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
@@ -167,6 +168,7 @@ public class IdeController {
         menuItem.setOnAction(event -> {
           eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText(), language));
         });
+        menuItem.setGraphic(new ImageView(service.getImage()));
 
         shareOnMenu.getItems().add(menuItem);
       });
