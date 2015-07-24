@@ -165,7 +165,7 @@ public class IdeController {
         final MenuItem menuItem = new MenuItem(service.getServiceName());
 
         menuItem.setOnAction(event -> {
-          eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText()));
+          eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText(), language));
         });
 
         shareOnMenu.getItems().add(menuItem);
