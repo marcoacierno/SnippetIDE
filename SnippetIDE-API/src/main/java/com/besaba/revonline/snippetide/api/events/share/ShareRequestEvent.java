@@ -13,7 +13,7 @@ public class ShareRequestEvent extends Event<ShareService> {
   public ShareRequestEvent(@NotNull final ShareService target,
                            @NotNull final String fileName,
                            @NotNull final String code) {
-    super(target);
+    super(target, true);
     this.fileName = fileName;
     this.code = code;
   }

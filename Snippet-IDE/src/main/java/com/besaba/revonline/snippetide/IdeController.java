@@ -577,26 +577,30 @@ public class IdeController {
 
   @Subscribe
   public void onSuccessfulShare(@NotNull final ShareCompletedEvent event) {
-    final Optional<ButtonType> buttonType
-        = new Alert(Alert.AlertType.INFORMATION,
-                    "Shared: " + event.getData(), ButtonType.OK,
-                    new ButtonType("Copy", ButtonBar.ButtonData.APPLY)
+    Platform.runLater(() -> {
+      final Optional<ButtonType> buttonType
+          = new Alert(Alert.AlertType.INFORMATION,
+          "Shared: " + event.getData(), ButtonType.OK,
+          new ButtonType("Copy", ButtonBar.ButtonData.APPLY)
       ).showAndWait();
 
-    buttonType.ifPresent(button -> {
-      if (button.getButtonData() == ButtonBar.ButtonData.APPLY) {
-        final Clipboard clipboard = Clipboard.getSystemClipboard();
-        final ClipboardContent content = new ClipboardContent();
-        content.putString(event.getData());
-        clipboard.setContent(content);
-      }
+      buttonType.ifPresent(button -> {
+        if (button.getButtonData() == ButtonBar.ButtonData.APPLY) {
+          final Clipboard clipboard = Clipboard.getSystemClipboard();
+          final ClipboardContent content = new ClipboardContent();
+          content.putString(event.getData());
+          clipboard.setContent(content);
+        }
+      });
     });
   }
 
   @Subscribe
   public void onFailedShare(@NotNull final ShareFailedEvent event) {
-    new Alert(Alert.AlertType.ERROR, "Unable to share your code! :( " + event.getReason(), ButtonType.OK).show();
-    logger.error("share failed", event.getThrowable());
+    Platform.runLater(() -> {
+      new Alert(Alert.AlertType.ERROR, "Unable to share your code! :( " + event.getReason(), ButtonType.OK).show();
+      logger.error("share failed", event.getThrowable());
+    });
   }
 
   public class UnBootWorker {

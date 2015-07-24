@@ -8,8 +8,12 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class EventBusEventManager implements EventManager {
   private final static Logger logger = Logger.getLogger(EventBusEventManager.class);
+  private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
   private final EventBus eventBus = new EventBus((throwable, subscriberExceptionContext) -> {
     logger.fatal("Exception inside the EventBus");
@@ -31,7 +35,13 @@ public class EventBusEventManager implements EventManager {
   }
 
   public void post(@NotNull final Event<?> event) {
-    eventBus.post(event);
+    if (event.isUseNewThread()) {
+      // create a new thread and post the event
+      // it's a single thread so new event should wait in the queue
+      executorService.submit(() -> eventBus.post(event));
+    } else {
+      eventBus.post(event);
+    }
   }
 
   @Subscribe
