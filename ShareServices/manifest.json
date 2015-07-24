@@ -7,5 +7,8 @@
     "Marco Acierno"
   ],
   "languages": [],
-  "shareServices": ["com.besaba.revonline.snippetide.shareservices.GistShareService"]
+  "shareServices": [
+    "com.besaba.revonline.snippetide.shareservices.GistShareService",
+    "com.besaba.revonline.snippetide.shareservices.PastebinShareService"
+  ]
 }
