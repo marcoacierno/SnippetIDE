@@ -37,10 +37,11 @@ public class GistShareService implements ShareService {
 
     final String fileName = event.getFileName();
     final String code = event.getCode();
+    final String languageName = event.getLanguage().getName();
 
     final HttpURLConnection httpURLConnection
         = ((HttpURLConnection) new URL("https://api.github.com/gists").openConnection());
-    final String completeJson = prepareJsonResponse(fileName, code);
+    final String completeJson = prepareJsonResponse(fileName, code, languageName);
 
     httpURLConnection.setDoOutput(true);
     httpURLConnection.setRequestMethod("POST");
@@ -66,22 +67,26 @@ public class GistShareService implements ShareService {
     }
   }
 
-  private String prepareJsonResponse(@NotNull final String fileName, @NotNull final String code) {
+  private String prepareJsonResponse(@NotNull final String fileName,
+                                     @NotNull final String code,
+                                     @NotNull final String languageName) {
     // the quote method adds the "
     final String rawJson = "{\n" +
         "  \"description\": \"SnippetIDE\", \n" +
         "  \"public\": true, \n" +
         "  \"files\": {\n" +
         "    %s: {\n" +
-        "      \"content\": %s\n" +
+        "      \"content\": %s,\n" +
+        "      \"language\": %s\n" +
         "    }\n" +
         "  }\n" +
         "}   ";
 
     final String escapedFileNameForJson = escapeForJson(fileName);
     final String escapedCodeForJson = escapeForJson(code);
+    final String escapedLanguageNameForJson = escapeForJson(languageName);
 
-    return String.format(rawJson, escapedFileNameForJson, escapedCodeForJson);
+    return String.format(rawJson, escapedFileNameForJson, escapedCodeForJson, escapedLanguageNameForJson);
   }
 
   public static String escapeForJson(final String text) {
