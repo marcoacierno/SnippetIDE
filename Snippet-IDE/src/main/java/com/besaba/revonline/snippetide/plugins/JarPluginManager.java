@@ -145,10 +145,18 @@ public class JarPluginManager implements PluginManager {
         throw new UnableToLoadPluginException("Unable to create an instance of the class ShareService " + fullName, e, file, this);
       }
 
+      shareServicesContractCheck(instance, file);
+
       shareServices.add(instance);
     });
 
     return shareServices.build();
+  }
+
+  private void shareServicesContractCheck(final ShareService instance, final Path file) {
+    if (instance.getImage().getHeight() != 16 || instance.getImage().getWidth() != 16) {
+      throw new UnableToLoadPluginException("ShareServices contract says that Image should be 16x16!", file, this);
+    }
   }
 
   @NotNull
