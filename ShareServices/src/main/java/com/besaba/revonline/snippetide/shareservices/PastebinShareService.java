@@ -1,5 +1,11 @@
 package com.besaba.revonline.snippetide.shareservices;
 
+import com.besaba.revonline.pastebinapi.Pastebin;
+import com.besaba.revonline.pastebinapi.impl.factory.PastebinFactory;
+import com.besaba.revonline.pastebinapi.paste.Paste;
+import com.besaba.revonline.pastebinapi.paste.PasteExpire;
+import com.besaba.revonline.pastebinapi.paste.PasteVisiblity;
+import com.besaba.revonline.pastebinapi.response.Response;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.StructureFieldInfo;
@@ -8,19 +14,11 @@ import com.besaba.revonline.snippetide.api.events.share.ShareCompletedEvent;
 import com.besaba.revonline.snippetide.api.events.share.ShareFailedEvent;
 import com.besaba.revonline.snippetide.api.events.share.ShareRequestEvent;
 import com.besaba.revonline.snippetide.api.shareservices.ShareService;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.net.UrlEscapers;
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 public class PastebinShareService implements ShareService {
   private static final int SHARE_WITH_DEV_KEY = 1;
@@ -56,43 +54,18 @@ public class PastebinShareService implements ShareService {
       return;
     }
 
-    final HttpURLConnection httpURLConnection
-        = ((HttpURLConnection) new URL("http://pastebin.com/api/api_post.php").openConnection());
-    httpURLConnection.setDoOutput(true);
-    httpURLConnection.setRequestMethod("POST");
-    httpURLConnection.connect();
-
     final String devKey = event.getParameters().getValues().get("Pastebin DevKey").toString();
-    final String data = generateData(event.getFileName(), event.getCode(), devKey, event.getLanguage().getName());
 
-    System.out.println(data);
+    final PastebinFactory factory = new PastebinFactory();
+    final Pastebin pastebin = factory.createPastebin(devKey);
 
-    try(final BufferedWriter writer = new BufferedWriter(
-        new OutputStreamWriter(httpURLConnection.getOutputStream(), StandardCharsets.UTF_8));
-        final BufferedReader reader = new BufferedReader(
-            new InputStreamReader(httpURLConnection.getInputStream(), StandardCharsets.UTF_8)
-        )
-    ) {
-      writer.append(data);
-      writer.flush();
+    final Paste paste = generateData(event.getFileName(), event.getCode(), devKey, event.getLanguage().getName(), factory);
+    final Response<String> response = pastebin.post(paste);
 
-      final int responseCode = httpURLConnection.getResponseCode();
-
-      if (responseCode != 200) {
-        eventManager.post(new ShareFailedEvent(null, "Code: " + responseCode, this));
-        return;
-      }
-
-      final String response = reader.readLine();
-
-      if (response == null || response.startsWith("Bad API request")) {
-        eventManager.post(new ShareFailedEvent(null, String.valueOf(response), this));
-        return;
-      }
-
-      eventManager.post(new ShareCompletedEvent(response, this));
-    } finally {
-      httpURLConnection.disconnect();
+    if (response.hasError()) {
+      eventManager.post(new ShareFailedEvent(null, response.getError(), this));
+    } else {
+      eventManager.post(new ShareCompletedEvent(response.get(), this));
     }
   }
 
@@ -102,20 +75,13 @@ public class PastebinShareService implements ShareService {
     return parameters;
   }
 
-  private static String generateData(final String fileName, final String code, final String devkey, final String languageName) {
-    return ImmutableMap.<String, String>builder()
-        .put("api_option", "paste")
-        .put("api_paste_private", String.valueOf(1))
-        .put("api_paste_name", UrlEscapers.urlPathSegmentEscaper().escape(fileName))
-        .put("api_paste_expire_date", "N")
-        .put("api_paste_format", UrlEscapers.urlPathSegmentEscaper().escape(languageName))
-        .put("api_paste_code", UrlEscapers.urlPathSegmentEscaper().escape(code))
-        .put("api_dev_key", devkey)
-        .build()
-        .entrySet()
-        .stream()
-        .map(entry -> entry.getKey() + "=" + entry.getValue())
-        .reduce("", (acc, nxt) -> acc + "&" + nxt)
-        .substring(1);
+  private static Paste generateData(final String fileName, final String code, final String devkey, final String languageName, final PastebinFactory factory) {
+    return factory.createPaste()
+        .setVisiblity(PasteVisiblity.Unlisted)
+        .setExpire(PasteExpire.Never)
+        .setMachineFriendlyLanguage(UrlEscapers.urlPathSegmentEscaper().escape(languageName))
+        .setRaw(UrlEscapers.urlPathSegmentEscaper().escape(code))
+        .setTitle(UrlEscapers.urlPathSegmentEscaper().escape(fileName))
+        .build();
   }
 }
