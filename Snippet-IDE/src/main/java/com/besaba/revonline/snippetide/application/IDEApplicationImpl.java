@@ -123,7 +123,7 @@ public class IDEApplicationImpl implements IDEApplication {
 
     final Stage stage = new Stage();
     final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
-    final IdeController ideController = new IdeController(language, plugin, fileToOpen);
+    final IdeController ideController = new IdeController(language, plugin, fileToOpen, stage);
 
     loader.setControllerFactory(param -> param == IdeController.class ? ideController : null);
 

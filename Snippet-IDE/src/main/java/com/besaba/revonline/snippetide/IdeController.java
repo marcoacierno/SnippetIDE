@@ -57,6 +57,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.Notifications;
@@ -132,21 +133,26 @@ public class IdeController {
   private Optional<RunSnippet> runSnippetThread = Optional.empty();
   private DataStructureManagerContext runconfigurationContext;
   private boolean dirtyCodeArea = false;
+  @NotNull
+  private final Stage stage;
 
   /**
    * @param language What will be the language used by this view?
+   * @param stage
    */
   public IdeController(@NotNull final Language language,
                        @NotNull final Plugin plugin,
-                       @Nullable final Path originalFile) {
+                       @Nullable final Path originalFile, final @NotNull Stage stage) {
     initUnbootWorker();
+    this.stage = stage;
     changeLanguage(plugin, language);
     this.originalFile = Optional.ofNullable(originalFile);
   }
 
   public IdeController(@NotNull final Language language,
-                       @NotNull final Plugin plugin) {
+                       @NotNull final Plugin plugin, final @NotNull Stage stage) {
     initUnbootWorker();
+    this.stage = stage;
     changeLanguage(plugin, language);
     this.originalFile = Optional.empty();
   }
@@ -158,10 +164,15 @@ public class IdeController {
   public void initialize() {
     eventManager.registerListener(this);
 
+    prepareRunAndCompileKeysListener();
     prepareIde();
     prepareShareOnMenu();
     prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void prepareRunAndCompileKeysListener() {
+    stage.addEventFilter(KeyEvent.KEY_PRESSED, this::compileOrRunKeyPress);
   }
 
   private void prepareShareOnMenu() {
@@ -201,6 +212,10 @@ public class IdeController {
   }
 
   private void onInputSubmit(final KeyEvent keyEvent) {
+    if (!runSnippetThread.isPresent()) {
+      return;
+    }
+
     if (keyEvent.getCode() != KeyCode.ENTER) {
       logger.debug("pressed something else");
       return;
@@ -303,7 +318,7 @@ public class IdeController {
     compilationTableMessage.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getMessage()));
   }
 
-  public void onKeyPressed(Event event) {
+  public void compileOrRunKeyPress(Event event) {
     final KeyEvent keyEvent = (KeyEvent) event;
     final Action action = Keymap.match(keyEvent);
 

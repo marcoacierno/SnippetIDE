@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 // TODO: Rewrite tests
 public class IdeControllerTest extends ApplicationTest {
@@ -37,7 +36,7 @@ public class IdeControllerTest extends ApplicationTest {
 
     final Language randomLanguage = MockLanguage.INSTANCE;
     final FXMLLoader loader = new FXMLLoader(Main.class.getResource("ide.fxml"));
-    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage, MockPluginManager.plugin) : null);
+    loader.setControllerFactory(param -> param == IdeController.class ? new IdeController(randomLanguage, MockPluginManager.plugin, stage) : null);
 
     final Scene scene = new Scene(loader.load(Main.class.getResourceAsStream("ide.fxml")));
     stage.setScene(scene);
