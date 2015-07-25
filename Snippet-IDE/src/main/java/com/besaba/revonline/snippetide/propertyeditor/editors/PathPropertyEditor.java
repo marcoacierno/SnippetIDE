@@ -1,4 +1,4 @@
-package com.besaba.revonline.snippetide.run.editors;
+package com.besaba.revonline.snippetide.propertyeditor.editors;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;

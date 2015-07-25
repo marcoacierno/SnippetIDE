@@ -1,6 +1,6 @@
-package com.besaba.revonline.snippetide.run;
+package com.besaba.revonline.snippetide.propertyeditor;
 
-import com.besaba.revonline.snippetide.run.editors.PathPropertyEditor;
+import com.besaba.revonline.snippetide.propertyeditor.editors.PathPropertyEditor;
 import javafx.util.Callback;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;

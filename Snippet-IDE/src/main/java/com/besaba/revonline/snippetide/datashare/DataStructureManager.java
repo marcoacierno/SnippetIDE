@@ -8,7 +8,7 @@ import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.StructureFieldInfo;
 import com.besaba.revonline.snippetide.converter.Converters;
 import com.besaba.revonline.snippetide.datashare.context.DataStructureManagerContext;
-import com.besaba.revonline.snippetide.run.CustomPropertyEditorFactory;
+import com.besaba.revonline.snippetide.propertyeditor.CustomPropertyEditorFactory;
 import com.besaba.revonline.snippetide.run.SimplePropertySheetItem;
 import com.google.common.collect.ImmutableMap;
 import javafx.collections.FXCollections;
@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
