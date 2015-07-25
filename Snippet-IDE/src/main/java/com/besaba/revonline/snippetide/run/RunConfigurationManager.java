@@ -5,7 +5,7 @@ import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
-import com.besaba.revonline.snippetide.api.datashare.FieldInfo;
+import com.besaba.revonline.snippetide.api.datashare.StructureFieldInfo;
 import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
@@ -137,14 +137,14 @@ public class RunConfigurationManager {
   }
 
   private Map<String, Object> tryToFixValues(final Map<String, Object> restoredValues, final StructureDataContainer originalConfiguration) {
-    final Map<String, FieldInfo> originalRun = originalConfiguration.getFields();
+    final Map<String, StructureFieldInfo> originalRun = originalConfiguration.getFields();
     final Map<String, Object> fixedValues = new HashMap<>();
     final Converters converters = new Converters();
 
     for (final Map.Entry<String, Object> entry : restoredValues.entrySet()) {
       final String key = entry.getKey();
 
-      final FieldInfo keyInfo = originalRun.get(key);
+      final StructureFieldInfo keyInfo = originalRun.get(key);
       final Class<?> destinationType = keyInfo.getType();
       // source type is always string
       final String valueString = entry.getValue().toString();

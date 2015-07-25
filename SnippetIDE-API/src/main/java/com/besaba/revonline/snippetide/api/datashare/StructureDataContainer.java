@@ -8,12 +8,12 @@ import java.util.Map;
 
 public class StructureDataContainer {
   @NotNull
-  private final ImmutableMap<String, FieldInfo> fields;
+  private final ImmutableMap<String, StructureFieldInfo> fields;
   @NotNull
   private final String name;
   private final int id;
 
-  private StructureDataContainer(@NotNull final Map<String, FieldInfo> fields, final @NotNull String name, final int id) {
+  private StructureDataContainer(@NotNull final Map<String, StructureFieldInfo> fields, final @NotNull String name, final int id) {
     this.name = name;
     this.id = id;
     this.fields = ImmutableMap.copyOf(fields);
@@ -24,7 +24,7 @@ public class StructureDataContainer {
   }
 
   @NotNull
-  public ImmutableMap<String, FieldInfo> getFields() {
+  public ImmutableMap<String, StructureFieldInfo> getFields() {
     return fields;
   }
 
@@ -34,7 +34,7 @@ public class StructureDataContainer {
   }
 
   public static class Builder {
-    private final Map<String, FieldInfo> fields = new HashMap<>();
+    private final Map<String, StructureFieldInfo> fields = new HashMap<>();
     private String name;
     private int id;
 
@@ -56,7 +56,7 @@ public class StructureDataContainer {
       return this;
     }
 
-    public Builder addField(final String name, final FieldInfo type) {
+    public Builder addField(final String name, final StructureFieldInfo type) {
       this.fields.put(name, type);
       return this;
     }
