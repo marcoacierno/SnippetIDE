@@ -163,9 +163,13 @@ public class ManageRunConfigurationsController {
       }
 
       for (final RunConfigurationValuesManagerData item : selectedItems) {
-        final boolean removed = applicationConfiguration.remove(
+        boolean removed = applicationConfiguration.remove(
             languageConfigurationsQuery + "." + item.getDataContainer().getParentId()
         );
+
+        if (item.isDefault()) {
+          removed &= applicationConfiguration.remove(languageConfigurationsQuery + ".default");
+        }
 
         if (!removed) {
           new Alert(
