@@ -1,27 +1,27 @@
 package com.besaba.revonline.snippetide.run;
 
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 
 public class ConfigurationTab extends Tab {
-  private final RunConfiguration runConfiguration;
+  private final StructureDataContainer structureDataContainer;
 
-  public ConfigurationTab(final RunConfiguration runConfiguration) {
-    this.runConfiguration = runConfiguration;
+  public ConfigurationTab(final StructureDataContainer structureDataContainer) {
+    this.structureDataContainer = structureDataContainer;
   }
 
-  public ConfigurationTab(final String text, final RunConfiguration runConfiguration) {
+  public ConfigurationTab(final String text, final StructureDataContainer structureDataContainer) {
     super(text);
-    this.runConfiguration = runConfiguration;
+    this.structureDataContainer = structureDataContainer;
   }
 
-  public ConfigurationTab(final String text, final Node content, final RunConfiguration runConfiguration) {
+  public ConfigurationTab(final String text, final Node content, final StructureDataContainer structureDataContainer) {
     super(text, content);
-    this.runConfiguration = runConfiguration;
+    this.structureDataContainer = structureDataContainer;
   }
 
-  public RunConfiguration getRunConfiguration() {
-    return runConfiguration;
+  public StructureDataContainer getStructureDataContainer() {
+    return structureDataContainer;
   }
 }

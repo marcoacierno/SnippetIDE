@@ -1,19 +1,20 @@
-package com.besaba.revonline.snippetide.api.run;
+package com.besaba.revonline.snippetide.api.datashare;
 
+import com.besaba.revonline.snippetide.api.run.FieldInfo;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RunConfiguration {
+public class StructureDataContainer {
   @NotNull
   private final ImmutableMap<String, FieldInfo> fields;
   @NotNull
   private final String name;
   private final int id;
 
-  private RunConfiguration(@NotNull final Map<String, FieldInfo> fields, final @NotNull String name, final int id) {
+  private StructureDataContainer(@NotNull final Map<String, FieldInfo> fields, final @NotNull String name, final int id) {
     this.name = name;
     this.id = id;
     this.fields = ImmutableMap.copyOf(fields);
@@ -61,8 +62,8 @@ public class RunConfiguration {
       return this;
     }
 
-    public RunConfiguration create() {
-      return new RunConfiguration(fields, name, id);
+    public StructureDataContainer create() {
+      return new StructureDataContainer(fields, name, id);
     }
   }
 
