@@ -36,7 +36,7 @@ public class StructureDataContainer {
   public static class Builder {
     private final Map<String, StructureFieldInfo> fields = new HashMap<>();
     private String name;
-    private int id;
+    private final int id;
 
     public Builder(final int id) {
       this.id = id;
@@ -44,11 +44,6 @@ public class StructureDataContainer {
       if (this.id < 0) {
         throw new IllegalArgumentException("ID cannot be negative.");
       }
-    }
-
-    public Builder setId(final int id) {
-      this.id = id;
-      return this;
     }
 
     public Builder setName(final String name) {
