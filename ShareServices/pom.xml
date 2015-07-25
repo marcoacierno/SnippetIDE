@@ -55,6 +55,10 @@
   <build>
     <resources>
       <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+
+      <resource>
         <directory>.</directory>
         <includes>
           <include>manifest.json</include>
