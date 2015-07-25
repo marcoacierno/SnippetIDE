@@ -1,5 +1,6 @@
 package com.besaba.revonline.snippetide.api.shareservices;
 
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.events.share.ShareRequestEvent;
 import com.google.common.eventbus.Subscribe;
 import javafx.scene.image.Image;
@@ -54,4 +55,7 @@ public interface ShareService {
    */
   @Subscribe
   void share(@NotNull final ShareRequestEvent event) throws IOException;
+
+  @NotNull
+  StructureDataContainer[] getShareParameters();
 }

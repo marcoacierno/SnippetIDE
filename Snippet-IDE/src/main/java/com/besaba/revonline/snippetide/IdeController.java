@@ -26,6 +26,7 @@ import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
 import com.besaba.revonline.snippetide.datashare.DataStructureManager;
 import com.besaba.revonline.snippetide.datashare.context.DataStructureManagerContext;
 import com.besaba.revonline.snippetide.datashare.context.RunConfigurationDataStructureManagerContext;
+import com.besaba.revonline.snippetide.datashare.context.ShareServiceParametersDataStructureManagerContext;
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
 import com.besaba.revonline.snippetide.run.RunSnippet;
@@ -169,7 +170,12 @@ public class IdeController {
         final MenuItem menuItem = new MenuItem(service.getServiceName());
 
         menuItem.setOnAction(event -> {
-          eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText(), language));
+          final ShareServiceParametersDataStructureManagerContext context = new ShareServiceParametersDataStructureManagerContext(p, service);
+          final Optional<DataContainer> dataContainer = new DataStructureManager(context).getDataContainer();
+
+          dataContainer.ifPresent(container -> {
+            eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText(), language, container));
+          });
         });
         menuItem.setGraphic(new ImageView(service.getImage()));
 
@@ -341,11 +347,9 @@ public class IdeController {
     final Optional<DataContainer> dataContainer = new DataStructureManager(runconfigurationContext)
         .getDataContainer();
 
-    if (dataContainer.isPresent()) {
-      eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), dataContainer.get()));
-    } else {
-      new Alert(Alert.AlertType.ERROR, "Invalid run configuration :(", ButtonType.OK).show();
-    }
+    dataContainer.ifPresent(container -> {
+      eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), container));
+    });
   }
 
 

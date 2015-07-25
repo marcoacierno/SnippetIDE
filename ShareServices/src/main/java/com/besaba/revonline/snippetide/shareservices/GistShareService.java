@@ -1,6 +1,7 @@
 package com.besaba.revonline.snippetide.shareservices;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.events.share.ShareCompletedEvent;
 import com.besaba.revonline.snippetide.api.events.share.ShareFailedEvent;
@@ -54,7 +55,7 @@ public class GistShareService implements ShareService {
       final int response = httpURLConnection.getResponseCode();
 
       if (response != 201) {
-        eventManager.post(new ShareFailedEvent(null, "Unable to post. Code: " + response, this));
+        eventManager.post(new ShareFailedEvent(null, "Code: " + response, this));
         return;
       }
 
@@ -65,6 +66,12 @@ public class GistShareService implements ShareService {
     } finally {
       httpURLConnection.disconnect();
     }
+  }
+
+  @NotNull
+  @Override
+  public StructureDataContainer[] getShareParameters() {
+    return new StructureDataContainer[0];
   }
 
   private String prepareJsonResponse(@NotNull final String fileName,
