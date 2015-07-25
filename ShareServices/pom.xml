@@ -55,10 +55,11 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.3.1</version>
         <configuration>
-          <outputDirectory>../release/${ideversion}/SnippetIDE/plugins/</outputDirectory>
+          <!--<outputDirectory>../release/${ideversion}/SnippetIDE/plugins/</outputDirectory>-->
+          <outputDirectory>../SnippetIDE/plugins</outputDirectory>
           <finalName>ShareService</finalName>
           <includes>
-            <include>${project.basedir}/Snippet-IDE/manifest.json</include>
+            <include>manifest.json</include>
           </includes>
         </configuration>
       </plugin>
@@ -71,28 +72,6 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.apache.maven:lib:tests</exclude>
-                  <exclude>org.apache.maven:lib:provided</exclude>
-                </excludes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

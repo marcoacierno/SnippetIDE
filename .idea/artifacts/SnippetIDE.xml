@@ -24,11 +24,17 @@
         <element id="library" level="project" name="Maven: org.controlsfx:openjfx-dialogs:1.0.3" />
         <element id="library" level="project" name="Maven: com.intellij:annotations:12.0" />
       </element>
-      <element id="artifact" artifact-name="Java" />
-      <element id="artifact" artifact-name="PlainText" />
       <element id="artifact" artifact-name="SnippetIDE-API" />
       <element id="artifact" artifact-name="Preloader" />
-      <element id="artifact" artifact-name="Javascript" />
+      <element id="directory" name="SnippetIDE">
+        <element id="directory" name="plugins">
+          <element id="artifact" artifact-name="ShareService" />
+          <element id="artifact" artifact-name="Java" />
+          <element id="artifact" artifact-name="PlainText" />
+          <element id="artifact" artifact-name="Javascript" />
+        </element>
+        <element id="file-copy" path="$PROJECT_DIR$/Snippet-IDE/default_settings.json" />
+      </element>
     </root>
   </artifact>
 </component>
