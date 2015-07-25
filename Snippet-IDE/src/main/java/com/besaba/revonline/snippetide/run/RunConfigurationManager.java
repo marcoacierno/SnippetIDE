@@ -10,6 +10,7 @@ import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
 import com.besaba.revonline.snippetide.converter.Converters;
+import com.besaba.revonline.snippetide.datashare.DataStructureTab;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -175,7 +176,7 @@ public class RunConfigurationManager {
     final Parent root;
 
     try {
-      root = FXMLLoader.load(IdeController.class.getResource("runconfigurations/fillrunconfiguration.fxml"));
+      root = FXMLLoader.load(IdeController.class.getResource("runconfigurations/fillcontainer.fxml"));
     } catch (IOException e) {
       new Alert(Alert.AlertType.ERROR, "Unable to open run configuration dialog :(", ButtonType.OK).show();
       return Optional.empty();
@@ -184,7 +185,7 @@ public class RunConfigurationManager {
     final TabPane configurationsTabPane = ((TabPane) root.lookup("#configurations"));
 
     for (final StructureDataContainer configuration : configurations) {
-      final Tab tab = new ConfigurationTab(configuration.getName(), configuration);
+      final Tab tab = new DataStructureTab(configuration.getName(), configuration);
       final ObservableList<PropertySheet.Item> items = FXCollections.observableArrayList();
 
       configuration.getFields().forEach((name, fieldInfo) -> items.add(new SimplePropertySheetItem(name, fieldInfo)));
@@ -210,7 +211,7 @@ public class RunConfigurationManager {
         return null;
       }
 
-      final ConfigurationTab activeTab = (ConfigurationTab) configurationsTabPane.getSelectionModel().getSelectedItem();
+      final DataStructureTab activeTab = (DataStructureTab) configurationsTabPane.getSelectionModel().getSelectedItem();
       final PropertySheet propertySheet = (PropertySheet) activeTab.getContent().lookup("PropertySheet");
 
       final boolean allFieldsCorrect = propertySheet

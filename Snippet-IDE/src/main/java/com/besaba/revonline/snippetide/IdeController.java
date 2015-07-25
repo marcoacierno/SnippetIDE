@@ -6,6 +6,7 @@ import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblem;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblemType;
 import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
+import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.api.events.boot.UnBootEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
@@ -22,9 +23,11 @@ import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
+import com.besaba.revonline.snippetide.datashare.DataStructureManager;
+import com.besaba.revonline.snippetide.datashare.context.DataStructureManagerContext;
+import com.besaba.revonline.snippetide.datashare.context.RunConfigurationDataStructureManagerContext;
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
-import com.besaba.revonline.snippetide.run.RunConfigurationManager;
 import com.besaba.revonline.snippetide.run.RunSnippet;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
@@ -126,7 +129,7 @@ public class IdeController {
   private final Optional<Path> originalFile;
   @NotNull
   private Optional<RunSnippet> runSnippetThread = Optional.empty();
-  private RunConfigurationManager runConfigurationManager;
+  private DataStructureManagerContext runconfigurationContext;
   private boolean dirtyCodeArea = false;
 
   /**
@@ -276,7 +279,7 @@ public class IdeController {
                               @NotNull final Language language) {
     this.plugin = plugin;
     this.language = language;
-    this.runConfigurationManager = new RunConfigurationManager(language, plugin);
+    this.runconfigurationContext = new RunConfigurationDataStructureManagerContext(plugin, language);
 
     // update text only if available, since this method is excepted to be called from constructor too
     if (manageRunConfigurations != null) {
@@ -335,11 +338,14 @@ public class IdeController {
       return;
     }
 
-    runConfigurationManager
-        .getRunConfiguration()
-        .ifPresent(value -> eventManager.post(
-                new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value))
-        );
+    final Optional<DataContainer> dataContainer = new DataStructureManager(runconfigurationContext)
+        .getDataContainer();
+
+    if (dataContainer.isPresent()) {
+      eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), dataContainer.get()));
+    } else {
+      new Alert(Alert.AlertType.ERROR, "Invalid run configuration :(", ButtonType.OK).show();
+    }
   }
 
 
