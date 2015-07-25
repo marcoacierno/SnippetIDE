@@ -19,6 +19,8 @@ import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class PastebinShareService implements ShareService {
   private static final int SHARE_WITH_DEV_KEY = 1;
@@ -76,12 +78,16 @@ public class PastebinShareService implements ShareService {
   }
 
   private static Paste generateData(final String fileName, final String code, final String devkey, final String languageName, final PastebinFactory factory) {
-    return factory.createPaste()
-        .setVisiblity(PasteVisiblity.Unlisted)
-        .setExpire(PasteExpire.Never)
-        .setMachineFriendlyLanguage(UrlEscapers.urlPathSegmentEscaper().escape(languageName))
-        .setRaw(UrlEscapers.urlPathSegmentEscaper().escape(code))
-        .setTitle(UrlEscapers.urlPathSegmentEscaper().escape(fileName))
-        .build();
+    try {
+      return factory.createPaste()
+          .setVisiblity(PasteVisiblity.Unlisted)
+          .setExpire(PasteExpire.Never)
+          .setMachineFriendlyLanguage(URLEncoder.encode(languageName, "UTF-8"))
+          .setRaw(URLEncoder.encode(code, "UTF-8"))
+          .setTitle(URLEncoder.encode(fileName, "UTF-8"))
+          .build();
+    } catch (UnsupportedEncodingException e) {
+      throw new AssertionError(e);
+    }
   }
 }
