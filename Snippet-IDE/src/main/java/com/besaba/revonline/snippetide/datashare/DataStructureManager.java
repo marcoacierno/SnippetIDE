@@ -77,6 +77,8 @@ public class DataStructureManager {
     }
 
     final Dialog<DataContainer> fillRunConfiguration = new Dialog<>();
+    fillRunConfiguration.setTitle("Data");
+
     final Parent root;
 
     try {
