@@ -56,7 +56,19 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
+  <repositories>
+    <repository>
+      <id>revonline-repository</id>
+      <name>Revonline Maven Repository</name>
+      <url>http://revonline.comuf.com/maven3/</url>
+    </repository>
+    <repository>
+      <id>Sonatype</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
       <plugin>
