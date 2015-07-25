@@ -1,9 +1,7 @@
 package com.besaba.revonline.snippetide.api.language;
 
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Define a language.
@@ -97,5 +95,5 @@ public interface Language {
    *         one run configuration with the values.
    */
   @NotNull
-  RunConfiguration[] getRunConfigurations();
+  StructureDataContainer[] getRunConfigurations();
 }

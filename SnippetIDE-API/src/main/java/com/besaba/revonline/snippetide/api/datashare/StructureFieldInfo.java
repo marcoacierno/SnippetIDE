@@ -1,14 +1,14 @@
-package com.besaba.revonline.snippetide.api.run;
+package com.besaba.revonline.snippetide.api.datashare;
 
 import java.util.function.Predicate;
 
-public class FieldInfo<T> {
+public class StructureFieldInfo<T> {
   private final Class<T> type;
   private final Object defaultValue;
   private final String description;
   private final Predicate<T> validator;
 
-  public FieldInfo(final Class<T> type, final T defaultValue, final String description, final Predicate<T> validator) {
+  public StructureFieldInfo(final Class<T> type, final T defaultValue, final String description, final Predicate<T> validator) {
     this.type = type;
     this.defaultValue = defaultValue;
     this.description = description;

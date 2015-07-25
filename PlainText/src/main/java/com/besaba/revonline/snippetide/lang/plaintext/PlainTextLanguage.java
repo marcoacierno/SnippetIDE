@@ -1,7 +1,7 @@
 package com.besaba.revonline.snippetide.lang.plaintext;
 
 import com.besaba.revonline.snippetide.api.language.Language;
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import org.jetbrains.annotations.NotNull;
 
 public class PlainTextLanguage implements Language {
@@ -23,7 +23,7 @@ public class PlainTextLanguage implements Language {
 
   @NotNull
   @Override
-  public RunConfiguration[] getRunConfigurations() {
-    return new RunConfiguration[0];
+  public StructureDataContainer[] getRunConfigurations() {
+    return new StructureDataContainer[0];
   }
 }

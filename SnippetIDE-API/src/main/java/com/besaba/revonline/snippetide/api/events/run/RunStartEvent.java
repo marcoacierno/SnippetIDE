@@ -2,7 +2,7 @@ package com.besaba.revonline.snippetide.api.events.run;
 
 import com.besaba.revonline.snippetide.api.events.Event;
 import com.besaba.revonline.snippetide.api.language.Language;
-import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
+import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -30,16 +30,16 @@ public class RunStartEvent extends Event<Language> {
   @NotNull
   private final Path temporaryDirectory;
   @NotNull
-  private final RunConfigurationValues runConfigurationValues;
+  private final DataContainer dataContainer;
 
   public RunStartEvent(@NotNull final Language target,
                        @NotNull final Path sourceFile,
                        @NotNull final Path temporaryDirectory,
-                       @NotNull final RunConfigurationValues runConfigurationValues) {
+                       @NotNull final DataContainer dataContainer) {
     super(target);
     this.sourceFile = sourceFile;
     this.temporaryDirectory = temporaryDirectory;
-    this.runConfigurationValues = runConfigurationValues;
+    this.dataContainer = dataContainer;
   }
 
   @NotNull
@@ -53,7 +53,7 @@ public class RunStartEvent extends Event<Language> {
   }
 
   @NotNull
-  public RunConfigurationValues getRunConfigurationValues() {
-    return runConfigurationValues;
+  public DataContainer getDataContainer() {
+    return dataContainer;
   }
 }
