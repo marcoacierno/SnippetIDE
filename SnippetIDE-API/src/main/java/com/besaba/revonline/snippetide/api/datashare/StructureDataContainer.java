@@ -1,6 +1,5 @@
 package com.besaba.revonline.snippetide.api.datashare;
 
-import com.besaba.revonline.snippetide.api.run.FieldInfo;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 

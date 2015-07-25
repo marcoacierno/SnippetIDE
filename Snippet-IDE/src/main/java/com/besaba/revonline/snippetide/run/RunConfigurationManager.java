@@ -5,7 +5,7 @@ import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
-import com.besaba.revonline.snippetide.api.run.FieldInfo;
+import com.besaba.revonline.snippetide.api.datashare.FieldInfo;
 import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;

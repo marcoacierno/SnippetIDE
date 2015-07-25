@@ -13,7 +13,7 @@ import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
-import com.besaba.revonline.snippetide.api.run.FieldInfo;
+import com.besaba.revonline.snippetide.api.datashare.FieldInfo;
 import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.google.common.collect.ImmutableList;

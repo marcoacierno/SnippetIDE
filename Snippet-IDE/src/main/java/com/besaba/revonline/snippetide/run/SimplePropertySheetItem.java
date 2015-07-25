@@ -1,6 +1,6 @@
 package com.besaba.revonline.snippetide.run;
 
-import com.besaba.revonline.snippetide.api.run.FieldInfo;
+import com.besaba.revonline.snippetide.api.datashare.FieldInfo;
 import org.controlsfx.control.PropertySheet;
 
 import java.util.function.Predicate;
