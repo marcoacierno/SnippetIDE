@@ -6,6 +6,7 @@ import com.besaba.revonline.snippetide.api.application.IDEInstanceContext;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblem;
 import com.besaba.revonline.snippetide.api.compiler.CompilationProblemType;
 import com.besaba.revonline.snippetide.api.compiler.CompilationResult;
+import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.api.events.boot.UnBootEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileFinishedEvent;
 import com.besaba.revonline.snippetide.api.events.compile.CompileStartEvent;
@@ -15,13 +16,19 @@ import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.events.run.SendMessageToProcessEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareCompletedEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareFailedEvent;
+import com.besaba.revonline.snippetide.api.events.share.ShareRequestEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
+import com.besaba.revonline.snippetide.datashare.DataStructureManager;
+import com.besaba.revonline.snippetide.datashare.context.DataStructureManagerContext;
+import com.besaba.revonline.snippetide.datashare.context.RunConfigurationDataStructureManagerContext;
+import com.besaba.revonline.snippetide.datashare.context.ShareServiceParametersDataStructureManagerContext;
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
-import com.besaba.revonline.snippetide.run.RunConfigurationManager;
 import com.besaba.revonline.snippetide.run.RunSnippet;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
@@ -33,15 +40,20 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
@@ -71,6 +83,8 @@ public class IdeController {
 
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
+  @FXML
+  private Menu shareOnMenu;
   @FXML
   private TextField inputField;
   @FXML
@@ -116,7 +130,7 @@ public class IdeController {
   private final Optional<Path> originalFile;
   @NotNull
   private Optional<RunSnippet> runSnippetThread = Optional.empty();
-  private RunConfigurationManager runConfigurationManager;
+  private DataStructureManagerContext runconfigurationContext;
   private boolean dirtyCodeArea = false;
 
   /**
@@ -145,8 +159,29 @@ public class IdeController {
     eventManager.registerListener(this);
 
     prepareIde();
+    prepareShareOnMenu();
     prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void prepareShareOnMenu() {
+    pluginManager.getPlugins().forEach(p -> {
+      p.getShareServices().forEach(service -> {
+        final MenuItem menuItem = new MenuItem(service.getServiceName());
+
+        menuItem.setOnAction(event -> {
+          final ShareServiceParametersDataStructureManagerContext context = new ShareServiceParametersDataStructureManagerContext(p, service);
+          final Optional<DataContainer> dataContainer = new DataStructureManager(context).getDataContainer();
+
+          dataContainer.ifPresent(container -> {
+            eventManager.post(new ShareRequestEvent(service, fileName, codeArea.getText(), language, container));
+          });
+        });
+        menuItem.setGraphic(new ImageView(service.getImage()));
+
+        shareOnMenu.getItems().add(menuItem);
+      });
+    });
   }
 
   private void prepareIde() {
@@ -250,7 +285,7 @@ public class IdeController {
                               @NotNull final Language language) {
     this.plugin = plugin;
     this.language = language;
-    this.runConfigurationManager = new RunConfigurationManager(language, plugin);
+    this.runconfigurationContext = new RunConfigurationDataStructureManagerContext(plugin, language);
 
     // update text only if available, since this method is excepted to be called from constructor too
     if (manageRunConfigurations != null) {
@@ -309,11 +344,12 @@ public class IdeController {
       return;
     }
 
-    runConfigurationManager
-        .getRunConfiguration()
-        .ifPresent(value -> eventManager.post(
-                new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), value))
-        );
+    final Optional<DataContainer> dataContainer = new DataStructureManager(runconfigurationContext)
+        .getDataContainer();
+
+    dataContainer.ifPresent(container -> {
+      eventManager.post(new RunStartEvent(language, sourceFile, application.getTemporaryDirectory(), container));
+    });
   }
 
 
@@ -549,6 +585,34 @@ public class IdeController {
 
   public void stopRunSnippetThread(ActionEvent actionEvent) {
     stopIfAlreadyRunningRunThread();
+  }
+
+  @Subscribe
+  public void onSuccessfulShare(@NotNull final ShareCompletedEvent event) {
+    Platform.runLater(() -> {
+      final Optional<ButtonType> buttonType
+          = new Alert(Alert.AlertType.INFORMATION,
+          "Shared: " + event.getData(), ButtonType.OK,
+          new ButtonType("Copy", ButtonBar.ButtonData.APPLY)
+      ).showAndWait();
+
+      buttonType.ifPresent(button -> {
+        if (button.getButtonData() == ButtonBar.ButtonData.APPLY) {
+          final Clipboard clipboard = Clipboard.getSystemClipboard();
+          final ClipboardContent content = new ClipboardContent();
+          content.putString(event.getData());
+          clipboard.setContent(content);
+        }
+      });
+    });
+  }
+
+  @Subscribe
+  public void onFailedShare(@NotNull final ShareFailedEvent event) {
+    Platform.runLater(() -> {
+      new Alert(Alert.AlertType.ERROR, "Unable to share your code! :( " + event.getReason(), ButtonType.OK).show();
+      logger.error("share failed", event.getThrowable());
+    });
   }
 
   public class UnBootWorker {

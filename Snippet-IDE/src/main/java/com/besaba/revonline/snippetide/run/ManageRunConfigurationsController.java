@@ -6,8 +6,8 @@ import com.besaba.revonline.snippetide.api.configuration.Configuration;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
-import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
+import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -77,7 +77,7 @@ public class ManageRunConfigurationsController {
     configurationValues.setCellValueFactory(value -> new ReadOnlyStringWrapper(
         value
           .getValue()
-          .getRunConfigurationValues()
+          .getDataContainer()
           .getValues()
           .entrySet()
           .stream()
@@ -89,7 +89,7 @@ public class ManageRunConfigurationsController {
     configurationAsDefault.setCellValueFactory(value -> {
       final SimpleBooleanProperty defaultProperty = new SimpleBooleanProperty(value.getValue().isDefault());
       defaultProperty.addListener(((observable, oldValue, newValue) -> {
-        changeDefaultListener(observable, oldValue, newValue, value.getValue().getRunConfigurationValues().getParentId());
+        changeDefaultListener(observable, oldValue, newValue, value.getValue().getDataContainer().getParentId());
       }));
       return defaultProperty;
     });
@@ -115,7 +115,7 @@ public class ManageRunConfigurationsController {
           languageConfigurationsQuery + ".default"
       ).orElse(-1);
 
-      for (final RunConfiguration configuration : language.getRunConfigurations()) {
+      for (final StructureDataContainer configuration : language.getRunConfigurations()) {
         logger.debug("checking " + configuration.getName());
         logger.debug("query -> " + (languageConfigurationsQuery + "." + configuration.getId()));
 
@@ -127,10 +127,10 @@ public class ManageRunConfigurationsController {
           continue;
         }
 
-        final RunConfigurationValues runConfigurationValues = new RunConfigurationValues(configuration.getId(), values.get());
+        final DataContainer dataContainer = new DataContainer(configuration.getId(), values.get());
         final RunConfigurationValuesManagerData runConfigurationValuesManagerData
             = new RunConfigurationValuesManagerData(
-              runConfigurationValues,
+            dataContainer,
               configuration.getName(),
               defaultConfiguration == configuration.getId()
           );
@@ -163,9 +163,13 @@ public class ManageRunConfigurationsController {
       }
 
       for (final RunConfigurationValuesManagerData item : selectedItems) {
-        final boolean removed = applicationConfiguration.remove(
-            languageConfigurationsQuery + "." + item.getRunConfigurationValues().getParentId()
+        boolean removed = applicationConfiguration.remove(
+            languageConfigurationsQuery + "." + item.getDataContainer().getParentId()
         );
+
+        if (item.isDefault()) {
+          removed &= applicationConfiguration.remove(languageConfigurationsQuery + ".default");
+        }
 
         if (!removed) {
           new Alert(

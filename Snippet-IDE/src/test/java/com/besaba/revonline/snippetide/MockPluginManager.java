@@ -3,6 +3,8 @@ package com.besaba.revonline.snippetide;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.Version;
+import com.besaba.revonline.snippetide.api.shareservices.ShareService;
+import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -13,7 +15,7 @@ import java.util.Optional;
 
 public class MockPluginManager implements PluginManager {
   public static final Plugin plugin
-      = new Plugin("Mock", "Mock", Version.parse("0.1"), Version.parse("0.1"), new String[] {"Mock"}, Collections.singletonList(MockLanguage.INSTANCE));
+      = new Plugin("Mock", "Mock", Version.parse("0.1"), Version.parse("0.1"), new String[] {"Mock"}, Collections.singletonList(MockLanguage.INSTANCE), ImmutableList.<ShareService>of());
 
   public static final Plugin pluginWithRandomHtmlInDescription
       = new Plugin("Html", "<html><head><title>Lol?</title></head><body>" +
@@ -23,8 +25,8 @@ public class MockPluginManager implements PluginManager {
       Version.parse("3.0"),
       Version.parse("0.1"),
       new String[] {"You", "Me", "Hello", "<b>World</b>"},
-      Collections.emptyList()
-  );
+      Collections.emptyList(),
+      ImmutableList.<ShareService>of());
 
   @NotNull
   @Override

@@ -13,9 +13,9 @@ import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
-import com.besaba.revonline.snippetide.api.run.FieldInfo;
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
-import com.besaba.revonline.snippetide.api.run.RunConfigurationValues;
+import com.besaba.revonline.snippetide.api.datashare.StructureFieldInfo;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
+import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
@@ -40,15 +40,15 @@ public class JavaLanguage implements Language {
   private static final int SIMPLE_RUN_CONFIGURATION_ID = 1;
 
   private final IDEApplication application = IDEApplicationLauncher.getIDEApplication();
-  private final RunConfiguration runConfiguration = new RunConfiguration.Builder(SIMPLE_RUN_CONFIGURATION_ID)
+  private final StructureDataContainer structureDataContainer = new StructureDataContainer.Builder(SIMPLE_RUN_CONFIGURATION_ID)
       .setName("Run")
       .addField(
           "JRE Location",
-          new FieldInfo<>(
+          new StructureFieldInfo<>(
               Path.class,
               System.getenv("JAVA_HOME") != null ? Paths.get(System.getenv("JAVA_HOME")) : Paths.get("."),
               "Location to your JRE/JDK",
-              path -> path != null && !java.nio.file.Files.isDirectory(path)
+              path -> path != null && java.nio.file.Files.isDirectory(path)
           )
       )
       .create();
@@ -83,9 +83,9 @@ public class JavaLanguage implements Language {
 
   @NotNull
   @Override
-  public RunConfiguration[] getRunConfigurations() {
-    return new RunConfiguration[] {
-        runConfiguration
+  public StructureDataContainer[] getRunConfigurations() {
+    return new StructureDataContainer[] {
+        structureDataContainer
     };
   }
 
@@ -174,19 +174,19 @@ public class JavaLanguage implements Language {
       return;
     }
 
-    final RunConfigurationValues runConfigurationValues = runStartEvent.getRunConfigurationValues();
+    final DataContainer dataContainer = runStartEvent.getDataContainer();
 
-    switch (runConfigurationValues.getParentId()) {
+    switch (dataContainer.getParentId()) {
       case SIMPLE_RUN_CONFIGURATION_ID: {
-        simpleRun(runStartEvent, runConfigurationValues);
+        simpleRun(runStartEvent, dataContainer);
         break;
       }
     }
   }
 
   private void simpleRun(final RunStartEvent runStartEvent,
-                         final RunConfigurationValues runConfigurationValues) {
-    final String javaHome = ((Path) runConfigurationValues.getValues().get("JRE Location")).toAbsolutePath().toString();
+                         final DataContainer dataContainer) {
+    final String javaHome = ((Path) dataContainer.getValues().get("JRE Location")).toAbsolutePath().toString();
 
     final Path classFile = Paths.get(
         Files.getNameWithoutExtension(runStartEvent.getSourceFile().getFileName().toString())

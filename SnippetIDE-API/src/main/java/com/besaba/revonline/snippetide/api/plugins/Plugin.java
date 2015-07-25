@@ -1,6 +1,7 @@
 package com.besaba.revonline.snippetide.api.plugins;
 
 import com.besaba.revonline.snippetide.api.language.Language;
+import com.besaba.revonline.snippetide.api.shareservices.ShareService;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -17,14 +18,16 @@ public class Plugin {
   private final Version minIdeVersion;
   private final String[] authors;
   private final ImmutableList<Language> languages;
+  private final ImmutableList<ShareService> shareServices;
   private final int pluginId;
 
-  public Plugin(final String name, final String description, final Version version, final Version minIdeVersion, final String[] authors, final List<Language> languages) {
+  public Plugin(final String name, final String description, final Version version, final Version minIdeVersion, final String[] authors, final List<Language> languages, final ImmutableList<ShareService> shareServices) {
     this.name = name;
     this.description = description;
     this.version = version;
     this.minIdeVersion = minIdeVersion;
     this.authors = authors;
+    this.shareServices = shareServices;
     this.languages = ImmutableList.copyOf(languages);
     this.pluginId = name.hashCode();
   }
@@ -51,6 +54,10 @@ public class Plugin {
 
   public ImmutableList<Language> getLanguages() {
     return languages;
+  }
+
+  public ImmutableList<ShareService> getShareServices() {
+    return shareServices;
   }
 
   public String[] getAuthors() {

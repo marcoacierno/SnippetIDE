@@ -6,14 +6,13 @@ import com.besaba.revonline.snippetide.api.events.run.MessageFromProcess;
 import com.besaba.revonline.snippetide.api.events.run.RunInformationEvent;
 import com.besaba.revonline.snippetide.api.events.run.RunStartEvent;
 import com.besaba.revonline.snippetide.api.language.Language;
-import com.besaba.revonline.snippetide.api.run.RunConfiguration;
+import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.google.common.eventbus.Subscribe;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,8 +35,8 @@ public class JavascriptLanguage implements Language {
   }
 
   @NotNull
-  public RunConfiguration[] getRunConfigurations() {
-    return new RunConfiguration[0];
+  public StructureDataContainer[] getRunConfigurations() {
+    return new StructureDataContainer[0];
   }
 
   @Subscribe

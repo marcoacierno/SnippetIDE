@@ -31,8 +31,33 @@
     </dependency>
   </dependencies>
 
+  <distributionManagement>
+    <repository>
+      <id>revonline-repository</id>
+      <url>ftp://revonline.comuf.com/public_html/maven3</url>
+    </repository>
+  </distributionManagement>
+
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ftp</artifactId>
+        <version>1.0-alpha-6</version>
+      </extension>
+    </extensions>
+
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <outputDirectory>../release/${ideversion}/</outputDirectory>
+          <finalName>SnippetIDE-API</finalName>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

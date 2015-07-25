@@ -5,8 +5,10 @@ import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.UnableToLoadPluginException;
 import com.besaba.revonline.snippetide.api.plugins.Version;
+import com.besaba.revonline.snippetide.api.shareservices.ShareService;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +21,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +75,8 @@ public class JarPluginManager implements PluginManager {
   private Plugin parseManifest(@NotNull final Path file,
                                @NotNull final JarFile jarFile,
                                @NotNull final ZipEntry manifestEntry) throws IOException {
+    final URLClassLoader jarClassLoader = new URLClassLoader(new URL[] {file.toUri().toURL()});
+
     final JsonObject root = new JsonParser().parse(
         new InputStreamReader(jarFile.getInputStream(manifestEntry))
     ).getAsJsonObject();
@@ -90,7 +92,9 @@ public class JarPluginManager implements PluginManager {
     final Version minIdeVersion = Version.parse(root.get("minSupportedVersion").getAsString());
 
     final List<String> authors = getAuthors(root.get("authors").getAsJsonArray());
-    final ImmutableList<Language> languages = initializeLanguages(file, root.get("languages").getAsJsonArray());
+
+    final ImmutableList<Language> languages = initializeLanguages(file, root.get("languages").getAsJsonArray(), jarClassLoader);
+    final ImmutableList<ShareService> shareServices = getShareServices(file, jarClassLoader, root);
 
     return new Plugin(
         name,
@@ -98,8 +102,61 @@ public class JarPluginManager implements PluginManager {
         pluginVersion,
         minIdeVersion,
         authors.toArray(new String[authors.size()]),
-        languages
+        languages,
+        shareServices
     );
+  }
+
+  private ImmutableList<ShareService> getShareServices(final @NotNull Path file, final URLClassLoader jarClassLoader, final JsonObject root) {
+    final JsonElement element = root.get("shareServices");
+
+    if (element == null || element.isJsonNull()) {
+      return ImmutableList.of();
+    }
+
+    return initializeShareServices(file, element.getAsJsonArray(), jarClassLoader);
+  }
+
+  private ImmutableList<ShareService> initializeShareServices(final Path file,
+                                                              final JsonArray services,
+                                                              final ClassLoader jarClassLoader) {
+    final ImmutableList.Builder<ShareService> shareServices = ImmutableList.builder();
+
+    services.forEach(service -> {
+      final String fullName = service.getAsString();
+
+      final Class<?> languageClass;
+
+      try {
+        languageClass = Class.forName(fullName, false, jarClassLoader);
+      } catch (ClassNotFoundException e) {
+        throw new UnableToLoadPluginException("Unable to search class ShareService " + fullName, e, file, this);
+      }
+
+      if (!ShareService.class.isAssignableFrom(languageClass)) {
+        throw new UnableToLoadPluginException("Class " + fullName + " should implement ShareService interface", file, this);
+      }
+
+      final ShareService instance;
+
+      try {
+        instance = (ShareService) languageClass.newInstance();
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new UnableToLoadPluginException("Unable to create an instance of the class ShareService " + fullName, e, file, this);
+      }
+
+      shareServicesContractCheck(instance, file);
+
+      shareServices.add(instance);
+    });
+
+    return shareServices.build();
+  }
+
+  private void shareServicesContractCheck(final ShareService instance, final Path file) {
+    if (instance.getImage().getHeight() != 16 || instance.getImage().getWidth() != 16) {
+      throw new UnableToLoadPluginException("ShareServices contract says that Image should be 16x16!", file, this);
+    }
   }
 
   @NotNull
@@ -111,8 +168,8 @@ public class JarPluginManager implements PluginManager {
 
   @NotNull
   private ImmutableList<Language> initializeLanguages(@NotNull final Path file,
-                                                      @NotNull final JsonArray languagesJsonArray) throws MalformedURLException {
-    final URLClassLoader jarClassLoader = new URLClassLoader(new URL[] {file.toUri().toURL()});
+                                                      @NotNull final JsonArray languagesJsonArray,
+                                                      @NotNull final ClassLoader jarClassLoader) throws MalformedURLException {
     final ImmutableList.Builder<Language> languages = ImmutableList.builder();
 
     languagesJsonArray.forEach(language -> {

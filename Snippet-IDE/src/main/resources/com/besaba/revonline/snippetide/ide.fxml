@@ -12,7 +12,15 @@
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <TextArea fx:id="codeArea" layoutX="459.0" layoutY="70.0" onKeyPressed="#onKeyPressed" prefHeight="340.0" prefWidth="989.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <TextArea fx:id="codeArea" layoutX="459.0" layoutY="70.0" onKeyPressed="#onKeyPressed" prefHeight="340.0" prefWidth="989.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <contextMenu>
+                        <ContextMenu>
+                          <items>
+                            <Menu fx:id="shareOnMenu" mnemonicParsing="false" text="Share on...">
+                            </Menu>
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></TextArea>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="178.0" prefWidth="989.0">
@@ -53,7 +61,7 @@
                                                       <Insets />
                                                    </HBox.margin>
                                                 </TextField>
-                                                <Button onAction="#stopRunSnippetThread" mnemonicParsing="false" text="Stop" />
+                                                <Button mnemonicParsing="false" onAction="#stopRunSnippetThread" text="Stop" />
                                              </children>
                                           </HBox>
                                        </bottom>

@@ -1,4 +1,4 @@
-package com.besaba.revonline.snippetide.api.run;
+package com.besaba.revonline.snippetide.api.datashare;
 
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
@@ -6,14 +6,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RunConfiguration {
+public class StructureDataContainer {
   @NotNull
-  private final ImmutableMap<String, FieldInfo> fields;
+  private final ImmutableMap<String, StructureFieldInfo> fields;
   @NotNull
   private final String name;
   private final int id;
 
-  private RunConfiguration(@NotNull final Map<String, FieldInfo> fields, final @NotNull String name, final int id) {
+  private StructureDataContainer(@NotNull final Map<String, StructureFieldInfo> fields, final @NotNull String name, final int id) {
     this.name = name;
     this.id = id;
     this.fields = ImmutableMap.copyOf(fields);
@@ -24,7 +24,7 @@ public class RunConfiguration {
   }
 
   @NotNull
-  public ImmutableMap<String, FieldInfo> getFields() {
+  public ImmutableMap<String, StructureFieldInfo> getFields() {
     return fields;
   }
 
@@ -34,9 +34,9 @@ public class RunConfiguration {
   }
 
   public static class Builder {
-    private final Map<String, FieldInfo> fields = new HashMap<>();
+    private final Map<String, StructureFieldInfo> fields = new HashMap<>();
     private String name;
-    private int id;
+    private final int id;
 
     public Builder(final int id) {
       this.id = id;
@@ -46,23 +46,18 @@ public class RunConfiguration {
       }
     }
 
-    public Builder setId(final int id) {
-      this.id = id;
-      return this;
-    }
-
     public Builder setName(final String name) {
       this.name = name;
       return this;
     }
 
-    public Builder addField(final String name, final FieldInfo type) {
+    public Builder addField(final String name, final StructureFieldInfo type) {
       this.fields.put(name, type);
       return this;
     }
 
-    public RunConfiguration create() {
-      return new RunConfiguration(fields, name, id);
+    public StructureDataContainer create() {
+      return new StructureDataContainer(fields, name, id);
     }
   }
 
