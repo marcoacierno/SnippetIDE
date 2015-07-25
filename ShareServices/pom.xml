@@ -33,11 +33,36 @@
       <version>18.0</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.besaba.revonline</groupId>
+      <artifactId>Pastebin</artifactId>
+      <version>0.1.1</version>
+    </dependency>
   </dependencies>
+
+  <repositories>
+    <repository>
+      <id>revonline-repository</id>
+      <name>Revonline Maven Repository</name>
+      <url>http://revonline.comuf.com/maven3/</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <outputDirectory>../release/${ideversion}/SnippetIDE/plugins/</outputDirectory>
+          <finalName>ShareService</finalName>
+          <includes>
+            <include>${project.basedir}/Snippet-IDE/manifest.json</include>
+          </includes>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -46,6 +71,28 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>org.apache.maven:lib:tests</exclude>
+                  <exclude>org.apache.maven:lib:provided</exclude>
+                </excludes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

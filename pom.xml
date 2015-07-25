@@ -6,6 +6,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <ideversion>0.1-alpha5</ideversion>
   </properties>
 
   <groupId>com.besaba.revonline.snippetide</groupId>
@@ -21,6 +22,14 @@
     <module>Preloader</module>
     <module>JavascriptLang</module>
   </modules>
+
+  <repositories>
+    <repository>
+      <id>revonline-repository</id>
+      <name>Revonline Maven Repository</name>
+      <url>http://revonline.comuf.com/maven3/</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
