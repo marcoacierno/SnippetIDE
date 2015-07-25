@@ -137,6 +137,7 @@ public class DataStructureManager {
 
       if (param.getButtonData() == ButtonBar.ButtonData.APPLY) {
         configuration.set(context.getDataContainerConfigurationNode(container.getParentId()), container.getValues());
+        configuration.set(context.getDefaultDataContainerConfigurationNode(), container.getParentId());
       }
 
       return container;
