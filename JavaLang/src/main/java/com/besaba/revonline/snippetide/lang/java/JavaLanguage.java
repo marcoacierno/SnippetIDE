@@ -48,7 +48,7 @@ public class JavaLanguage implements Language {
               Path.class,
               System.getenv("JAVA_HOME") != null ? Paths.get(System.getenv("JAVA_HOME")) : Paths.get("."),
               "Location to your JRE/JDK",
-              path -> path != null && !java.nio.file.Files.isDirectory(path)
+              path -> path != null && java.nio.file.Files.isDirectory(path)
           )
       )
       .create();
