@@ -11,5 +11,6 @@ It's still alpha and not complete.
 - **JavaLang**: Plugin which adds the ability to compile and run the Java snippets
 - **PlainText**: Plugin which allows the user to create .txt files
 - **Javascript**: Plugin which adds support for Javascript
+- **ShareServices**: Plugin which adds GitHub Gist / Pastebin share
 
 The IDE loads the plugins during the boot phase, from the IDEDir/plugins directory. Use --applicationdir= to change the directory
