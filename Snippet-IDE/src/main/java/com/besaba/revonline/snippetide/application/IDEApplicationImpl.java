@@ -163,9 +163,9 @@ public class IDEApplicationImpl implements IDEApplication {
 
     final Stage stage = new Stage();
 
-    final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("."));
-    final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("about.fxml")));
-    scene.getStylesheets().add(IdeController.class.getResource("about.css").toExternalForm());
+    final FXMLLoader loader = new FXMLLoader(IdeController.class.getResource("about/"));
+    final Scene scene = new Scene(loader.load(IdeController.class.getResourceAsStream("about/about.fxml")));
+    scene.getStylesheets().add(IdeController.class.getResource("about/about.css").toExternalForm());
     scene.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.ESCAPE) {
         stage.close();
