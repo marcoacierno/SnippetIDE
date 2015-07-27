@@ -5,8 +5,16 @@
 <ul id="authors">
 </ul>
 
-<h3>Languages</h3>
-<ul id="languages"></ul>
+<div id="languagesBox" style="display: none;">
+  <h3>Languages</h3>
+  <ul id="languages"></ul>
+</div>
+
+<div id="shareServicesBox" style="display: none;">
+  <h3>Share Services</h3>
+  <ul id="shareServices"></ul>
+</div>
+
 
 
 <script type="text/javascript">
@@ -18,9 +26,23 @@
     clearElement(authors);
     putElementsInList(authors, plugin.authors);
 
-    var languages = document.getElementById("languages");
-    clearElement(languages);
-    putElementsInList(languages, plugin.languages);
+    if(plugin.languages.length > 0) {
+      var languages = document.getElementById("languages");
+      document.getElementById("languagesBox").style.display = "";
+      clearElement(languages);
+      putElementsInList(languages, plugin.languages);
+    } else {
+      document.getElementById("languagesBox").style.display = "none";
+    }
+
+    if(plugin.shareServices.length > 0) {
+      var shareServices = document.getElementById("shareServices");
+      document.getElementById("shareServicesBox").style.display = "";
+      clearElement(shareServices);
+      putElementsInList(shareServices, plugin.shareServices);
+    } else {
+      document.getElementById("shareServicesBox").style.display = "none";
+    }
   }
 
   function clearElement(element) {
