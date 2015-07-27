@@ -33,7 +33,9 @@ import com.besaba.revonline.snippetide.run.RunSnippet;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -85,9 +87,11 @@ public class IdeController {
   private final static Logger logger = Logger.getLogger(IdeController.class);
 
   @FXML
+  private Button stopRunSnippetThreadButton;
+  @FXML
   private Menu shareOnMenu;
   @FXML
-  private TextField inputField;
+  private TextField runSnippetSendMessage;
   @FXML
   private Button manageRunConfigurations;
   @FXML
@@ -130,7 +134,7 @@ public class IdeController {
   @NotNull
   private final Optional<Path> originalFile;
   @NotNull
-  private Optional<RunSnippet> runSnippetThread = Optional.empty();
+  private ObjectProperty<Optional<RunSnippet>> runSnippetThread = new SimpleObjectProperty<>(Optional.empty());
   private DataStructureManagerContext runconfigurationContext;
   private boolean dirtyCodeArea = false;
   @NotNull
@@ -164,11 +168,19 @@ public class IdeController {
   public void initialize() {
     eventManager.registerListener(this);
 
+    prepareRunInputsFile();
     prepareRunAndCompileKeysListener();
     prepareIde();
     prepareShareOnMenu();
     prepareLanguagesList();
     prepareCompilationTable();
+  }
+
+  private void prepareRunInputsFile() {
+    runSnippetThread.addListener(((observable, oldValue, newValue) -> {
+      stopRunSnippetThreadButton.setDisable(newValue.isPresent());
+      runSnippetSendMessage.setEditable(!newValue.isPresent());
+    }));
   }
 
   private void prepareRunAndCompileKeysListener() {
@@ -208,11 +220,11 @@ public class IdeController {
     }
 
     codeArea.setOnKeyTyped(event -> dirtyCodeArea = true);
-    inputField.setOnKeyPressed(this::onInputSubmit);
+    runSnippetSendMessage.setOnKeyPressed(this::onInputSubmit);
   }
 
   private void onInputSubmit(final KeyEvent keyEvent) {
-    if (!runSnippetThread.isPresent()) {
+    if (!runSnippetThread.get().isPresent()) {
       return;
     }
 
@@ -223,12 +235,12 @@ public class IdeController {
 
     logger.debug("pressing send SEND IT!");
 
-    runSnippetThread.ifPresent(runSnippet -> {
-      final String messageToSend = inputField.getText();
+    runSnippetThread.get().ifPresent(runSnippet -> {
+      final String messageToSend = runSnippetSendMessage.getText();
       runTextArea.appendText(messageToSend);
       runTextArea.appendText(System.lineSeparator());
       eventManager.post(new SendMessageToProcessEvent(messageToSend));
-      inputField.clear();
+      runSnippetSendMessage.clear();
     });
   }
 
@@ -529,7 +541,7 @@ public class IdeController {
     }
 
     final RunSnippet runSnippet = new RunSnippet(runInformationEvent, eventManager);
-    runSnippetThread = Optional.of(runSnippet);
+    runSnippetThread.set(Optional.of(runSnippet));
     runSnippet.start();
   }
 
@@ -542,12 +554,12 @@ public class IdeController {
   }
 
   private void stopIfAlreadyRunningRunThread() {
-    if (!runSnippetThread.isPresent()) {
+    if (!runSnippetThread.get().isPresent()) {
       return;
     }
 
-    runSnippetThread.get().stop();
-    runSnippetThread = Optional.empty();
+    runSnippetThread.get().get().stop();
+    runSnippetThread.set(Optional.empty());
   }
 
   public void showLogs(ActionEvent actionEvent) {
@@ -639,8 +651,8 @@ public class IdeController {
     @Subscribe
     public void unbootEvent(final UnBootEvent unBootEvent) {
       logger.debug("unboot event");
-      runSnippetThread.ifPresent(RunSnippet::stop);
-      runSnippetThread = Optional.empty();
+      runSnippetThread.get().ifPresent(RunSnippet::stop);
+      runSnippetThread.set(Optional.empty());
     }
   }
 }

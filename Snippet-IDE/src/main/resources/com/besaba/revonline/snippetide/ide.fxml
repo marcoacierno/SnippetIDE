@@ -56,12 +56,12 @@
                                        <bottom>
                                           <HBox BorderPane.alignment="CENTER">
                                              <children>
-                                                <TextField fx:id="inputField" prefHeight="25.0" prefWidth="1064.0" HBox.hgrow="ALWAYS">
+                                                <TextField fx:id="runSnippetSendMessage" prefHeight="25.0" prefWidth="1064.0" HBox.hgrow="ALWAYS">
                                                    <HBox.margin>
                                                       <Insets />
                                                    </HBox.margin>
                                                 </TextField>
-                                                <Button mnemonicParsing="false" onAction="#stopRunSnippetThread" text="Stop" />
+                                                <Button fx:id="stopRunSnippetThreadButton" mnemonicParsing="false" onAction="#stopRunSnippetThread" text="Stop" />
                                              </children>
                                           </HBox>
                                        </bottom>
