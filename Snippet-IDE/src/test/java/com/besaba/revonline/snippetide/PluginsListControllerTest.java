@@ -4,6 +4,7 @@ import com.besaba.revonline.snippetide.api.events.Event;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.boot.Boot;
+import com.besaba.revonline.snippetide.plugins.PluginsListController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,9 +14,6 @@ import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.nio.file.Paths;
-
-import static org.junit.Assert.*;
-import static org.testfx.api.FxAssert.*;
 
 public class PluginsListControllerTest extends ApplicationTest {
 

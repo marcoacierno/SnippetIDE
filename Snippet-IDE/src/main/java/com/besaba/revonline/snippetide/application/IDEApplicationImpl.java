@@ -11,6 +11,7 @@ import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
 import com.besaba.revonline.snippetide.api.plugins.Version;
 import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
+import com.besaba.revonline.snippetide.plugins.PluginsListController;
 import com.besaba.revonline.snippetide.run.ManageRunConfigurationsController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -189,7 +190,7 @@ public class IDEApplicationImpl implements IDEApplication {
   @Override
   public void openPluginsList(@Nullable final Window window) throws IOException {
     final Stage stage = new Stage();
-    final Scene scene = new Scene(FXMLLoader.load(IdeController.class.getResource("pluginslist.fxml")));
+    final Scene scene = new Scene(FXMLLoader.load(PluginsListController.class.getResource("pluginslist.fxml")));
 
     stage.initModality(Modality.WINDOW_MODAL);
     stage.initOwner(window);

@@ -1,4 +1,4 @@
-package com.besaba.revonline.snippetide;
+package com.besaba.revonline.snippetide.plugins;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
