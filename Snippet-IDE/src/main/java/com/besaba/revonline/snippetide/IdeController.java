@@ -30,6 +30,7 @@ import com.besaba.revonline.snippetide.datashare.context.ShareServiceParametersD
 import com.besaba.revonline.snippetide.keymap.Action;
 import com.besaba.revonline.snippetide.keymap.Keymap;
 import com.besaba.revonline.snippetide.run.RunSnippet;
+import com.besaba.revonline.snippetide.ui.CodeTextArea;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import javafx.application.Platform;
@@ -113,7 +114,7 @@ public class IdeController {
   @NotNull
   private final PluginManager pluginManager = application.getPluginManager();
   @FXML
-  private TextArea codeArea;
+  private CodeTextArea codeArea;
   @FXML
   private MenuItem saveToOriginalFile;
 

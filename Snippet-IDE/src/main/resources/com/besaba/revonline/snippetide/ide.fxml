@@ -6,13 +6,14 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
+<?import com.besaba.revonline.snippetide.ui.CodeTextArea?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="748.0" prefWidth="1121.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.besaba.revonline.snippetide.IdeController">
    <center>
       <SplitPane dividerPositions="0.739193083573487" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <TextArea fx:id="codeArea" layoutX="459.0" layoutY="70.0" prefHeight="340.0" prefWidth="989.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <CodeTextArea fx:id="codeArea" layoutX="459.0" layoutY="70.0" prefHeight="340.0" prefWidth="989.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <contextMenu>
                         <ContextMenu>
                           <items>
@@ -20,7 +21,7 @@
                             </Menu>
                           </items>
                         </ContextMenu>
-                     </contextMenu></TextArea>
+                     </contextMenu></CodeTextArea>
                </children>
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="178.0" prefWidth="989.0">
