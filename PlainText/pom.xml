@@ -21,6 +21,14 @@
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>revonline-repository</id>
+      <name>Revonline Maven Repository</name>
+      <url>http://revonline.comuf.com/maven3/</url>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
       <plugin>
