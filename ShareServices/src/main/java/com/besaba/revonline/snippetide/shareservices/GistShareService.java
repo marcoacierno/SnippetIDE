@@ -2,6 +2,7 @@ package com.besaba.revonline.snippetide.shareservices;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
+import com.besaba.revonline.snippetide.api.datashare.StructureFieldInfo;
 import com.besaba.revonline.snippetide.api.events.manager.EventManager;
 import com.besaba.revonline.snippetide.api.events.share.ShareCompletedEvent;
 import com.besaba.revonline.snippetide.api.events.share.ShareFailedEvent;
@@ -18,7 +19,17 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class GistShareService implements ShareService {
+  private static final int SHARE_WITH_DESCRIPTION = 1;
   private final EventManager eventManager = IDEApplicationLauncher.getIDEApplication().getEventManager();
+
+  private final StructureDataContainer[] shareParameters = new StructureDataContainer[] {
+      new StructureDataContainer.Builder(SHARE_WITH_DESCRIPTION)
+        .setName("Share")
+        .addField("Description", new StructureFieldInfo<>(
+            String.class, "", "Gist description", text -> text != null
+        ))
+        .create()
+  };
 
   @NotNull
   public String getServiceName() {
@@ -39,10 +50,11 @@ public class GistShareService implements ShareService {
     final String fileName = event.getFileName();
     final String code = event.getCode();
     final String languageName = event.getLanguage().getName();
+    final String description = (String) event.getParameters().getValues().get("Description");
 
     final HttpURLConnection httpURLConnection
         = ((HttpURLConnection) new URL("https://api.github.com/gists").openConnection());
-    final String completeJson = prepareJsonResponse(fileName, code, languageName);
+    final String completeJson = prepareJsonResponse(fileName, code, languageName, description);
 
     httpURLConnection.setDoOutput(true);
     httpURLConnection.setRequestMethod("POST");
@@ -71,15 +83,16 @@ public class GistShareService implements ShareService {
   @NotNull
   @Override
   public StructureDataContainer[] getShareParameters() {
-    return new StructureDataContainer[0];
+    return shareParameters;
   }
 
   private String prepareJsonResponse(@NotNull final String fileName,
                                      @NotNull final String code,
-                                     @NotNull final String languageName) {
+                                     @NotNull final String languageName,
+                                     @NotNull final String description) {
     // the quote method adds the "
     final String rawJson = "{\n" +
-        "  \"description\": \"SnippetIDE\", \n" +
+        "  \"description\": %s, \n" +
         "  \"public\": true, \n" +
         "  \"files\": {\n" +
         "    %s: {\n" +
@@ -89,11 +102,12 @@ public class GistShareService implements ShareService {
         "  }\n" +
         "}   ";
 
+    final String escapedDescription = escapeForJson(description);
     final String escapedFileNameForJson = escapeForJson(fileName);
     final String escapedCodeForJson = escapeForJson(code);
     final String escapedLanguageNameForJson = escapeForJson(languageName);
 
-    return String.format(rawJson, escapedFileNameForJson, escapedCodeForJson, escapedLanguageNameForJson);
+    return String.format(rawJson, escapedDescription, escapedFileNameForJson, escapedCodeForJson, escapedLanguageNameForJson);
   }
 
   public static String escapeForJson(final String text) {
