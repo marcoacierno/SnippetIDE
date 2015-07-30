@@ -11,7 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="SnippetIDE-API" scope="PROVIDED" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.besaba.revonline.snippetide:SnippetIDE-API:1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellij:annotations:12.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.guava:guava:18.0" level="project" />
   </component>
