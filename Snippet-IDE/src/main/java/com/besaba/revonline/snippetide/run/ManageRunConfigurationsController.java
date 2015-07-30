@@ -9,6 +9,8 @@ import com.besaba.revonline.snippetide.api.run.ManageRunConfigurationsContext;
 import com.besaba.revonline.snippetide.api.datashare.StructureDataContainer;
 import com.besaba.revonline.snippetide.api.datashare.DataContainer;
 import com.besaba.revonline.snippetide.configuration.contract.ConfigurationSettingsContract;
+import com.besaba.revonline.snippetide.datashare.DataStructureManager;
+import com.besaba.revonline.snippetide.datashare.context.RunConfigurationDataStructureManagerContext;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -182,5 +184,28 @@ public class ManageRunConfigurationsController {
         }
       }
     });
+  }
+
+  @FXML
+  private void changeValues(ActionEvent actionEvent) {
+    final RunConfigurationValuesManagerData selectedItem = runConfigurationsTable.getSelectionModel().getSelectedItem();
+
+    if (selectedItem == null) {
+      return;
+    }
+
+    final RunConfigurationDataStructureManagerContext runConfigurationDataStructureManagerContext
+        = new RunConfigurationDataStructureManagerContext(plugin, language);
+
+    final DataStructureManager dataStructureManager
+        = new DataStructureManager(runConfigurationDataStructureManagerContext);
+
+    final Optional<DataContainer> newValues
+        = dataStructureManager.showDataContainerPreCompiled(selectedItem.getDataContainer());
+
+    newValues.ifPresent(values -> applicationConfiguration.set(
+        ConfigurationSettingsContract.RunConfigurations.generateRunConfigurationsLanguageQuery(plugin, language) + "." + selectedItem.getDataContainer().getParentId(),
+        values.getValues())
+    );
   }
 }

@@ -16,6 +16,7 @@
    <contextMenu>
       <ContextMenu>
         <items>
+          <MenuItem mnemonicParsing="false" text="Change values" onAction="#changeValues" />
           <MenuItem mnemonicParsing="false" text="Delete configuration(s)" onAction="#deleteConfiguration" />
         </items>
       </ContextMenu>

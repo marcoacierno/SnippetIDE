@@ -21,6 +21,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.util.Callback;
 import org.apache.log4j.Logger;
 import org.controlsfx.control.PropertySheet;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +66,10 @@ public class DataStructureManager {
               .orElseGet(() -> null)
         )
     );
+  }
+
+  public Optional<DataContainer> createDataContainer() {
+    return Optional.of(askToTheUserToCreateADataContainer().orElseGet(() -> null));
   }
 
   @NotNull
@@ -178,24 +183,102 @@ public class DataStructureManager {
     return Optional.empty();
   }
 
+  public Optional<DataContainer> showDataContainerPreCompiled(final DataContainer dataContainer) {
+    final Dialog<DataContainer> fillRunConfiguration = new Dialog<>();
+    fillRunConfiguration.setTitle("Data");
+
+    final Parent root;
+
+    try {
+      root = FXMLLoader.load(IdeController.class.getResource("structure/fillcontainer.fxml"));
+    } catch (IOException e) {
+      new Alert(Alert.AlertType.ERROR, "Unable to open run configuration dialog :(", ButtonType.OK).show();
+      return Optional.empty();
+    }
+
+    final TabPane structuresTabPane = ((TabPane) root.lookup("#configurations"));
+    final StructureDataContainer structure = context.getStructureFromId(dataContainer.getParentId());
+
+    final Tab tab = new DataStructureTab(structure.getName(), structure);
+    final ObservableList<PropertySheet.Item> items = FXCollections.observableArrayList();
+    final ImmutableMap<String, Object> currentValues = dataContainer.getValues();
+
+    structure.getFields().forEach((name, fieldInfo) -> {
+      final SimplePropertySheetItem item = new SimplePropertySheetItem(name, fieldInfo);
+
+      item.setValue(tryToFixValue(String.class.cast(currentValues.get(name)), String.class, fieldInfo.getType()));
+
+      items.add(item);
+    });
+
+    final PropertySheet propertySheet = new PropertySheet(items);
+    propertySheet.searchBoxVisibleProperty().set(false);
+    propertySheet.setModeSwitcherVisible(false);
+
+    propertySheet.setPropertyEditorFactory(new CustomPropertyEditorFactory());
+
+    tab.setContent(propertySheet);
+
+    structuresTabPane.getTabs().add(tab);
+
+    fillRunConfiguration.getDialogPane().setContent(root);
+    fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.APPLY);
+    fillRunConfiguration.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+    fillRunConfiguration.setResultConverter(new Callback<ButtonType, DataContainer>() {
+      @Override
+      public DataContainer call(final ButtonType param) {
+        if (param == ButtonType.CLOSE) {
+          return null;
+        }
+
+        final DataStructureTab activeTab = (DataStructureTab) structuresTabPane.getSelectionModel().getSelectedItem();
+
+        final boolean allFieldsCorrect = propertySheet
+            .getItems()
+            .stream()
+            .anyMatch(item -> ((SimplePropertySheetItem) item).check(item.getValue()));
+
+        if (!allFieldsCorrect) {
+          return null;
+        }
+
+        final Map<String, Object> values = propertySheet
+            .getItems()
+            .stream()
+            .collect(Collectors.toMap(PropertySheet.Item::getName, PropertySheet.Item::getValue));
+
+        return new DataContainer(activeTab.getStructureDataContainer(), values);
+      }
+    });
+
+    return fillRunConfiguration.showAndWait();
+  }
+
   @SuppressWarnings("unchecked")
   private Map<String, Object> tryToFixValues(final Map<String, Object> values, final int defaultDataContainer) {
     final StructureDataContainer structure = context.getStructureFromId(defaultDataContainer);
     final ImmutableMap<String, StructureFieldInfo> fields = structure.getFields();
     final Converters converters = new Converters();
     return values
-            .entrySet()
-            .stream()
-            .collect(toMap(Map.Entry::getKey, entry -> {
-              final StructureFieldInfo structureFieldInfo = fields.get(entry.getKey());
-              final Class<?> destinationType = structureFieldInfo.getType();
-              final Object fixedValue = converters.convert(String.class, destinationType, entry.getValue().toString());
+        .entrySet()
+        .stream()
+        .collect(toMap(Map.Entry::getKey, entry -> {
+          final StructureFieldInfo structureFieldInfo = fields.get(entry.getKey());
+          final Class<?> destinationType = structureFieldInfo.getType();
+          final Object fixedValue = converters.convert(String.class, destinationType, entry.getValue().toString());
 
-              if (!structureFieldInfo.getValidator().test(fixedValue)) {
-                throw new IllegalArgumentException(fixedValue + " is not valid anymore");
-              }
+          if (!structureFieldInfo.getValidator().test(fixedValue)) {
+            throw new IllegalArgumentException(fixedValue + " is not valid anymore");
+          }
 
-              return fixedValue;
-            }));
+          return fixedValue;
+        }));
+  }
+
+  @SuppressWarnings("unchecked")
+  private <S, D> D tryToFixValue(final S value, final Class<S> source, final Class<D> destination) {
+    final Converters converters = new Converters();
+    return converters.convert(source, destination, value);
   }
 }

@@ -501,7 +501,11 @@ public class IdeController {
   public void openFile(ActionEvent actionEvent) {
     final FileChooser fileChooser = new FileChooser();
 
-    final String[] fixedExtensions = Arrays.stream(language.getExtensions()).map(extension -> "*" + extension).toArray(String[]::new);
+    final String[] fixedExtensions = Arrays
+        .stream(language.getExtensions())
+        .map(extension -> "*" + extension)
+        .toArray(String[]::new);
+
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(language.getName(), fixedExtensions));
     final File tempFile = fileChooser.showOpenDialog(null);
 
