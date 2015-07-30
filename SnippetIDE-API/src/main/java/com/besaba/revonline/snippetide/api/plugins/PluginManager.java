@@ -3,7 +3,6 @@ package com.besaba.revonline.snippetide.api.plugins;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

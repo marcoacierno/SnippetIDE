@@ -1,0 +1,62 @@
+<h1 id="pluginName"></h1>
+<p id="description"></p>
+
+<h3>Authors</h3>
+<ul id="authors">
+</ul>
+
+<div id="languagesBox" style="display: none;">
+  <h3>Languages</h3>
+  <ul id="languages"></ul>
+</div>
+
+<div id="shareServicesBox" style="display: none;">
+  <h3>Share Services</h3>
+  <ul id="shareServices"></ul>
+</div>
+
+
+
+<script type="text/javascript">
+  function injectData() {
+    document.getElementById("pluginName").innerHTML = plugin.name + " (" + plugin.version + ")";
+    document.getElementById("description").innerHTML = plugin.description;
+
+    var authors = document.getElementById("authors");
+    clearElement(authors);
+    putElementsInList(authors, plugin.authors);
+
+    if(plugin.languages.length > 0) {
+      var languages = document.getElementById("languages");
+      document.getElementById("languagesBox").style.display = "";
+      clearElement(languages);
+      putElementsInList(languages, plugin.languages);
+    } else {
+      document.getElementById("languagesBox").style.display = "none";
+    }
+
+    if(plugin.shareServices.length > 0) {
+      var shareServices = document.getElementById("shareServices");
+      document.getElementById("shareServicesBox").style.display = "";
+      clearElement(shareServices);
+      putElementsInList(shareServices, plugin.shareServices);
+    } else {
+      document.getElementById("shareServicesBox").style.display = "none";
+    }
+  }
+
+  function clearElement(element) {
+    while(element.firstChild != null) {
+      element.removeChild(element.firstChild);
+    }
+  }
+
+  function putElementsInList(element, array) {
+    array.forEach(function(author) {
+      var li = document.createElement("li");
+      li.innerHTML = author;
+
+      element.appendChild(li);
+    });
+  }
+</script>

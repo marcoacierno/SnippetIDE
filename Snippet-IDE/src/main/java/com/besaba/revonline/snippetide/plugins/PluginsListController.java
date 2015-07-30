@@ -1,10 +1,11 @@
-package com.besaba.revonline.snippetide;
+package com.besaba.revonline.snippetide.plugins;
 
 import com.besaba.revonline.snippetide.api.application.IDEApplication;
 import com.besaba.revonline.snippetide.api.application.IDEApplicationLauncher;
 import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.plugins.Plugin;
 import com.besaba.revonline.snippetide.api.plugins.PluginManager;
+import com.besaba.revonline.snippetide.api.shareservices.ShareService;
 import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
 import javafx.concurrent.Worker;
@@ -81,7 +82,8 @@ public class PluginsListController {
               "  version: \"%s\",\n" +
               "  minIdeVersion: \"%s\",\n" +
               "  authors: [%s],\n" +
-              "  languages: [%s]\n" +
+              "  languages: [%s],\n" +
+              "  shareServices: [%s]\n" +
               "};" +
               "" +
               "injectData();",
@@ -90,7 +92,8 @@ public class PluginsListController {
           plugin.getVersion().toString(),
           plugin.getMinIdeVersion().toString(),
           Arrays.stream(plugin.getAuthors()).map(escaper::escape).map(author -> "\"" + author + "\"").reduce("", (acc, nxt) -> nxt + "," + acc),
-          plugin.getLanguages().stream().map(Language::getName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc)
+          plugin.getLanguages().stream().map(Language::getName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc),
+          plugin.getShareServices().stream().map(ShareService::getServiceName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc)
       );
 
       logger.debug("script to inject");
