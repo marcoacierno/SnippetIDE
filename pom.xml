@@ -21,9 +21,18 @@
     <module>PlainText</module>
     <module>Preloader</module>
     <module>JavascriptLang</module>
+    <module>ShareServices</module>
   </modules>
 
   <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>http://repo.maven.apache.org/maven2</url>
+    </repository>
     <repository>
       <id>revonline-repository</id>
       <name>Revonline Maven Repository</name>

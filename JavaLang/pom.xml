@@ -33,6 +33,14 @@
       <name>Revonline Maven Repository</name>
       <url>http://revonline.comuf.com/maven3/</url>
     </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>http://repo.maven.apache.org/maven2</url>
+    </repository>
   </repositories>
 
   <build>
