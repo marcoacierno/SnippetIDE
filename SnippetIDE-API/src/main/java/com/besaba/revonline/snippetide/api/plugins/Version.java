@@ -22,7 +22,7 @@ public final class Version implements Comparable<Version> {
   @NotNull
   private final String metadata;
   @NotNull
-  private String stringVersion;
+  private final String stringVersion;
 
   private final static Pattern pattern
       = Pattern.compile("(?<major>[0-9]+)\\.(?<minor>[0-9]+)(\\.(?<revision>[0-9]+))?(\\+(?<metadata>[0-9A-Za-z-]*))?");
