@@ -7,3 +7,6 @@ out/
 */target/
 Snippet-IDE/null
 Snippet-IDE/Tests
+SnippetIDE/logs.txt
+SnippetIDE/settings.json
+SnippetIDE/plugins
