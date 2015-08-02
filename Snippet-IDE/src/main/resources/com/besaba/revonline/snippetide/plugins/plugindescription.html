@@ -15,9 +15,12 @@
   <ul id="shareServices"></ul>
 </div>
 
+<hr>
+<input type="button" value="Disable plugin" id="enabledisableplugin" />
 
 
 <script type="text/javascript">
+
   function injectData() {
     document.getElementById("pluginName").innerHTML = plugin.name + " (" + plugin.version + ")";
     document.getElementById("description").innerHTML = plugin.description;
@@ -26,7 +29,32 @@
     clearElement(authors);
     putElementsInList(authors, plugin.authors);
 
-    if(plugin.languages.length > 0) {
+    putLanguagesList();
+    putSharesServicesInList();
+
+    preparePluginActions();
+  }
+
+  function preparePluginActions() {
+    var activeDisableButton = document.getElementById("enabledisableplugin");
+
+    if (plugin.enabled) {
+      activeDisableButton.value = "Disable plugin";
+    } else {
+      activeDisableButton.value = "Enable plugin";
+    }
+
+    activeDisableButton.addEventListener("click", function(event) {
+      if (plugin.enabled) {
+        manager.disablePlugin(plugin.name);
+      } else {
+        manager.enablePlugin(plugin.name);
+      }
+    }, false);
+  }
+
+  function putLanguagesList() {
+    if (plugin.languages.length > 0) {
       var languages = document.getElementById("languages");
       document.getElementById("languagesBox").style.display = "";
       clearElement(languages);
@@ -34,8 +62,10 @@
     } else {
       document.getElementById("languagesBox").style.display = "none";
     }
+  }
 
-    if(plugin.shareServices.length > 0) {
+  function putSharesServicesInList() {
+    if (plugin.shareServices.length > 0) {
       var shareServices = document.getElementById("shareServices");
       document.getElementById("shareServicesBox").style.display = "";
       clearElement(shareServices);

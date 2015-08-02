@@ -14,9 +14,12 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import netscape.javascript.JSObject;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class PluginsListController {
@@ -60,7 +63,7 @@ public class PluginsListController {
       showInformationAboutPlugin(selectedPlugin);
     }));
 
-    pluginsList.getItems().addAll(pluginManager.getPlugins());
+    pluginsList.getItems().addAll(pluginManager.getAllPlugins());
   }
 
   private void showInformationAboutPlugin(final Plugin plugin) {
@@ -75,6 +78,8 @@ public class PluginsListController {
         return;
       }
 
+      final boolean enabled = !Files.exists(Paths.get(plugin.getLocation().toAbsolutePath().getParent().toString(), plugin.getLocation().getFileName() + "._"));
+
       final Escaper escaper = HtmlEscapers.htmlEscaper();
       final String script = String.format("var plugin = {\n" +
               "  name: \"%s\",\n" +
@@ -83,21 +88,24 @@ public class PluginsListController {
               "  minIdeVersion: \"%s\",\n" +
               "  authors: [%s],\n" +
               "  languages: [%s],\n" +
-              "  shareServices: [%s]\n" +
-              "};" +
-              "" +
-              "injectData();",
+              "  shareServices: [%s],\n" +
+              "  enabled: %b\n" +
+              "};injectData();",
           escaper.escape(plugin.getName()),
           escaper.escape(plugin.getDescription()),
           plugin.getVersion().toString(),
           plugin.getMinIdeVersion().toString(),
           Arrays.stream(plugin.getAuthors()).map(escaper::escape).map(author -> "\"" + author + "\"").reduce("", (acc, nxt) -> nxt + "," + acc),
           plugin.getLanguages().stream().map(Language::getName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc),
-          plugin.getShareServices().stream().map(ShareService::getServiceName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc)
+          plugin.getShareServices().stream().map(ShareService::getServiceName).map(escaper::escape).reduce("", (acc, nxt) -> "\"" + nxt + "\"," + acc),
+          enabled
       );
 
       logger.debug("script to inject");
       logger.debug(script);
+
+      final JSObject window = (JSObject) webEngine.executeScript("window");
+      window.setMember("manager", new JsToJavaPluginActions());
 
       webEngine.executeScript(script);
     });

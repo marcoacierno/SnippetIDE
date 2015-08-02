@@ -4,6 +4,7 @@ import com.besaba.revonline.snippetide.api.language.Language;
 import com.besaba.revonline.snippetide.api.shareservices.ShareService;
 import com.google.common.collect.ImmutableList;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -20,16 +21,28 @@ public class Plugin {
   private final ImmutableList<Language> languages;
   private final ImmutableList<ShareService> shareServices;
   private final int pluginId;
+  private final Path location;
+  private final boolean enabled;
 
-  public Plugin(final String name, final String description, final Version version, final Version minIdeVersion, final String[] authors, final List<Language> languages, final ImmutableList<ShareService> shareServices) {
+  public Plugin(final String name, final String description, final Version version, final Version minIdeVersion, final String[] authors, final List<Language> languages, final ImmutableList<ShareService> shareServices, final Path location, final boolean enabled) {
     this.name = name;
     this.description = description;
     this.version = version;
     this.minIdeVersion = minIdeVersion;
     this.authors = authors;
     this.shareServices = shareServices;
+    this.location = location;
+    this.enabled = enabled;
     this.languages = ImmutableList.copyOf(languages);
     this.pluginId = name.hashCode();
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public Path getLocation() {
+    return location;
   }
 
   public int getPluginId() {

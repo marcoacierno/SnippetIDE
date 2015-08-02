@@ -20,17 +20,22 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 public class JarPluginManager implements PluginManager {
   private final ConcurrentMap<String, Plugin> plugins = new ConcurrentHashMap<>();
+  private final ConcurrentMap<String, Plugin> disabledPlugins = new ConcurrentHashMap<>();
 
   @NotNull
   @Override
@@ -64,7 +69,12 @@ public class JarPluginManager implements PluginManager {
         throw new UnableToLoadPluginException("Plugin " + plugin.getName() + " is not compatible with running IDE", file, this);
       }
 
-      plugins.put(plugin.getName().toLowerCase(), plugin);
+      if (plugin.isEnabled()) {
+        plugins.put(plugin.getName().toLowerCase(), plugin);
+      } else {
+        disabledPlugins.put(plugin.getName().toLowerCase(), plugin);
+      }
+
       return plugin;
     } catch (IOException e) {
       throw new UnableToLoadPluginException("Unable to create an input stream from the manifest", e, file, this);
@@ -96,6 +106,8 @@ public class JarPluginManager implements PluginManager {
     final ImmutableList<Language> languages = initializeLanguages(file, root.get("languages").getAsJsonArray(), jarClassLoader);
     final ImmutableList<ShareService> shareServices = getShareServices(file, jarClassLoader, root);
 
+    final boolean enabled = !Files.exists(Paths.get(file.toAbsolutePath().getParent().toString(), file.getFileName().toString() + "._"));
+
     return new Plugin(
         name,
         description,
@@ -103,7 +115,9 @@ public class JarPluginManager implements PluginManager {
         minIdeVersion,
         authors.toArray(new String[authors.size()]),
         languages,
-        shareServices
+        shareServices,
+        file,
+        enabled
     );
   }
 
@@ -200,6 +214,41 @@ public class JarPluginManager implements PluginManager {
     return languages.build();
   }
 
+  @Override
+  public boolean disablePlugin(@NotNull final Plugin plugin) {
+    try {
+      Files.createFile(Paths.get(
+              plugin.getLocation().toAbsolutePath().getParent().toString(),
+              plugin.getLocation().getFileName().toString() + "._")
+      );
+      return true;
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean disablePlugin(@NotNull final String plugin) {
+    return disablePlugin(plugins.get(plugin.toLowerCase()));
+  }
+
+  @Override
+  public boolean enablePlugin(@NotNull final Plugin plugin) {
+    try {
+      return Files.deleteIfExists(Paths.get(
+              plugin.getLocation().toAbsolutePath().getParent().toString(),
+              plugin.getLocation().getFileName().toString() + "._")
+      );
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean enablePlugin(@NotNull final String plugin) {
+    return enablePlugin(disabledPlugins.get(plugin.toLowerCase()));
+  }
+
   @NotNull
   @Override
   public Optional<Plugin> searchPluginByName(@NotNull final String pluginName) {
@@ -215,5 +264,13 @@ public class JarPluginManager implements PluginManager {
   @Override
   public List<Plugin> getPlugins() {
     return Collections.unmodifiableList(new ArrayList<>(plugins.values()));
+  }
+
+  @NotNull
+  @Override
+  public List<Plugin> getAllPlugins() {
+    return Stream
+        .concat(plugins.values().stream(), disabledPlugins.values().stream())
+        .collect(Collectors.toList());
   }
 }

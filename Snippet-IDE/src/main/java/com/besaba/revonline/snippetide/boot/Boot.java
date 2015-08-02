@@ -159,6 +159,12 @@ public class Boot {
         public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
           try {
             final Plugin plugin = pluginManager.loadPlugin(file, ideApplication.getVersion());
+
+            if (!plugin.isEnabled()) {
+              logger.info("skipping " + plugin.getName() + " because it's disabled");
+              return FileVisitResult.CONTINUE;
+            }
+
             // we need to register the languages created by the plugin not the plugin class!
             plugin.getLanguages().forEach(eventManager::registerListener);
             plugin.getShareServices().forEach(eventManager::registerListener);

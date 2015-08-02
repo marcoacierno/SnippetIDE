@@ -33,6 +33,12 @@ public interface PluginManager {
   @NotNull
   Plugin loadPlugin(@NotNull final Path file, @NotNull final Version ideVersion);
 
+  boolean disablePlugin(@NotNull Plugin plugin);
+  boolean disablePlugin(@NotNull String plugin);
+
+  boolean enablePlugin(@NotNull Plugin plugin);
+  boolean enablePlugin(@NotNull String plugin);
+
   /**
    * Search a plugin by name (There cannot be two plugins with the same name)
    *
@@ -58,4 +64,7 @@ public interface PluginManager {
    */
   @NotNull
   List<Plugin> getPlugins();
+
+  @NotNull
+  List<Plugin> getAllPlugins();
 }

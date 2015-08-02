@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -39,6 +40,8 @@ public class JarPluginManagerTest {
     pluginWithoutManifest = Paths.get(JarPluginManagerTest.class.getResource("WrongPluginWithoutManifest.jar").toURI());
     correctPluginWithALanguage = Paths.get(JarPluginManagerTest.class.getResource("PluginWithAManifest.jar").toURI());
     pluginWhichRequireIdeVersion31 = Paths.get(JarPluginManagerTest.class.getResource("PluginWhichRequiresIdeVersion31.jar").toURI());
+
+    Files.deleteIfExists(Paths.get(correctPluginWithALanguage.toAbsolutePath().getParent().toString(), correctPluginWithALanguage.getFileName().toString() + "._"));
   }
 
   @Test
@@ -124,5 +127,25 @@ public class JarPluginManagerTest {
   public void testSearchPluginByNameWithAPluginThatDoesntExists() throws Exception {
     final Optional<Plugin> wrongPlugin = jarPluginManager.searchPluginByName("MyPlugin");
     assertFalse(wrongPlugin.isPresent());
+  }
+
+  @Test
+  public void testDisablePlugin() throws Exception {
+    final Plugin plugin = jarPluginManager.loadPlugin(correctPluginWithALanguage, Version.parse("0.1"));
+    assertTrue(jarPluginManager.disablePlugin(plugin));
+
+    assertTrue(Files.exists(Paths.get(correctPluginWithALanguage.toAbsolutePath().getParent().toString(), correctPluginWithALanguage.getFileName().toString() + "._")));
+  }
+
+  @Test
+  public void testEnablePlugin() throws Exception {
+    final Plugin plugin = jarPluginManager.loadPlugin(correctPluginWithALanguage, Version.parse("0.1"));
+    assertTrue(jarPluginManager.disablePlugin(plugin));
+
+    assertTrue(Files.exists(Paths.get(correctPluginWithALanguage.toAbsolutePath().getParent().toString(), correctPluginWithALanguage.getFileName().toString() + "._")));
+
+    assertTrue(jarPluginManager.enablePlugin(plugin));
+
+    assertFalse(Files.exists(Paths.get(correctPluginWithALanguage.toAbsolutePath().getParent().toString(), correctPluginWithALanguage.getFileName().toString() + "._")));
   }
 }

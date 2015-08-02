@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class MockPluginManager implements PluginManager {
   public static final Plugin plugin
-      = new Plugin("Mock", "Mock", Version.parse("0.1"), Version.parse("0.1"), new String[] {"Mock"}, Collections.singletonList(MockLanguage.INSTANCE), ImmutableList.<ShareService>of());
+      = new Plugin("Mock", "Mock", Version.parse("0.1"), Version.parse("0.1"), new String[] {"Mock"}, Collections.singletonList(MockLanguage.INSTANCE), ImmutableList.<ShareService>of(), null, true);
 
   public static final Plugin pluginWithRandomHtmlInDescription
       = new Plugin("Html", "<html><head><title>Lol?</title></head><body>" +
@@ -26,12 +26,34 @@ public class MockPluginManager implements PluginManager {
       Version.parse("0.1"),
       new String[] {"You", "Me", "Hello", "<b>World</b>"},
       Collections.emptyList(),
-      ImmutableList.<ShareService>of());
+      ImmutableList.<ShareService>of(),
+      null,
+      true);
 
   @NotNull
   @Override
   public Plugin loadPlugin(@NotNull final Path file, @NotNull final Version ideVersion) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean disablePlugin(@NotNull final Plugin plugin) {
+    return false;
+  }
+
+  @Override
+  public boolean enablePlugin(@NotNull final Plugin plugin) {
+    return false;
+  }
+
+  @Override
+  public boolean enablePlugin(@NotNull final String plugin) {
+    return false;
+  }
+
+  @Override
+  public boolean disablePlugin(@NotNull final String plugin) {
+    return false;
   }
 
   @NotNull
@@ -54,6 +76,12 @@ public class MockPluginManager implements PluginManager {
   @NotNull
   @Override
   public List<Plugin> getPlugins() {
+    return Arrays.asList(plugin, pluginWithRandomHtmlInDescription);
+  }
+
+  @NotNull
+  @Override
+  public List<Plugin> getAllPlugins() {
     return Arrays.asList(plugin, pluginWithRandomHtmlInDescription);
   }
 }
