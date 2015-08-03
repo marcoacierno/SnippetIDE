@@ -9,11 +9,11 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -76,7 +76,15 @@ public class Main extends Application {
         return;
       }
 
-      ideApplication.openPluginsList(null);
+      response.ifPresent(button -> {
+        if (button != pluginsView) {
+          return;
+        }
+
+        try {
+          ideApplication.openPluginsList(null);
+        } catch (IOException e) { }
+      });
       return;
     }
 
