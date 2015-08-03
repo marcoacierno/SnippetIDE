@@ -1,0 +1,8 @@
+{
+  "name": "Markdown support",
+  "description": "Adds Markdown support",
+  "authors": ["Marco Acierno"],
+  "minSupportedVersion": "0.1",
+  "version": "1.0",
+  "languages": ["com.besaba.revonline.snippetide.lang.markdown.MarkdownLanguage"]
+}

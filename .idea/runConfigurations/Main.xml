@@ -29,6 +29,7 @@
       <option name="BuildArtifacts" enabled="true">
         <artifact name="Java" />
         <artifact name="Javascript" />
+        <artifact name="Markdown" />
         <artifact name="PlainText" />
       </option>
       <option name="Make" enabled="true" />

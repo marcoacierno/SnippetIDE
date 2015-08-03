@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Markdown">
+    <output-path>$PROJECT_DIR$/SnippetIDE/plugins</output-path>
+    <root id="archive" name="Markdown.jar">
+      <element id="module-output" name="MarkdownPlugin" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/rjeschke/txtmark/0.13/txtmark-0.13.jar" path-in-jar="/" />
+      <element id="file-copy" path="$PROJECT_DIR$/MarkdownPlugin/manifest.json" />
+    </root>
+  </artifact>
+</component>
