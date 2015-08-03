@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.apache.log4j.Logger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 public class Main extends Application {
   private final Boot boot = new Boot();
@@ -63,9 +65,18 @@ public class Main extends Application {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("Ops");
       alert.setContentText("Ops... Looks like the application doesn't have any language. ");
-      alert.getButtonTypes().add(new ButtonType("Close application"));
-      alert.showAndWait();
-      Platform.exit();
+      final ButtonType pluginsView = new ButtonType("Open Plugins view");
+      alert.getButtonTypes().add(pluginsView);
+      final ButtonType closeApplication = new ButtonType("Close application");
+      alert.getButtonTypes().add(closeApplication);
+      final Optional<ButtonType> response = alert.showAndWait();
+
+      if (!response.isPresent()) {
+        Platform.exit();
+        return;
+      }
+
+      ideApplication.openPluginsList(null);
       return;
     }
 
