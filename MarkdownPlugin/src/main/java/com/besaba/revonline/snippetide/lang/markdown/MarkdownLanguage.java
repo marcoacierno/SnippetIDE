@@ -32,6 +32,10 @@ public class MarkdownLanguage implements Language {
 
   @Subscribe
   public void runPressed(final RunStartEvent runStartEvent) {
+    if (runStartEvent.getTarget() != this) {
+      return;
+    }
+
     final EventManager eventManager = IDEApplicationLauncher.getIDEApplication().getEventManager();
     final String textFromFile;
 
