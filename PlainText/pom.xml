@@ -12,6 +12,12 @@
   <artifactId>PlainText</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <parent>
+    <groupId>com.besaba.revonline.snippetide</groupId>
+    <artifactId>SnippetIDE</artifactId>
+    <version>0.1-alpha5</version>
+  </parent>
+
   <dependencies>
     <dependency>
       <groupId>com.besaba.revonline.snippetide</groupId>

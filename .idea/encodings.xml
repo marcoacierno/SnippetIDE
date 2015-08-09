@@ -3,7 +3,10 @@
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/JavaLang" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/JavascriptLang" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/MarkdownPlugin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/PlainText" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Preloader" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ShareServices" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Snippet-IDE" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/SnippetIDE-API" charset="UTF-8" />
