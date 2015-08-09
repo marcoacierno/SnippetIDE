@@ -4,14 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.besaba.revonline.snippetide</groupId>
   <artifactId>MarkdownPlugin</artifactId>
   <version>1.0</version>
 
   <parent>
     <groupId>com.besaba.revonline.snippetide</groupId>
     <artifactId>SnippetIDE</artifactId>
-    <version>0.1-alpha5</version>
+    <version>0.1+alpha5</version>
   </parent>
 
   <dependencies>
@@ -45,6 +44,19 @@
   </repositories>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>manifest.json</include>
+        </includes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -53,9 +65,6 @@
         <configuration>
           <outputDirectory>../release/${ideversion}/SnippetIDE/plugins/</outputDirectory>
           <finalName>Markdown</finalName>
-          <includes>
-            <include>${project.basedir}/MarkdownPlugin/manifest.json</include>
-          </includes>
         </configuration>
       </plugin>
       <plugin>

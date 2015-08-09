@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
 Main-Class: com.besaba.revonline.snippetide.Main
 JavaFX-Application-Class: com.besaba.revonline.snippetide.Main
+JavaFX-Class-Path: Preloader.jar
+JavaFX-Version: 8.0

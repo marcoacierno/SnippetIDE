@@ -7,16 +7,15 @@
   <parent>
     <groupId>com.besaba.revonline.snippetide</groupId>
     <artifactId>SnippetIDE</artifactId>
-    <version>0.1-alpha5</version>
+    <version>0.1+alpha5</version>
   </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <groupId>com.besaba.revonline.snippetide</groupId>
   <artifactId>Snippet-IDE</artifactId>
-  <version>0.1</version>
+  <version>0.1+alpha5</version>
 
   <dependencies>
     <dependency>
@@ -103,7 +102,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <outputDirectory>../release/${ideversion}/</outputDirectory>
+              <outputDirectory>../release/${ideversion}/libs/</outputDirectory>
               <overWriteReleases>false</overWriteReleases>
               <overWriteSnapshots>false</overWriteSnapshots>
               <overWriteIfNewer>true</overWriteIfNewer>
@@ -115,20 +114,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
         <version>2.3.1</version>
         <configuration>
           <outputDirectory>../release/${ideversion}/</outputDirectory>
           <finalName>SnippetIDE</finalName>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>com.besaba.revonline.snippetide.Main</mainClass>
+              <classpathPrefix>libs/</classpathPrefix>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
 

@@ -8,15 +8,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <groupId>com.besaba.revonline.snippetide</groupId>
-  <artifactId>JavaLang</artifactId>
-  <version>1.0</version>
-
   <parent>
     <groupId>com.besaba.revonline.snippetide</groupId>
     <artifactId>SnippetIDE</artifactId>
-    <version>0.1-alpha5</version>
+    <version>0.1+alpha5</version>
   </parent>
+
+  <artifactId>JavaLang</artifactId>
+  <version>1.0</version>
 
   <dependencies>
     <dependency>
@@ -50,6 +49,18 @@
   </repositories>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>manifest.json</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -58,9 +69,6 @@
         <configuration>
           <outputDirectory>../release/${ideversion}/SnippetIDE/plugins/</outputDirectory>
           <finalName>Java</finalName>
-          <includes>
-            <include>${project.basedir}/JavaLang/manifest.json</include>
-          </includes>
         </configuration>
       </plugin>
       <plugin>

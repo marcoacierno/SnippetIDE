@@ -25,14 +25,8 @@
       <option name="WINDOW" value="false" />
     </RunnerSettings>
     <method>
-      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/ShareServices/pom.xml" goal="clean package --batch-mode -Dmaven.test.skip=true" />
-      <option name="BuildArtifacts" enabled="true">
-        <artifact name="Java" />
-        <artifact name="Javascript" />
-        <artifact name="Markdown" />
-        <artifact name="PlainText" />
-      </option>
-      <option name="Make" enabled="true" />
+      <option name="Make" enabled="false" />
+      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/pom.xml" goal="clean package -Dmaven.test.skip=true" />
     </method>
   </configuration>
 </component>

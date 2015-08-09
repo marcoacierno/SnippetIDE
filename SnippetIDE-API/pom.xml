@@ -7,9 +7,8 @@
   <parent>
     <groupId>com.besaba.revonline.snippetide</groupId>
     <artifactId>SnippetIDE</artifactId>
-    <version>0.1-alpha5</version>
+    <version>0.1+alpha5</version>
   </parent>
-
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,16 +54,6 @@
     </extensions>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
-        <configuration>
-          <outputDirectory>../release/${ideversion}/</outputDirectory>
-          <finalName>SnippetIDE-API</finalName>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

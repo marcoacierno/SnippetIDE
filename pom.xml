@@ -44,6 +44,52 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>1.4</version>
+        <configuration>
+          <providerSelection>1.7</providerSelection>
+          <properties>
+            <script>git log --pretty="%H.%ad" -1</script>
+          </properties>
+          <source>
+            System.out.println("Hello")
+//                def command = project.properties.script
+//                def process = command.execute()
+//                process.waitFor()
+//
+//                project.properties.gitinfo = process.in.text
+          </source>
+
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.gmaven.runtime</groupId>
+            <artifactId>gmaven-runtime-1.7</artifactId>
+            <version>1.2</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.7.0</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.3</version>
