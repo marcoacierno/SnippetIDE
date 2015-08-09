@@ -6,12 +6,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ideversion>0.1-alpha5</ideversion>
+    <ideversion>0.1+alpha5</ideversion>
   </properties>
 
   <groupId>com.besaba.revonline.snippetide</groupId>
   <artifactId>SnippetIDE</artifactId>
-  <version>0.1-alpha5</version>
+  <version>0.1+alpha5</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -51,6 +51,28 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.7</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>release/${ideversion}/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>resources</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

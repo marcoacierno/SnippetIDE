@@ -86,7 +86,7 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>2.4.1</version>
         <configuration>
-          <outputFile>../SnippetIDE/plugins/ShareServices.jar</outputFile>
+          <outputFile>../release/${ideversion}/SnippetIDE/plugins/ShareServices.jar</outputFile>
         </configuration>
         <executions>
           <execution>
