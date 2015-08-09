@@ -22,6 +22,7 @@
     <module>Preloader</module>
     <module>JavascriptLang</module>
     <module>ShareServices</module>
+    <module>MarkdownPlugin</module>
   </modules>
 
   <repositories>
