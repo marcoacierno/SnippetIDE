@@ -12,5 +12,6 @@ It's still alpha and not complete.
 - **PlainText**: Plugin which allows the user to create .txt files
 - **Javascript**: Plugin which adds support for Javascript
 - **ShareServices**: Plugin which adds GitHub Gist / Pastebin share
+- **Markdown**: Plugin which adds support for convert Markdown to HTML
 
 The IDE loads the plugins during the boot phase, from the IDEDir/plugins directory. Use --applicationdir= to change the directory
